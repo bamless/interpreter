@@ -8,7 +8,6 @@ import com.bamless.interpreter.parser.ast.ASTNode;
 import com.bamless.interpreter.parser.ast.visitor.PrinterVisitor;
 
 public class Main {
-	private final static String LEX_FILE = "/lexical-spec.lex";
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {		
 		ASTParser p = new ASTParser();
