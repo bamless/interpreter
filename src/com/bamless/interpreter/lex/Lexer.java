@@ -54,8 +54,12 @@ public class Lexer {
 	}
 	
 	public void tokenize(File f) throws FileNotFoundException, IOException {
+		tokenize(new FileInputStream(f));
+	}
+	
+	public void tokenize(InputStream is) throws IOException {
 		pos = -1;
-		try(BufferedReader r = new BufferedReader(new FileReader(f))){
+		try(BufferedReader r = new BufferedReader(new InputStreamReader(is))){
 			String line;
 			int lineNo = 0;
 			while((line = r.readLine()) != null) {

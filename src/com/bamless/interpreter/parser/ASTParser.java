@@ -3,6 +3,7 @@ package com.bamless.interpreter.parser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,11 @@ public class ASTParser {
 	
 	public ASTNode parse(File f) throws FileNotFoundException, IOException {
 		lex.tokenize(f);
+		return parse();
+	}
+	
+	public ASTNode parse(InputStream src) throws IOException {
+		lex.tokenize(src);
 		return parse();
 	}
 	
