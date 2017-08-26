@@ -1,0 +1,18 @@
+{
+
+int x;
+x = 0;
+
+if(false)
+	if(true)
+		x = 1;
+else {
+	boolean b;
+	b = false;
+	if(b)
+		x = 3;
+	else
+		x = 2;
+}
+
+}

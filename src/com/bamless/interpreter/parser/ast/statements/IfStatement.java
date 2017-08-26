@@ -1,0 +1,40 @@
+package com.bamless.interpreter.parser.ast.statements;
+
+import com.bamless.interpreter.Position;
+import com.bamless.interpreter.parser.ast.expression.Expression;
+import com.bamless.interpreter.parser.ast.visitor.Visitor;
+
+public class IfStatement extends Statement {
+	private Expression condition;
+	private Statement thenStmt;
+	private Statement elseStmt;
+	
+	public IfStatement(Expression condition, Statement thenStmt, Position pos) {
+		this(condition, thenStmt, null, pos);
+	}
+	
+	public IfStatement(Expression condition, Statement thenStmt, Statement elseStmt, Position pos) {
+		super(pos);
+		this.condition = condition;
+		this.thenStmt = thenStmt;
+		this.elseStmt = elseStmt;
+	}
+
+	@Override
+	public <T, A> T accept(Visitor<T, A> v, A arg) {
+		return v.visit(this, arg);
+	}
+
+	public Expression getCondition() {
+		return condition;
+	}
+
+	public Statement getThenStmt() {
+		return thenStmt;
+	}
+
+	public Statement getElseStmt() {
+		return elseStmt;
+	}
+	
+}
