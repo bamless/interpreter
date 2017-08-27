@@ -52,7 +52,7 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
-    <target name="run-interpreter">
+    <target name="run-interpreter" depends="build">
         <java classname="com.bamless.interpreter.Main" failonerror="true" fork="yes">
             <classpath refid="Interpreter.classpath"/>
         </java>
