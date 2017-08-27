@@ -27,6 +27,7 @@ import com.bamless.interpreter.lex.Token;
 import com.bamless.interpreter.parser.ast.ASTNode;
 import com.bamless.interpreter.parser.ast.Identifier;
 import com.bamless.interpreter.parser.ast.expression.ArithmeticBinExpression;
+import com.bamless.interpreter.parser.ast.expression.AssignExpression;
 import com.bamless.interpreter.parser.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.parser.ast.expression.EqualityExpression;
 import com.bamless.interpreter.parser.ast.expression.Expression;
@@ -36,7 +37,6 @@ import com.bamless.interpreter.parser.ast.expression.LogicalExpression;
 import com.bamless.interpreter.parser.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.parser.ast.expression.RelationalExpression;
 import com.bamless.interpreter.parser.ast.expression.VarLiteral;
-import com.bamless.interpreter.parser.ast.statements.AssignStatement;
 import com.bamless.interpreter.parser.ast.statements.BlockStatement;
 import com.bamless.interpreter.parser.ast.statements.IfStatement;
 import com.bamless.interpreter.parser.ast.statements.Statement;
@@ -85,8 +85,6 @@ public class ASTParser {
 			case "FLOAT":
 			case "BOOLEAN":
 				return varDecl();
-			case "IDENTIFIER":
-				return assignStmt();
 			case "IF":
 				return ifStmt();
 			case "WHILE":
@@ -94,8 +92,9 @@ public class ASTParser {
 			case "{":
 				return block();
 			default:
-				error("expected statement but instead found \"%s\"", lex.peek().getValue());
-				return null;
+				Statement s = expression();
+				require(";");
+				return s;
 		}
 	}
 	
@@ -133,7 +132,7 @@ public class ASTParser {
 		require(";");
 		
 		Identifier id = new Identifier(idTok.getPosition(), idTok.getValue());
-		return new AssignStatement(idTok.getPosition(), id, e);
+		return new AssignExpression(idTok.getPosition(), id, e);
 	}
 	
 	private Statement ifStmt() {
@@ -167,7 +166,28 @@ public class ASTParser {
 		return new WhileStatement(cond, body, start);
 	}
 	
-	private Expression expression() {
+	private  Expression expression() {
+		if(lex.peek().getType().equals("IDENTIFIER") && lex.peek(2).getType().equals("=")) {
+			Token id = lex.next();
+			require("=");
+			return new AssignExpression(id.getPosition(), new Identifier(id.getPosition(), id.getValue()), expression());
+		} else {
+			return primaryExpr();
+		}
+	}
+	
+	private Expression assignOrExpr() {
+		Token id = lex.next();
+		
+		if(lex.peek().getType().equals("=")) {
+			lex.next();
+			return new AssignExpression(id.getPosition(), new Identifier(id.getPosition(), id.getValue()), primaryExpr());
+		} else {
+			return new VarLiteral(new Identifier(id.getPosition(), id.getValue()), id.getPosition());
+		}
+	}
+
+	private Expression primaryExpr() {
 		Expression left = equalityExpr();
 		
 		Token op;

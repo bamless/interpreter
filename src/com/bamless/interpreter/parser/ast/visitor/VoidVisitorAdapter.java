@@ -1,7 +1,7 @@
 package com.bamless.interpreter.parser.ast.visitor;
 
 import com.bamless.interpreter.parser.ast.Identifier;
-import com.bamless.interpreter.parser.ast.statements.AssignStatement;
+import com.bamless.interpreter.parser.ast.expression.Expression;
 import com.bamless.interpreter.parser.ast.statements.BlockStatement;
 import com.bamless.interpreter.parser.ast.statements.IfStatement;
 import com.bamless.interpreter.parser.ast.statements.VarDecl;
@@ -11,10 +11,6 @@ public class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 
 	@Override
 	public void visit(Visitable v, A arg) {
-	}
-
-	@Override
-	public void visit(AssignStatement v, A arg) {
 	}
 
 	@Override
@@ -35,5 +31,9 @@ public class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 
 	@Override
 	public void visit(Identifier v, A arg) {
+	}
+
+	@Override
+	public void visit(Expression v, A arg) {
 	}
 }

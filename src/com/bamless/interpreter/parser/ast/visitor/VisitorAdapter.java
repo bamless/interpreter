@@ -1,7 +1,6 @@
 package com.bamless.interpreter.parser.ast.visitor;
 
 import com.bamless.interpreter.parser.ast.Identifier;
-import com.bamless.interpreter.parser.ast.statements.AssignStatement;
 import com.bamless.interpreter.parser.ast.statements.BlockStatement;
 import com.bamless.interpreter.parser.ast.statements.IfStatement;
 import com.bamless.interpreter.parser.ast.statements.VarDecl;
@@ -11,11 +10,6 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 
 	@Override
 	public T visit(Visitable v, A arg) {
-		return null;
-	}
-
-	@Override
-	public T visit(AssignStatement v, A arg) {
 		return null;
 	}
 

@@ -1,16 +1,15 @@
-package com.bamless.interpreter.parser.ast.statements;
+package com.bamless.interpreter.parser.ast.expression;
 
 import com.bamless.interpreter.Position;
 import com.bamless.interpreter.parser.ast.Identifier;
-import com.bamless.interpreter.parser.ast.expression.Expression;
 import com.bamless.interpreter.parser.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.parser.ast.visitor.VoidVisitor;
 
-public class AssignStatement extends Statement {
+public class AssignExpression extends Expression {
 	private Identifier id;
 	private Expression e;
 	
-	public AssignStatement(Position pos, Identifier id, Expression e) {
+	public AssignExpression(Position pos, Identifier id, Expression e) {
 		super(pos);
 		this.id = id;
 		this.e = e;
@@ -32,6 +31,11 @@ public class AssignStatement extends Statement {
 
 	public Expression getExpression() {
 		return e;
+	}
+	
+	@Override
+	public String toString() {
+		return id.getId() + " = " + e.toString();
 	}
 
 }

@@ -149,6 +149,10 @@ public class Lexer {
 		return pos < tokens.size() - 1 ? tokens.get(pos + 1) : END;
 	}
 	
+	public Token peek(int i) {
+		return pos + i < tokens.size() ? tokens.get(pos + i) : END;
+	}
+	
 	public boolean isFinished() {
 		return pos == tokens.size() - 1;
 	}

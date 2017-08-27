@@ -3,7 +3,7 @@
 int x;
 x = 0;
 
-if(4 + x / 3 == 2 % 1) {
+if(x = y = 3 ) {
 	if(true)
 		x = 1;
 } else

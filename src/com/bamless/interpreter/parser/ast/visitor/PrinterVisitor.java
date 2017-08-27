@@ -1,6 +1,6 @@
 package com.bamless.interpreter.parser.ast.visitor;
 
-import com.bamless.interpreter.parser.ast.statements.AssignStatement;
+import com.bamless.interpreter.parser.ast.expression.Expression;
 import com.bamless.interpreter.parser.ast.statements.BlockStatement;
 import com.bamless.interpreter.parser.ast.statements.IfStatement;
 import com.bamless.interpreter.parser.ast.statements.Statement;
@@ -40,14 +40,10 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	}
 
 	@Override
-	public void visit(AssignStatement v, Integer arg) {
-		print(arg, v.getId().getId() + " = " + v.getExpression() +";");
-	}
-
-	@Override
 	public void visit(IfStatement v, Integer arg) {
 		print(arg, "IF " + v.getCondition());
 		v.getThenStmt().accept(this, arg + 1);
+		
 		if(v.getElseStmt() != null) {
 			print(arg, "ELSE");
 			v.getElseStmt().accept(this, arg + 1);
@@ -62,7 +58,7 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 
 	@Override
 	public void visit(VarDecl v, Integer arg) {
-		print(arg, v.getType() + " " + v.getId().getId() + ";");
+		print(arg, v.getType() + " " + v.getId().getId());
 	}
 	
 	private String indent(int i, String s) {
@@ -71,6 +67,11 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 			indent += tabs;
 		}
 		return indent + s;
+	}
+	
+	@Override
+	public void visit(Expression v, Integer arg) {
+		print(arg, v.toString());
 	}
 	
 	private void print(int indent, String s) {
