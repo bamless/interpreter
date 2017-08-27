@@ -146,10 +146,11 @@ public class Lexer {
 	}
 	
 	public Token peek() {
-		return pos < tokens.size() - 1 ? tokens.get(pos + 1) : END;
+		return peek(1);
 	}
 	
 	public Token peek(int i) {
+		if(i < 1) throw new IllegalArgumentException("Can only peek forward in the token stream!");
 		return pos + i < tokens.size() ? tokens.get(pos + i) : END;
 	}
 	

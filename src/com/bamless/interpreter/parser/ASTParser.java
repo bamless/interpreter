@@ -122,19 +122,6 @@ public class ASTParser {
 		return new VarDecl(typeTok.getPosition(), t, id);
 	}
 
-	private Statement assignStmt() {
-		Token idTok = require("IDENTIFIER");
-
-		require("=");
-		
-		Expression e = expression();
-		
-		require(";");
-		
-		Identifier id = new Identifier(idTok.getPosition(), idTok.getValue());
-		return new AssignExpression(idTok.getPosition(), id, e);
-	}
-	
 	private Statement ifStmt() {
 		Position start = require("IF").getPosition();
 		require("(");
@@ -167,23 +154,13 @@ public class ASTParser {
 	}
 	
 	private  Expression expression() {
+		//now the grammar is officially LL(2)
 		if(lex.peek().getType().equals("IDENTIFIER") && lex.peek(2).getType().equals("=")) {
 			Token id = lex.next();
 			require("=");
 			return new AssignExpression(id.getPosition(), new Identifier(id.getPosition(), id.getValue()), expression());
 		} else {
 			return primaryExpr();
-		}
-	}
-	
-	private Expression assignOrExpr() {
-		Token id = lex.next();
-		
-		if(lex.peek().getType().equals("=")) {
-			lex.next();
-			return new AssignExpression(id.getPosition(), new Identifier(id.getPosition(), id.getValue()), primaryExpr());
-		} else {
-			return new VarLiteral(new Identifier(id.getPosition(), id.getValue()), id.getPosition());
 		}
 	}
 
