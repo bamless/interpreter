@@ -81,20 +81,26 @@ public class ASTParser {
 	
 	private Statement statement() {
 		switch(lex.peek().getType()) {
-			case "INT":
-			case "FLOAT":
-			case "BOOLEAN":
-				return varDecl();
+			//statement
 			case "IF":
 				return ifStmt();
 			case "WHILE":
 				return whileStmt();
 			case "{":
 				return block();
-			default:
+				
+			//expresion statement
+			case "IDENTIFIER":
+			case "INT_CONST":
+			case "FLOAT_CONST":
+			case "BOOL_CONST":
+			case "!":
 				Statement s = expression();
 				require(";");
-				return s;
+				return s;	
+			default:
+				error("Expected expression before \"%s\"", lex.peek().getValue());
+				return null;
 		}
 	}
 	
@@ -102,8 +108,14 @@ public class ASTParser {
 		Position start = require("{").getPosition();
 		
 		List<Statement> statements = new ArrayList<>();
-		while(!lex.peek().getType().equals("}")) {
-			statements.add(statement());
+		Token peek;
+		while(!(peek = lex.peek()).getType().equals("}")) {
+			//can only declare var inside a block
+			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || peek.getType().equals("FLOAT")) {
+				statements.add(varDecl());
+			} else {
+				statements.add(statement());
+			}
 		}
 		
 		require("}");
@@ -302,7 +314,7 @@ public class ASTParser {
 			require(")");
 			return e;
 		default:
-			error("expected an expression literal but instead found \"%s\"", lex.curr().getValue());
+			error("expected a literal or a subexpression but instead found \"%s\"", lex.curr().getValue());
 			return null;
 		}
 	}

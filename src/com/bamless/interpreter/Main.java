@@ -16,6 +16,7 @@ public class Main {
 		
 		PrinterVisitor v = new PrinterVisitor(4);
 		root.accept(v, 0);
+		
 	}
 	
 }
