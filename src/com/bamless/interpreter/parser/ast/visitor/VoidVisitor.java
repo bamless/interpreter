@@ -7,12 +7,12 @@ import com.bamless.interpreter.parser.ast.statements.IfStatement;
 import com.bamless.interpreter.parser.ast.statements.VarDecl;
 import com.bamless.interpreter.parser.ast.statements.WhileStatement;
 
-public interface Visitor<T, A> {
-	T visit(Visitable v, A arg);
-	T visit(AssignStatement v, A arg);
-	T visit(IfStatement v, A arg);
-	T visit(WhileStatement v, A arg);
-	T visit(BlockStatement v, A arg);
-	T visit(VarDecl v, A arg);
-	T visit(Identifier v, A arg);
+public interface VoidVisitor<A> {
+	void visit(Visitable v, A arg);
+	void visit(AssignStatement v, A arg);
+	void visit(IfStatement v, A arg);
+	void visit(WhileStatement v, A arg);
+	void visit(BlockStatement v, A arg);
+	void visit(VarDecl v, A arg);
+	void visit(Identifier v, A arg);
 }

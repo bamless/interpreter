@@ -7,7 +7,7 @@ import com.bamless.interpreter.parser.ast.statements.Statement;
 import com.bamless.interpreter.parser.ast.statements.VarDecl;
 import com.bamless.interpreter.parser.ast.statements.WhileStatement;
 
-public class PrinterVisitor extends VisitorAdapter<Void, Integer> {
+public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	private String tabs;
 	
 	public PrinterVisitor(int tabLength) {
@@ -24,13 +24,12 @@ public class PrinterVisitor extends VisitorAdapter<Void, Integer> {
 	}
 	
 	@Override
-	public Void visit(Visitable v, Integer arg) {
+	public void visit(Visitable v, Integer arg) {
 		print(arg, "UNKNWN");
-		return null;
 	}
 	
 	@Override
-	public Void visit(BlockStatement v, Integer indent) {
+	public void visit(BlockStatement v, Integer indent) {
 		print(indent, "START BLOCK");
 		
 		for(Statement s : v) {
@@ -38,38 +37,32 @@ public class PrinterVisitor extends VisitorAdapter<Void, Integer> {
 		}
 		
 		print(indent, "END BLOCK");
-		
-		return null;
 	}
 
 	@Override
-	public Void visit(AssignStatement v, Integer arg) {
-		print(arg, v.getId().getId() + " = EXPR;");
-		return null;
+	public void visit(AssignStatement v, Integer arg) {
+		print(arg, v.getId().getId() + " = " + v.getExpression() +";");
 	}
 
 	@Override
-	public Void visit(IfStatement v, Integer arg) {
-		print(arg, "IF");
+	public void visit(IfStatement v, Integer arg) {
+		print(arg, "IF " + v.getCondition());
 		v.getThenStmt().accept(this, arg + 1);
 		if(v.getElseStmt() != null) {
 			print(arg, "ELSE");
 			v.getElseStmt().accept(this, arg + 1);
 		}
-		return null;
 	}
 
 	@Override
-	public Void visit(WhileStatement v, Integer arg) {
-		print(arg, "WHILE");
+	public void visit(WhileStatement v, Integer arg) {
+		print(arg, "WHILE " + v.getCondition());
 		v.getBody().accept(this, arg + 1);
-		return null;
 	}
 
 	@Override
-	public Void visit(VarDecl v, Integer arg) {
+	public void visit(VarDecl v, Integer arg) {
 		print(arg, v.getType() + " " + v.getId().getId() + ";");
-		return null;
 	}
 	
 	private String indent(int i, String s) {

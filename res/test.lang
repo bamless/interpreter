@@ -3,16 +3,10 @@
 int x;
 x = 0;
 
-if(false)
+if(4 + x / 3 == 2 % 1) {
 	if(true)
 		x = 1;
-else {
-	boolean b;
-	b = false;
-	if(b)
-		x = 3;
-	else
-		x = 2;
-}
-
+} else
+	boolean z;
+	
 }

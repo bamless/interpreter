@@ -4,19 +4,20 @@ import com.bamless.interpreter.Position;
 import com.bamless.interpreter.parser.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.parser.ast.visitor.VoidVisitor;
 
-public class ArithmeticBinExpression extends BinaryExpression {
-	public static enum ArithmeticBinOperation {
-		PLUS, MINUS, MULT, DIV, MOD;
+public class EqualityExpression extends BinaryExpression {
+	public static enum EqualityOperation {
+		EQ, NEQ;
 	}
-	private ArithmeticBinOperation operation;
-
-	public ArithmeticBinExpression(ArithmeticBinOperation op, Expression left, Expression right, Position pos) {
+	private EqualityOperation operation;
+	
+	public EqualityExpression(EqualityOperation op, Expression left, Expression right, Position pos) {
 		super(left, right, pos);
 		this.operation = op;
 	}
 
-	public ArithmeticBinOperation getOperation() {
-		return operation;
+	@Override
+	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
+		return v.visit(this, arg);
 	}
 
 	@Override
@@ -24,14 +25,12 @@ public class ArithmeticBinExpression extends BinaryExpression {
 		v.visit(this, arg);
 	}
 	
-	@Override
-	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
-		return v.visit(this, arg);
+	public EqualityOperation getOperation() {
+		return operation;
 	}
 	
 	@Override
 	public String toString() {
 		return "(" + getLeft() +" "+ operation +" "+ getRight() + ")";
 	}
-
 }

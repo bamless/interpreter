@@ -6,7 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.bamless.interpreter.Position;
-import com.bamless.interpreter.parser.ast.visitor.Visitor;
+import com.bamless.interpreter.parser.ast.visitor.GenericVisitor;
+import com.bamless.interpreter.parser.ast.visitor.VoidVisitor;
 
 public class BlockStatement extends Statement implements Iterable<Statement> {
 	private List<Statement> stmts = new ArrayList<>();
@@ -17,6 +18,11 @@ public class BlockStatement extends Statement implements Iterable<Statement> {
 	}
 
 	@Override
+	public <A> void accept(VoidVisitor<A> v, A arg) {
+		v.visit(this, arg);
+	}
+	
+	@Override
 	public Iterator<Statement> iterator() {
 		return stmts.iterator();
 	}
@@ -26,7 +32,7 @@ public class BlockStatement extends Statement implements Iterable<Statement> {
 	}
 
 	@Override
-	public <T, A> T accept(Visitor<T, A> v, A arg) {
+	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
 		return v.visit(this, arg);
 	}
 

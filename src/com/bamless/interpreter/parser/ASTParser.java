@@ -1,5 +1,19 @@
 package com.bamless.interpreter.parser;
 
+import static com.bamless.interpreter.parser.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation.DIV;
+import static com.bamless.interpreter.parser.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation.MINUS;
+import static com.bamless.interpreter.parser.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation.MOD;
+import static com.bamless.interpreter.parser.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation.MULT;
+import static com.bamless.interpreter.parser.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation.PLUS;
+import static com.bamless.interpreter.parser.ast.expression.EqualityExpression.EqualityOperation.EQ;
+import static com.bamless.interpreter.parser.ast.expression.EqualityExpression.EqualityOperation.NEQ;
+import static com.bamless.interpreter.parser.ast.expression.LogicalExpression.BooleanBinOperation.AND;
+import static com.bamless.interpreter.parser.ast.expression.LogicalExpression.BooleanBinOperation.OR;
+import static com.bamless.interpreter.parser.ast.expression.RelationalExpression.RelationalOperation.GE;
+import static com.bamless.interpreter.parser.ast.expression.RelationalExpression.RelationalOperation.GT;
+import static com.bamless.interpreter.parser.ast.expression.RelationalExpression.RelationalOperation.LE;
+import static com.bamless.interpreter.parser.ast.expression.RelationalExpression.RelationalOperation.LT;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,7 +26,16 @@ import com.bamless.interpreter.lex.Lexer;
 import com.bamless.interpreter.lex.Token;
 import com.bamless.interpreter.parser.ast.ASTNode;
 import com.bamless.interpreter.parser.ast.Identifier;
+import com.bamless.interpreter.parser.ast.expression.ArithmeticBinExpression;
+import com.bamless.interpreter.parser.ast.expression.BooleanLiteral;
+import com.bamless.interpreter.parser.ast.expression.EqualityExpression;
 import com.bamless.interpreter.parser.ast.expression.Expression;
+import com.bamless.interpreter.parser.ast.expression.FloatLiteral;
+import com.bamless.interpreter.parser.ast.expression.IntegerLiteral;
+import com.bamless.interpreter.parser.ast.expression.LogicalExpression;
+import com.bamless.interpreter.parser.ast.expression.LogicalNotExpression;
+import com.bamless.interpreter.parser.ast.expression.RelationalExpression;
+import com.bamless.interpreter.parser.ast.expression.VarLiteral;
 import com.bamless.interpreter.parser.ast.statements.AssignStatement;
 import com.bamless.interpreter.parser.ast.statements.BlockStatement;
 import com.bamless.interpreter.parser.ast.statements.IfStatement;
@@ -105,9 +128,7 @@ public class ASTParser {
 
 		require("=");
 		
-		//here expression, for now ignore
-		Expression e = null;
-		lex.next();
+		Expression e = expression();
 		
 		require(";");
 		
@@ -119,9 +140,7 @@ public class ASTParser {
 		Position start = require("IF").getPosition();
 		require("(");
 		
-		//here expression, for now ignore
-		Expression e = null;
-		lex.next();
+		Expression e = expression();
 		
 		require(")");
 		
@@ -140,16 +159,157 @@ public class ASTParser {
 		Position start = require("WHILE").getPosition();
 		require("(");
 		
-		//here expression, for now ignore
-		Expression cond = null;
-		lex.next();
+		Expression cond = expression();
 		
 		require(")");
 		
 		Statement body = statement();
 		return new WhileStatement(cond, body, start);
 	}
+	
+	private Expression expression() {
+		Expression left = equalityExpr();
+		
+		Token op;
+		while((op = lex.peek()).getType().equals("OR_OP") || op.getType().equals("AND_OP")) {
+			lex.next();
+			Expression right = equalityExpr();
+			
+			switch(op.getType()) {
+			case "OR_OP":
+				left = new LogicalExpression(OR, left, right, left.getPosition());
+				break;
+			case "AND_OP":
+				left = new LogicalExpression(AND, left, right, left.getPosition());
+				break;
+			}
+		}
+		return left;
+	}
+	
+	private Expression equalityExpr() {
+		Expression left = relationalExpr();
+		
+		Token op;
+		while((op = lex.peek()).getType().equals("EQ_OP") || op.getType().equals("NEQ_OP")) {
+			lex.next();
+			Expression right = relationalExpr();
+			
+			switch(op.getType()) {
+			case "EQ_OP":
+				left = new EqualityExpression(EQ, left, right, left.getPosition());
+				break;
+			case "NEQ_OP":
+				left = new EqualityExpression(NEQ, left, right, left.getPosition());
+				break;
+			}
+		}
+		return left;
+	}
+	
+	private Expression relationalExpr() {
+		Expression left = arithmeticExpr();
+		
+		Token op;
+		while((op = lex.peek()).getType().equals("<") || op.getType().equals(">") ||
+				op.getType().equals("GE_OP") || op.getType().equals("LE_OP")) {
+			lex.next();
+			Expression right = arithmeticExpr();
+			
+			switch(op.getType()) {
+			case "<":
+				left = new RelationalExpression(LT, left, right, left.getPosition());
+				break;
+			case ">":
+				left = new RelationalExpression(GT, left, right, left.getPosition());
+				break;
+			case "LE_OP":
+				left = new RelationalExpression(LE, left, right, left.getPosition());
+				break;
+			case "GE_OP":
+				left = new RelationalExpression(GE, left, right, left.getPosition());
+				break;
+			}
+		}
+		return left;
+	}
+	
+	private Expression arithmeticExpr() {
+		Expression left = term();
+		
+		Token op;
+		while((op = lex.peek()).getType().equals("+") || op.getType().equals("-")) {
+			lex.next();
+			Expression right = term();
+			
+			switch(op.getType()) {
+			case "+":
+				left = new ArithmeticBinExpression(PLUS, left, right, left.getPosition());
+				break;
+			case "-":
+				left = new ArithmeticBinExpression(MINUS, left, right, left.getPosition());
+				break;
+			}
+		}
+		return left;
+	}
+	
+	private Expression term() {
+		Expression left = factor();
+		
+		Token op;
+		while((op = lex.peek()).getType().equals("/") || op.getType().equals("*") ||
+				op.getType().equals("%")) {
+			lex.next();
+			Expression right = factor();
+			
+			switch(op.getType()) {
+			case "/":
+				left = new ArithmeticBinExpression(DIV, left, right, left.getPosition());
+				break;
+			case "*":
+				left = new ArithmeticBinExpression(MULT, left, right, left.getPosition());
+				break;
+			case "%":
+				left = new ArithmeticBinExpression(MOD, left, right, left.getPosition());
+				break;
+			}
+		}
+		return left;
+	}
 
+	private Expression factor() {
+		if(lex.peek().getType().equals("!")) {
+			require("!");
+			Expression e = factor();
+			return new LogicalNotExpression(e, e.getPosition());
+		}
+		
+		return literal();
+	}
+	
+	private Expression literal() {
+		Token litTok = lex.next();
+		
+		switch(litTok.getType()) {
+		case "INT_CONST":
+			return new IntegerLiteral(litTok.getPosition(), Integer.parseInt(litTok.getValue()));
+		case "FLOAT_CONST":
+			return new FloatLiteral(litTok.getPosition(), Float.parseFloat(litTok.getValue()));
+		case "BOOL_CONST":
+			return new BooleanLiteral(litTok.getPosition(), Boolean.parseBoolean(litTok.getValue()));
+		case "IDENTIFIER":
+			return new VarLiteral(new Identifier(litTok.getPosition(), litTok.getValue()), litTok.getPosition());
+		case "(":
+			Expression e = expression();
+			require(")");
+			return e;
+		default:
+			error("expected an expression literal but instead found \"%s\"", lex.curr().getValue());
+			return null;
+		}
+	}
+	
 	private Token require(String tokType) {
 		Token next = lex.next();
 		if(!next.getType().equals(tokType)) {

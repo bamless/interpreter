@@ -7,41 +7,33 @@ import com.bamless.interpreter.parser.ast.statements.IfStatement;
 import com.bamless.interpreter.parser.ast.statements.VarDecl;
 import com.bamless.interpreter.parser.ast.statements.WhileStatement;
 
-public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
+public class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 
 	@Override
-	public T visit(Visitable v, A arg) {
-		return null;
+	public void visit(Visitable v, A arg) {
 	}
 
 	@Override
-	public T visit(AssignStatement v, A arg) {
-		return null;
+	public void visit(AssignStatement v, A arg) {
 	}
 
 	@Override
-	public T visit(IfStatement v, A arg) {
-		return null;
+	public void visit(IfStatement v, A arg) {
 	}
 
 	@Override
-	public T visit(WhileStatement v, A arg) {
-		return null;
+	public void visit(WhileStatement v, A arg) {
 	}
 
 	@Override
-	public T visit(BlockStatement v, A arg) {
-		return null;
+	public void visit(BlockStatement v, A arg) {
 	}
 
 	@Override
-	public T visit(VarDecl v, A arg) {
-		return null;
+	public void visit(VarDecl v, A arg) {
 	}
 
 	@Override
-	public T visit(Identifier v, A arg) {
-		return null;
+	public void visit(Identifier v, A arg) {
 	}
-
 }

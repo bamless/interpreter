@@ -4,12 +4,15 @@ import com.bamless.interpreter.Position;
 import com.bamless.interpreter.parser.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.parser.ast.visitor.VoidVisitor;
 
-public class BooleanLiteral extends Expression {
-	private boolean value;
-	
-	public BooleanLiteral(Position start, boolean value) {
-		super(start);
-		this.value = value;
+public class LogicalNotExpression extends UnaryExpression {
+
+	public LogicalNotExpression(Expression e, Position start) {
+		super(e, start);
+	}
+
+	@Override
+	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
+		return v.visit(this, arg);
 	}
 
 	@Override
@@ -18,16 +21,8 @@ public class BooleanLiteral extends Expression {
 	}
 	
 	@Override
-	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
-		return v.visit(this, arg);
+	public String toString() {
+		return "!(" + getExpression() + ")";
 	}
 
-	public boolean getValue() {
-		return value;
-	}
-	
-	@Override
-	public String toString() {
-		return value + "";
-	}
 }

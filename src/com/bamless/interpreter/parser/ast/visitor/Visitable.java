@@ -1,5 +1,6 @@
 package com.bamless.interpreter.parser.ast.visitor;
 
 public interface Visitable {
-	public abstract <T, A> T accept(Visitor<T, A> v, A arg);
+	<T, A> T accept(GenericVisitor<T, A> v, A arg);
+	<A> void accept(VoidVisitor<A> v, A arg);
 }

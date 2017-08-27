@@ -3,7 +3,8 @@ package com.bamless.interpreter.parser.ast.statements;
 import com.bamless.interpreter.Position;
 import com.bamless.interpreter.parser.ast.Identifier;
 import com.bamless.interpreter.parser.ast.expression.Expression;
-import com.bamless.interpreter.parser.ast.visitor.Visitor;
+import com.bamless.interpreter.parser.ast.visitor.GenericVisitor;
+import com.bamless.interpreter.parser.ast.visitor.VoidVisitor;
 
 public class AssignStatement extends Statement {
 	private Identifier id;
@@ -16,7 +17,12 @@ public class AssignStatement extends Statement {
 	}
 
 	@Override
-	public <T, A> T accept(Visitor<T, A> v, A arg) {
+	public <A> void accept(VoidVisitor<A> v, A arg) {
+		v.visit(this, arg);
+	}
+	
+	@Override
+	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
 		return v.visit(this, arg);
 	}
 
@@ -24,7 +30,7 @@ public class AssignStatement extends Statement {
 		return id;
 	}
 
-	public Expression getE() {
+	public Expression getExpression() {
 		return e;
 	}
 

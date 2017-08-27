@@ -6,7 +6,8 @@ import java.util.List;
 
 import com.bamless.interpreter.Position;
 import com.bamless.interpreter.parser.ast.type.Type;
-import com.bamless.interpreter.parser.ast.visitor.Visitor;
+import com.bamless.interpreter.parser.ast.visitor.GenericVisitor;
+import com.bamless.interpreter.parser.ast.visitor.VoidVisitor;
 
 public class FuncDecl extends ASTNode {
 	private Type type;
@@ -21,7 +22,12 @@ public class FuncDecl extends ASTNode {
 	}
 
 	@Override
-	public <T, A> T accept(Visitor<T, A> v, A arg) {
+	public <A> void accept(VoidVisitor<A> v, A arg) {
+		v.visit(this, arg);
+	}
+	
+	@Override
+	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
 		return v.visit(this, arg);
 	}
 
