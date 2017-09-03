@@ -3,9 +3,9 @@ package com.bamless.interpreter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.bamless.interpreter.ast.ASTNode;
+import com.bamless.interpreter.ast.visitor.PrinterVisitor;
 import com.bamless.interpreter.parser.ASTParser;
-import com.bamless.interpreter.parser.ast.ASTNode;
-import com.bamless.interpreter.parser.ast.visitor.PrinterVisitor;
 
 public class Main {
 	
@@ -15,7 +15,6 @@ public class Main {
 		
 		PrinterVisitor v = new PrinterVisitor(4);
 		root.accept(v, 0);
-		
 	}
 	
 }
