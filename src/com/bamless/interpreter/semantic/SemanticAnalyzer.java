@@ -6,10 +6,10 @@ import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
 import com.bamless.interpreter.semantic.symboltable.SymbolTable;
 
-public class SymbolTableBuilder extends VisitorAdapter<SymbolTable, Void> {
+public class SemanticAnalyzer extends VisitorAdapter<SymbolTable, Void> {
 	private SymbolTable symbolTable;
 	
-	public SymbolTableBuilder() {
+	public SemanticAnalyzer() {
 		symbolTable = new SymbolTable();
 	}
 	

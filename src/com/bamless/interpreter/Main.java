@@ -6,7 +6,7 @@ import java.io.IOException;
 import com.bamless.interpreter.ast.ASTNode;
 import com.bamless.interpreter.ast.visitor.PrinterVisitor;
 import com.bamless.interpreter.parser.ASTParser;
-import com.bamless.interpreter.semantic.SymbolTableBuilder;
+import com.bamless.interpreter.semantic.SemanticAnalyzer;
 import com.bamless.interpreter.semantic.TypeChecker;
 import com.bamless.interpreter.semantic.symboltable.SymbolTable;
 
@@ -19,7 +19,7 @@ public class Main {
 		PrinterVisitor v = new PrinterVisitor(4);
 		root.accept(v, 0);
 		
-		SymbolTableBuilder stb = new SymbolTableBuilder();
+		SemanticAnalyzer stb = new SemanticAnalyzer();
 		SymbolTable st = root.accept(stb, null);
 		root.accept(new TypeChecker(st), null);
 	}
