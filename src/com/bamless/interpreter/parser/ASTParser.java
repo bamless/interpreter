@@ -81,26 +81,18 @@ public class ASTParser {
 	
 	private Statement statement() {
 		switch(lex.peek().getType()) {
-			//statement
-			case "IF":
-				return ifStmt();
-			case "WHILE":
-				return whileStmt();
-			case "{":
-				return block();
-				
-			//expresion statement
-			case "IDENTIFIER":
-			case "INT_CONST":
-			case "FLOAT_CONST":
-			case "BOOL_CONST":
-			case "!":
-				Statement s = expression();
-				require(";");
-				return s;	
-			default:
-				error("Expected expression before \"%s\"", lex.peek().getValue());
-				return null;
+		//statement
+		case "IF":
+			return ifStmt();
+		case "WHILE":
+			return whileStmt();
+		case "{":
+			return block();
+		//expression statement (an expression followed by a semicolon)
+		default:
+			Statement s = expression();
+			require(";");
+			return s;
 		}
 	}
 	
@@ -110,7 +102,7 @@ public class ASTParser {
 		List<Statement> statements = new ArrayList<>();
 		Token peek;
 		while(!(peek = lex.peek()).getType().equals("}")) {
-			//can only declare var inside a block
+			//can only declare var 	inside a block
 			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || peek.getType().equals("FLOAT")) {
 				statements.add(varDecl());
 			} else {
@@ -123,15 +115,22 @@ public class ASTParser {
 		return new BlockStatement(statements, start);
 	}
 
-	private Statement varDecl() {
+	private Statement varDecl() {	
 		Token typeTok = lex.next();
-		Token idTok = require("IDENTIFIER");
-		require(";");
-		
 		Type t = Type.valueOf(typeTok.getType());
+		
+		Token idTok = require("IDENTIFIER");
 		Identifier id = new Identifier(idTok.getPosition(), idTok.getValue());
 		
-		return new VarDecl(typeTok.getPosition(), t, id);
+		Expression initializer = null;
+		if(lex.peek().getType().equals("=")) {
+			require("=");
+			initializer = expression();
+		}
+		
+		require(";");
+		
+		return new VarDecl(typeTok.getPosition(), t, id, initializer);
 	}
 
 	private Statement ifStmt() {
@@ -314,7 +313,7 @@ public class ASTParser {
 			require(")");
 			return e;
 		default:
-			error("expected a literal or a subexpression but instead found \"%s\"", lex.curr().getValue());
+			error("expected expression before \"%s\"", lex.curr().getValue());
 			return null;
 		}
 	}

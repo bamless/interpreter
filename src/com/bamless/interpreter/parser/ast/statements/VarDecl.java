@@ -2,6 +2,7 @@ package com.bamless.interpreter.parser.ast.statements;
 
 import com.bamless.interpreter.Position;
 import com.bamless.interpreter.parser.ast.Identifier;
+import com.bamless.interpreter.parser.ast.expression.Expression;
 import com.bamless.interpreter.parser.ast.type.Type;
 import com.bamless.interpreter.parser.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.parser.ast.visitor.VoidVisitor;
@@ -9,11 +10,17 @@ import com.bamless.interpreter.parser.ast.visitor.VoidVisitor;
 public class VarDecl extends Statement {
 	private Type type;
 	private Identifier id;
+	private Expression init;
 	
 	public VarDecl(Position pos, Type type, Identifier id) {
 		super(pos);
 		this.type = type;
 		this.id = id;
+	}
+	
+	public VarDecl(Position pos, Type type, Identifier id, Expression init) {
+		this(pos, type, id);
+		this.init = init;
 	}
 
 	@Override
@@ -32,6 +39,10 @@ public class VarDecl extends Statement {
 
 	public Identifier getId() {
 		return id;
+	}
+	
+	public Expression getInitializer() {
+		return init;
 	}
 
 }

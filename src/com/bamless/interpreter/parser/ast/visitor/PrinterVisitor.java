@@ -58,7 +58,11 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 
 	@Override
 	public void visit(VarDecl v, Integer arg) {
-		print(arg, v.getType() + " " + v.getId().getId());
+		String init = "";
+		if(v.getInitializer() != null)
+			init = " = " + v.getInitializer().toString();
+	
+		print(arg, v.getType() + " " + v.getId().getId() + init);
 	}
 	
 	private String indent(int i, String s) {
