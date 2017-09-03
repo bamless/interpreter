@@ -1,12 +1,12 @@
 {
 
-int b = 2;
-int p = 4;
 
-while(p - 1 > 0) {
-	b = b*b;
-	p = p - 1;
-}
+int a;
 
+for (i = 0; i < 30; i = i + 1)
+	if(i < 15)
+		b = 20;
+	else
+		b = 1;
 
 }

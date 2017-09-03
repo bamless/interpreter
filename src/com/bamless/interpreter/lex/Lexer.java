@@ -19,6 +19,7 @@ public class Lexer {
 	private final static Token END = new Token("_END_OF_INPUT_", "end of input");
 	private final static Pattern SPACES = Pattern.compile("\\s+");
 	
+	private String commentRegx;
 	private Pattern invalid;
 	private LinkedHashMap<String, Pattern> typesRegx = new LinkedHashMap<>();
 	private boolean skipSpaces;
@@ -26,31 +27,48 @@ public class Lexer {
 	private int pos;
 	private ArrayList<Token> tokens = new ArrayList<>();
 	
-	public Lexer(String[] types, boolean skipSpaces) {
+	public Lexer(String[] types, boolean skipSpaces, String commentsRegx) {
 		if(types.length % 2 != 0) {
 			throw new IllegalArgumentException("Invalid types array. "
 					+ "The array should be composed of pairs TOKEN_TYPE, regex.");
 		}
 		this.skipSpaces = skipSpaces;
-		initRegs(types);
+		initRegs(types, commentsRegx);
 	}
 	
-	private void initRegs(String[] types) {
+	public Lexer(String[] types, boolean skipSpaces) {
+		this(types, skipSpaces, null);
+	}
+	
+	private void initRegs(String[] types, String commentRegx) {
 		for(int i = 0; i < types.length; i+=2) {
 			typesRegx.put(types[i], Pattern.compile(types[i + 1]));
 		}
 		invalid = Pattern.compile(skipSpaces ? "[^\\s]+" : ".+");
+		
+		if(commentRegx != null)
+			this.commentRegx = commentRegx;
 	}
 	
-	public Lexer(File lexFile, boolean skipSpaces) throws FileNotFoundException {
-		this(new FileInputStream(lexFile), skipSpaces);
-	}
-	
-	public Lexer(InputStream lexFile, boolean skipSpaces) {
+	public Lexer(InputStream lexFile, boolean skipSpaces, String commentRegx) {
 		this.skipSpaces = skipSpaces;
 		parseLexFile(lexFile);
 		invalid = Pattern.compile(skipSpaces ? "[^\\s]+" : ".+");
+		if(commentRegx != null)
+			this.commentRegx = commentRegx;
 	}
+	
+	public Lexer(InputStream lexFile, boolean skipSpaces) {
+		this(lexFile, skipSpaces, null);
+	}
+	
+	public Lexer(File lexFile, boolean skipSpaces, String commentRegx) throws FileNotFoundException {
+		this(new FileInputStream(lexFile), skipSpaces, commentRegx);
+	}	
+	
+	public Lexer(File lexFile, boolean skipSpaces) throws FileNotFoundException {
+		this(lexFile, skipSpaces, null);
+	}	
 	
 	public void tokenize(File f) throws FileNotFoundException, IOException {
 		tokenize(new FileInputStream(f));
@@ -80,6 +98,11 @@ public class Lexer {
 		LinkedHashMap<Matcher, String> matchersType = initMatchers(line);
 		Matcher spaces = SPACES.matcher(line);
 		
+		//remove comments
+		if(commentRegx != null) {
+			line = line.replaceAll(commentRegx, "");
+		}
+			
 		int start = 0;
 		while(start < line.length()) {
 			//find and skip eventual spaces

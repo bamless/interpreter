@@ -2,6 +2,7 @@ package com.bamless.interpreter.parser.ast.visitor;
 
 import com.bamless.interpreter.parser.ast.expression.Expression;
 import com.bamless.interpreter.parser.ast.statements.BlockStatement;
+import com.bamless.interpreter.parser.ast.statements.ForStatement;
 import com.bamless.interpreter.parser.ast.statements.IfStatement;
 import com.bamless.interpreter.parser.ast.statements.Statement;
 import com.bamless.interpreter.parser.ast.statements.VarDecl;
@@ -33,36 +34,76 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 		print(indent, "START BLOCK");
 		
 		for(Statement s : v) {
-			s.accept(this, indent + 1);
+			if(s instanceof Expression)
+				print(indent + 1, s.toString());
+			else
+				s.accept(this, indent + 1);
 		}
 		
 		print(indent, "END BLOCK");
 	}
 
 	@Override
-	public void visit(IfStatement v, Integer arg) {
-		print(arg, "IF " + v.getCondition());
-		v.getThenStmt().accept(this, arg + 1);
+	public void visit(IfStatement ifStmt, Integer indent) {
+		print(indent, "IF " + ifStmt.getCondition());
 		
-		if(v.getElseStmt() != null) {
-			print(arg, "ELSE");
-			v.getElseStmt().accept(this, arg + 1);
+		Statement thenBody = ifStmt.getThenStmt();
+		if(thenBody instanceof Expression)
+			print(indent + 1, thenBody.toString());
+		else
+			thenBody.accept(this, indent + 1);
+		
+		if(ifStmt.getElseStmt() != null) {
+			print(indent, "ELSE");
+			Statement elseBody = ifStmt.getElseStmt();
+			if(elseBody instanceof Expression)
+				print(indent + 1, elseBody.toString());
+			else
+				elseBody.accept(this, indent + 1);
 		}
 	}
 
 	@Override
-	public void visit(WhileStatement v, Integer arg) {
-		print(arg, "WHILE " + v.getCondition());
-		v.getBody().accept(this, arg + 1);
+	public void visit(WhileStatement whileStmt, Integer indent) {
+		print(indent, "WHILE " + whileStmt.getCondition());
+		
+		Statement body = whileStmt.getBody();
+		if(body instanceof Expression)
+			print(indent + 1, body.toString());
+		else
+			body.accept(this, indent + 1);
 	}
 
 	@Override
-	public void visit(VarDecl v, Integer arg) {
-		String init = "";
-		if(v.getInitializer() != null)
-			init = " = " + v.getInitializer().toString();
+	public void visit(ForStatement forStmt, Integer indent) {
+		String exp1 = "";
+		if(forStmt.getInit() != null)
+			exp1 = forStmt.getInit().toString();
+		
+		String exp2 = "";
+		if(forStmt.getCond() != null)
+			exp2 = forStmt.getCond().toString();
+		
+		String exp3 = "";
+		if(forStmt.getAct() != null) 
+			exp3 = forStmt.getAct().toString();
+		
+		print(indent, "FOR " + exp1 + " ; " + exp2 + " ; " + exp3);
+		
+		Statement body = forStmt.getBody();
+		if(body instanceof Expression)
+			print(indent + 1, body.toString());
+		else
+			body.accept(this, indent + 1);
+	}
 	
-		print(arg, v.getType() + " " + v.getId().getId() + init);
+	@Override
+	public void visit(VarDecl decl, Integer indent) {
+		String init = "";
+		if(decl.getInitializer() != null)
+			init = " = " + decl.getInitializer().toString();
+	
+		print(indent, decl.getType() + " " + decl.getId().getId() + init);
 	}
 	
 	private String indent(int i, String s) {
@@ -71,11 +112,6 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 			indent += tabs;
 		}
 		return indent + s;
-	}
-	
-	@Override
-	public void visit(Expression v, Integer arg) {
-		print(arg, v.toString());
 	}
 	
 	private void print(int indent, String s) {

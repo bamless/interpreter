@@ -38,6 +38,7 @@ import com.bamless.interpreter.parser.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.parser.ast.expression.RelationalExpression;
 import com.bamless.interpreter.parser.ast.expression.VarLiteral;
 import com.bamless.interpreter.parser.ast.statements.BlockStatement;
+import com.bamless.interpreter.parser.ast.statements.ForStatement;
 import com.bamless.interpreter.parser.ast.statements.IfStatement;
 import com.bamless.interpreter.parser.ast.statements.Statement;
 import com.bamless.interpreter.parser.ast.statements.VarDecl;
@@ -50,7 +51,7 @@ public class ASTParser {
 	private Lexer lex;
 	
 	public ASTParser() {
-		lex = new Lexer(ClassLoader.class.getResourceAsStream(LEX_FILE), true);
+		lex = new Lexer(ClassLoader.class.getResourceAsStream(LEX_FILE), true, "//.+");
 	}
 	
 	public ASTNode parse(File f) throws FileNotFoundException, IOException {
@@ -86,21 +87,29 @@ public class ASTParser {
 			return ifStmt();
 		case "WHILE":
 			return whileStmt();
+		case "FOR":
+			return forStmt();
 		case "{":
 			return block();
 		//expression statement (an expression followed by a semicolon)
-		default:
+		case "!":
+		case "INT":
+		case "FLOAT":
+		case "IDENTIFIER":
 			Statement s = expression();
 			require(";");
 			return s;
+		default:
+			error("expected statement before \"%s\"", lex.peek().getValue());
+			return null;
 		}
 	}
 	
 	private Statement block() {
 		Position start = require("{").getPosition();
 		
-		List<Statement> statements = new ArrayList<>();
 		Token peek;
+		List<Statement> statements = new ArrayList<>();
 		while(!(peek = lex.peek()).getType().equals("}")) {
 			//can only declare var 	inside a block
 			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || peek.getType().equals("FLOAT")) {
@@ -135,10 +144,9 @@ public class ASTParser {
 
 	private Statement ifStmt() {
 		Position start = require("IF").getPosition();
+		
 		require("(");
-		
 		Expression e = expression();
-		
 		require(")");
 		
 		Statement thenBody = statement();
@@ -154,15 +162,46 @@ public class ASTParser {
 	
 	private Statement whileStmt() {
 		Position start = require("WHILE").getPosition();
+		
 		require("(");
-		
 		Expression cond = expression();
-		
 		require(")");
 		
 		Statement body = statement();
 		return new WhileStatement(cond, body, start);
 	}
+	
+	private Statement forStmt() {
+		Position start = require("FOR").getPosition();
+		
+		require("(");
+		
+		Expression init = null;
+		if(!lex.peek().getType().equals(";"))
+			init = expression();
+		
+		require(";");
+		
+		Expression cond = null;
+		if(!lex.peek().getType().equals(";"))
+			cond = expression();
+		
+		require(";");
+		
+		Expression action = null;
+		if(!lex.peek().getType().equals(")"))
+			action = expression();
+		
+		require(")");
+		
+		Statement body = statement();
+		return new ForStatement(start, init, cond, action, body);
+	}
+	
+	
+	/* ************************* */
+	/*        Expressions        */
+	/* ************************* */
 	
 	private  Expression expression() {
 		//now the grammar is officially LL(2)
@@ -313,7 +352,7 @@ public class ASTParser {
 			require(")");
 			return e;
 		default:
-			error("expected expression before \"%s\"", lex.curr().getValue());
+			error("expected expression before \"%s\"", litTok.getValue());
 			return null;
 		}
 	}
