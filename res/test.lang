@@ -3,10 +3,14 @@
 
 int a;
 
-for (i = 0; i < 30; i = i + 1)
-	if(i < 15)
+for (a = 0; a < 30; a = a + 1) {
+	float a;
+	if(a < 15)
 		b = 20;
 	else
 		b = 1;
+}
+
+boolean a;
 
 }
