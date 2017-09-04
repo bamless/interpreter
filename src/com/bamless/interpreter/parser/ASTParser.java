@@ -134,7 +134,7 @@ public class ASTParser {
 		Expression initializer = null;
 		if(lex.peek().getType().equals("=")) {
 			require("=");
-			initializer = expression();
+			initializer = new AssignExpression(idTok.getPosition(), id, expression());
 		}
 		
 		require(";");

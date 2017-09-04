@@ -99,11 +99,10 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	
 	@Override
 	public void visit(VarDecl decl, Integer indent) {
-		String init = "";
 		if(decl.getInitializer() != null)
-			init = " = " + decl.getInitializer().toString();
-	
-		print(indent, decl.getType() + " " + decl.getId().getVal() + init);
+			print(indent, decl.getType() + " " + decl.getInitializer());
+		else
+			print(indent, decl.getType() + " " + decl.getId().getVal());
 	}
 	
 	private String indent(int i, String s) {

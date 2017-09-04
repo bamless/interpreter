@@ -1,16 +1,15 @@
 {
 
-int a = 234 / 3.;
+int a = 300 / 3.;
 boolean b = false;
 
-if(4 < 2) {
-	int b;
-	while(a > 20)
+if(b == false && b)
+	if(a < 20) {
 		a = a - 2;
-	b = b + 2;
-} else if(a < 20) {
+	}
+else if(a > 20)
 	b = true;
-}
+
 
 a = b || false;
 

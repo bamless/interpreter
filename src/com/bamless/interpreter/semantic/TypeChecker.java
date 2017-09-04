@@ -92,17 +92,8 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		
 		st.define(v.getId().getVal(), v.getType());
 		
-		if(v.getInitializer() != null) {
-			Type t = v.getInitializer().accept(this, null);
-			
-			if(!v.getType().canAssign(t)) {
-				typeError("Type error %s: type mismatch, cannot assign %s to %s", 
-						v.getPosition(), t.toString().toLowerCase(), v.getType().toString().toLowerCase());
-			}
-			
-			if(v.getType() == Type.INT && t == Type.FLOAT)
-				ErrUtils.warn("Warning %s: implicit conversion to int, possible loss of precision", v.getInitializer().getPosition());
-		}
+		if(v.getInitializer() != null) 
+			v.getInitializer().accept(this, null);
 		
 		return null;
 	}
