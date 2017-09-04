@@ -25,7 +25,7 @@ public class SymbolTable<T> {
 	}
 	
 	public T lookup(String id) {
-		Iterator<HashMap<String, T>> i = scopes.descendingIterator();
+		Iterator<HashMap<String, T>> i = scopes.iterator();
 		while(i.hasNext()) {
 			HashMap<String, T> symTable = i.next();
 			if(symTable.containsKey(id))
