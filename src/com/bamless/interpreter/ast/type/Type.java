@@ -10,16 +10,16 @@ public abstract class Type {
 	}
 	
 	public static Type valueOf(String type) {
-		switch (type.toLowerCase()) {
-		case "int":
+		switch (type.toUpperCase()) {
+		case "INT":
 			return INT;
-		case "float":
+		case "FLOAT":
 			return FLOAT;
-		case "boolean":
+		case "BOOLEAN":
 			return BOOLEAN;
 		}
 		
-		throw new RuntimeException("Invalid type name");
+		throw new IllegalArgumentException("Invalid type name");
 	}
 	
 	/**
@@ -39,12 +39,9 @@ public abstract class Type {
 	
 	@Override
 	public String toString() {
-		if(this == INT)
-			return "INT";
-		if(this == FLOAT)
-			return "FLOAT";
-		if(this == BOOLEAN)
-			return "BOOLEAN";
+		if(this == BOOLEAN) return "BOOLEAN";
+		if(this == FLOAT) return "FLOAT";
+		if(this == INT) return "INT";
 		
 		return super.toString();
 	}
