@@ -17,7 +17,7 @@ public class BooleanType extends Type {
 	}
 
 	@Override
-	public Type times(Type other) {
+	public Type mul(Type other) {
 		return null;
 	}
 
@@ -38,6 +38,14 @@ public class BooleanType extends Type {
 
 	@Override
 	public Type equalityOp(Type other) {
+		if(other == Type.BOOLEAN)
+			return Type.BOOLEAN;
+		
+		return null;
+	}
+	
+	@Override
+	public Type logicalOp(Type other) {
 		if(other == Type.BOOLEAN)
 			return Type.BOOLEAN;
 		

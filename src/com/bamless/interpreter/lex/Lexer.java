@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 import com.bamless.interpreter.Position;
 
 public class Lexer {
-	private final static Token END = new Token("_END_OF_INPUT_", "end of input");
+	private final static Token END = new Token("_END_OF_INPUT_", "end of input", new Position(0, 0));
 	private final static Pattern SPACES = Pattern.compile("\\s+");
 	
 	private String commentRegx;

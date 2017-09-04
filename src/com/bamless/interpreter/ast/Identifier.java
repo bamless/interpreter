@@ -12,18 +12,18 @@ public class Identifier extends ASTNode {
 		this.id = id;
 	}
 
-	@Override
-	public <A> void accept(VoidVisitor<A> v, A arg) {
-		v.visit(this, arg);
+	public String getVal() {
+		return id;
 	}
-	
+
 	@Override
 	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
 		return v.visit(this, arg);
 	}
 
-	public String getVal() {
-		return id;
+	@Override
+	public <A> void accept(VoidVisitor<A> v, A arg) {
+		v.visit(this, arg);
 	}
 	
 }

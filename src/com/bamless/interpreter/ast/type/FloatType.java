@@ -1,11 +1,11 @@
 package com.bamless.interpreter.ast.type;
 
-/**
- * Applying any operation on a float would reult in a float if
- * the other operand is a float or an int (incompatible otherwise).
- */
 public class FloatType extends Type {
 	
+	/**
+	 * Applying an arithmetic operation on a float would reult in a float if
+	 * the other operand is a float or an int (incompatible otherwise).
+	 */
 	@Override
 	public Type plus(Type other) {
 		if(other == Type.FLOAT || other == Type.INT)
@@ -21,7 +21,7 @@ public class FloatType extends Type {
 	}
 
 	@Override
-	public Type times(Type other) {
+	public Type mul(Type other) {
 		if(other == Type.FLOAT || other == Type.INT)
 			return Type.FLOAT;
 		return null;
@@ -41,17 +41,26 @@ public class FloatType extends Type {
 		return null;
 	}
 
+	/**
+	 * relational and equality expression over a float resolves to a boolean
+	 * if the other operand is another float or an int
+	 */
 	@Override
 	public Type relationalOp(Type other) {
 		if(other == Type.FLOAT || other == Type.INT)
-			return Type.FLOAT;
+			return Type.BOOLEAN;
 		return null;
 	}
 
 	@Override
 	public Type equalityOp(Type other) {
 		if(other == Type.FLOAT || other == Type.INT)
-			return Type.FLOAT;
+			return Type.BOOLEAN;
+		return null;
+	}
+	
+	@Override
+	public Type logicalOp(Type other) {
 		return null;
 	}
 

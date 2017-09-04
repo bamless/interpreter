@@ -28,10 +28,11 @@ public abstract class Type {
 	 */
 	public abstract Type plus(Type other);
 	public abstract Type minus(Type other);
-	public abstract Type times(Type other);
+	public abstract Type mul(Type other);
 	public abstract Type div(Type other);
 	public abstract Type modulus(Type other);
 	
+	public abstract Type logicalOp(Type other);
 	public abstract Type relationalOp(Type other);
 	public abstract Type equalityOp(Type other);
 	
