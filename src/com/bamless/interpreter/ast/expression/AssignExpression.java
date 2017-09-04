@@ -35,7 +35,7 @@ public class AssignExpression extends Expression {
 	
 	@Override
 	public String toString() {
-		return id.getId() + " = " + e.toString();
+		return id.getVal() + " = " + e.toString();
 	}
 
 }

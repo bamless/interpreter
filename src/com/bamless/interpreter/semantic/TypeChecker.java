@@ -29,12 +29,12 @@ public class TypeChecker extends VoidVisitorAdapter<Void> {
 	
 	@Override
 	public void visit(VarDecl v, Void arg) {
-		if(st.probe(v.getId().getId()) != null) {
+		if(st.probe(v.getId().getVal()) != null) {
 			throw new SemanticException(String.format("Error at %s: duplicate "
-					+ "local variable \"%s\"", v.getId().getPosition(), v.getId().getId()));
+					+ "local variable \"%s\"", v.getId().getPosition(), v.getId().getVal()));
 		}
 		
-		st.define(v.getId().getId(), v.getType());
+		st.define(v.getId().getVal(), v.getType());
 	}
 
 }

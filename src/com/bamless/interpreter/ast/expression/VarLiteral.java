@@ -29,7 +29,7 @@ public class VarLiteral extends Expression {
 	
 	@Override
 	public String toString() {
-		return id.getId();
+		return id.getVal();
 	}
 	
 }

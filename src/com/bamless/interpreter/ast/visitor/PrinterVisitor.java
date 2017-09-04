@@ -103,7 +103,7 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 		if(decl.getInitializer() != null)
 			init = " = " + decl.getInitializer().toString();
 	
-		print(indent, decl.getType() + " " + decl.getId().getId() + init);
+		print(indent, decl.getType() + " " + decl.getId().getVal() + init);
 	}
 	
 	private String indent(int i, String s) {

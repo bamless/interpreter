@@ -22,7 +22,7 @@ public class Identifier extends ASTNode {
 		return v.visit(this, arg);
 	}
 
-	public String getId() {
+	public String getVal() {
 		return id;
 	}
 	
