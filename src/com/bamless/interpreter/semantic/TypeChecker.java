@@ -23,11 +23,6 @@ import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.Visitable;
 
-/**
- * WIP
- * @author fabrizio
- *
- */
 public class TypeChecker implements GenericVisitor<Type, Void> {
 	private SymbolTable<Type> st;
 	
@@ -212,14 +207,14 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	@Override
 	public Type visit(AssignExpression e, Void arg) {
 		Type self = e.getId().accept(this, null);
-		Type ass = e.getExpression().accept(this, null);
+		Type expr = e.getExpression().accept(this, null);
 		
-		if(!self.canAssign(ass)) {
+		if(!self.canAssign(expr)) {
 			typeError("Type error %s: type mismatch, cannot assign %s to %s", 
-					e.getPosition(), ass.toString().toLowerCase(), self.toString().toLowerCase());
+					e.getPosition(), expr.toString().toLowerCase(), self.toString().toLowerCase());
 		}
 		
-		if(self == Type.INT && ass == Type.FLOAT)
+		if(self == Type.INT && expr == Type.FLOAT)
 			ErrUtils.warn("Warning %s: implicit conversion to int, possible loss of precision", e.getExpression().getPosition());
 		
 		e.setType(self);

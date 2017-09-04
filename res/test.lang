@@ -1,13 +1,15 @@
 {
 
 int a = 234 / 3.;
+boolean b = false;
 
 if(4 < 2) {
 	while(a > 20)
 		a = a - 2;
 } else if(a < 20) {
-	a = 0;
+	b = true;
 }
 
+a = b || false;
 
 }
