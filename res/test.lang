@@ -4,7 +4,7 @@
 int a;
 
 for (a = 0; a < 30; a = a + 1) {
-	float a;
+	boolean a;
 	if(a < 15)
 		b = 20;
 	else
