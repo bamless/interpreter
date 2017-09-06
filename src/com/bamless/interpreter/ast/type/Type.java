@@ -5,6 +5,7 @@ public abstract class Type {
 	public static final Type INT = new IntType();
 	public static final Type FLOAT = new FloatType();
 	public static final Type BOOLEAN = new BooleanType();
+	public static final Type STRING = new StringType();
 	
 	protected Type() {
 	}
@@ -17,6 +18,8 @@ public abstract class Type {
 			return FLOAT;
 		case "BOOLEAN":
 			return BOOLEAN;
+		case "STRING":
+			return STRING;
 		}
 		
 		throw new IllegalArgumentException("Invalid type name");
@@ -38,12 +41,5 @@ public abstract class Type {
 	
 	public abstract boolean canAssign(Type other);
 	
-	@Override
-	public String toString() {
-		if(this == BOOLEAN) return "BOOLEAN";
-		if(this == FLOAT) return "FLOAT";
-		if(this == INT) return "INT";
-		
-		return super.toString();
-	}
+	public abstract String toString();
 }

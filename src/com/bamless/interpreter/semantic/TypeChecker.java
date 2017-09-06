@@ -12,6 +12,7 @@ import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
+import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
@@ -44,9 +45,9 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	@Override
 	public Type visit(IfStatement i, Void arg) {
 		Type condition = i.getCondition().accept(this, null);
-
-		if(condition != Type.BOOLEAN)
-			typeError("Type error %s: if condition must evaluate to boolean", i.getCondition().getPosition());
+		if(condition != Type.BOOLEAN) {
+			typeError(i.getCondition().getPosition(), "if condition must evaluate to boolean");
+		}
 		
 		i.getThenStmt().accept(this, null);
 		if(i.getElseStmt() != null) 
@@ -61,7 +62,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		Type condition = f.getCond().accept(this, null);
 		
 		if(condition != Type.BOOLEAN)
-			typeError("Type error %s: for condition must evaluate to boolean", f.getCond().getPosition());
+			typeError(f.getCond().getPosition(), "Type for condition must evaluate to boolean");
 		
 		//propagate visitor to the other 2 expressions an to the body
 		f.getInit().accept(this, null);
@@ -77,7 +78,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		Type condition = w.getCondition().accept(this, null);
 		
 		if(condition != Type.BOOLEAN)
-			typeError("Type error %s: while condition must evaluate to boolean", w.getCondition().getPosition());
+			typeError(w.getCondition().getPosition(), "while condition must evaluate to boolean");
 		
 		w.getBody().accept(this, null);
 		return null;
@@ -86,8 +87,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	@Override
 	public Type visit(VarDecl v, Void arg) {
 		if(st.probe(v.getId().getVal()) != null) {
-			throw new SemanticException(String.format("Error at %s: duplicate "
-					+ "local variable \"%s\"", v.getId().getPosition(), v.getId().getVal()));
+			semanticError(v.getId().getPosition(), "duplicate local variable \"%s\"", v.getId().getVal());
 		}
 		
 		st.define(v.getId().getVal(), v.getType());
@@ -128,7 +128,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		}
 		
 		if(res == null) {
-			typeErrorOp(e.getPosition(), e.getOperation().toString().toLowerCase(), 
+			undefOperatorError(e.getPosition(), e.getOperation().toString().toLowerCase(), 
 						left.toString().toLowerCase(), right.toString().toLowerCase());
 		}
 		
@@ -144,7 +144,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		Type res = left.logicalOp(right);
 		
 		if(res == null) {
-			typeErrorOp(l.getPosition(), l.getOperation().toString().toLowerCase(), 
+			undefOperatorError(l.getPosition(), l.getOperation().toString().toLowerCase(), 
 						left.toString().toLowerCase(), right.toString().toLowerCase());
 		}
 		
@@ -158,9 +158,8 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		Type right = e.getRight().accept(this, null);
 		
 		Type res = left.equalityOp(right);
-		
 		if(res == null) {
-			typeErrorOp(e.getPosition(), e.getOperation().toString().toLowerCase(), 
+			undefOperatorError(e.getPosition(), e.getOperation().toString().toLowerCase(), 
 						left.toString().toLowerCase(), right.toString().toLowerCase());
 		}
 		
@@ -175,7 +174,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		
 		Type res = left.relationalOp(right);
 		if(res == null) {
-			typeErrorOp(r.getPosition(), r.getOperation().toString().toLowerCase(), 
+			undefOperatorError(r.getPosition(), r.getOperation().toString().toLowerCase(), 
 						left.toString().toLowerCase(), right.toString().toLowerCase());
 		}
 		
@@ -186,9 +185,8 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	@Override
 	public Type visit(LogicalNotExpression n, Void arg) {
 		Type t = n.getExpression().accept(this, null);
-		
 		if(t != Type.BOOLEAN) {
-			typeErrorOp(n.getPosition(), "!", t.toString().toLowerCase());
+			undefOperatorError(n.getPosition(), "!", t.toString().toLowerCase());
 		}
 		
 		n.setType(Type.BOOLEAN);
@@ -201,12 +199,13 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		Type expr = e.getExpression().accept(this, null);
 		
 		if(!self.canAssign(expr)) {
-			typeError("Type error %s: type mismatch, cannot assign %s to %s", 
-					e.getPosition(), expr.toString().toLowerCase(), self.toString().toLowerCase());
+			typeError(e.getPosition(), "type mismatch, cannot assign %s to %s", 
+					 expr.toString().toLowerCase(), self.toString().toLowerCase());
 		}
 		
-		if(self == Type.INT && expr == Type.FLOAT)
+		if(self == Type.INT && expr == Type.FLOAT) {
 			ErrUtils.warn("Warning %s: implicit conversion to int, possible loss of precision", e.getExpression().getPosition());
+		}
 		
 		e.setType(self);
 		return self;
@@ -228,6 +227,11 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	}
 	
 	@Override
+	public Type visit(StringLiteral s, Void arg) {
+		return s.getType();
+	}
+	
+	@Override
 	public Type visit(VarLiteral v, Void arg) {
 		Type t = v.getId().accept(this, null);
 		v.setType(t);
@@ -237,26 +241,23 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	@Override
 	public Type visit(Identifier i, Void arg) {
 		Type t = st.lookup(i.getVal());
-		
 		if(t == null) {
-			semanticError("Semantic error %s: variable "
-					+ "%s cannot be resolved", i.getPosition(), i.getVal());
+			semanticError(i.getPosition(), "variable %s cannot be resolved", i.getVal());
 		}
-		
 		return t;
 	}
 	
-	private void semanticError(String format, Object... args) {
-		throw new SemanticException(String.format(format, args));
+	private void semanticError(Position pos, String format, Object... args) {
+		throw new SemanticException(String.format("Semantic error at " + pos + ": " + format, args));
 	}
 	
-	private void typeError(String format, Object... args) {
-		throw new TypeException(String.format(format, args));
+	private void typeError(Position pos, String format, Object... args) {
+		throw new TypeException(String.format("Type error at " + pos + ": " + format, args));
 	}
 	
-	private void typeErrorOp(Position pos, String operator, String... types) {
+	private void undefOperatorError(Position pos, String operator, String... types) {
 		throw new TypeException("Type error at " + pos + " : operator " + operator 
-				+ " undefined for the types " + String.join(", ", types));
+				+ " undefined for the type" + (types.length > 1 ? "s" : "") + " " + String.join(", ", types));
 	}
 
 	@Override

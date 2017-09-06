@@ -12,8 +12,6 @@ public abstract class Expression extends Statement {
 	}
 	
 	public void setType(Type type) {
-		//TODO: remove debug log
-		System.out.println("setting type " + type + " of " + toString() + " " + getPosition());
 		this.type = type;
 	}
 	

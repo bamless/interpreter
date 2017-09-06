@@ -3,17 +3,19 @@
 //keywords
 IF				"if"
 ELSE			"else"
+FOR				"for"
+WHILE			"while"
+
 INT				"int"
 FLOAT			"float"
-FOR				"for"
 BOOLEAN			"boolean"
-WHILE			"while"
+STRING			"string"
 
 //constants
 INT_CONST		"[0-9]+"
 FLOAT_CONST		"[0-9]+(\\.[0-9]*)?"
 BOOL_CONST		"true|false"
-STRING			"\"(\\.|[^\"])*\""
+STRING_CONST	"\"(\\\\.|[^\"])*\""
 
 //id
 IDENTIFIER		"[a-zA-Z][a-zA-Z0-9]*"

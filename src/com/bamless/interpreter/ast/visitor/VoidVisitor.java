@@ -10,6 +10,7 @@ import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
+import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
@@ -33,6 +34,7 @@ public interface VoidVisitor<A> {
 	void visit(FloatLiteral f, A arg);
 	void visit(IntegerLiteral i, A arg);
 	void visit(BooleanLiteral b, A arg);
+	void visit(StringLiteral s, A arg);
 	void visit(VarLiteral v, A arg);
 	void visit(Identifier i, A arg);
 }

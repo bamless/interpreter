@@ -11,6 +11,8 @@ public class IntType extends Type {
 			return Type.INT;
 		if(other == Type.FLOAT)
 			return Type.FLOAT;
+		if(other == Type.STRING)
+			return Type.STRING;
 		
 		return null;
 	}
@@ -31,6 +33,8 @@ public class IntType extends Type {
 			return Type.INT;
 		if(other == Type.FLOAT)
 			return Type.FLOAT;
+		if(other == Type.STRING)
+			return Type.STRING;
 		
 		return null;
 	}
@@ -82,10 +86,12 @@ public class IntType extends Type {
 
 	@Override
 	public boolean canAssign(Type other) {
-		if(other == Type.INT || other == Type.FLOAT)
-			return true;
-		
-		return false;
+		return other == Type.FLOAT || other == Type.INT;
+	}
+	
+	@Override
+	public String toString() {
+		return "INT";
 	}
 
 }

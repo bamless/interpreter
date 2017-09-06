@@ -1,16 +1,22 @@
 {
 
+string test = "testing strings \" does escape work? \"";
+
+//let's fuck with the type checker
+
+string immarealstring = test * 4 + "yeah" + 5; //we can multiply a string by an int k, resulting in a string repeated k times
+float imastringtrustme = test + "yeah... a string";
+
+//let's fuck with the other types and statements indentation
 int a = 300 / 3.;
 boolean b = false;
 
-if(b == false && b)
+if((b == false && b))
 	if(a < 20) {
 		a = a - 2;
 	}
-else if(a > 20)
+else if(a > 20) //this would actually bind to if(a < 20) (dangling else problem)
 	b = true;
 
-
-a = b || false;
 
 }

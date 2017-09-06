@@ -10,6 +10,8 @@ public class FloatType extends Type {
 	public Type plus(Type other) {
 		if(other == Type.FLOAT || other == Type.INT)
 			return Type.FLOAT;
+		if(other == Type.STRING)
+			return Type.STRING;
 		return null;
 	}
 
@@ -66,9 +68,12 @@ public class FloatType extends Type {
 
 	@Override
 	public boolean canAssign(Type other) {
-		if(other == Type.FLOAT || other == Type.INT)
-			return true;
-		return false;
+		return other == Type.FLOAT || other == Type.INT;
+	}
+	
+	@Override
+	public String toString() {
+		return "FLOAT";
 	}
 
 }

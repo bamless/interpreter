@@ -34,6 +34,7 @@ import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
+import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
@@ -112,7 +113,8 @@ public class ASTParser {
 		List<Statement> statements = new ArrayList<>();
 		while(!(peek = lex.peek()).getType().equals("}")) {
 			//can only declare var 	inside a block
-			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || peek.getType().equals("FLOAT")) {
+			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || 
+					peek.getType().equals("FLOAT") || peek.getType().equals("STRING")) {
 				statements.add(varDecl());
 			} else {
 				statements.add(statement());
@@ -345,6 +347,8 @@ public class ASTParser {
 			return new FloatLiteral(litTok.getPosition(), Float.parseFloat(litTok.getValue()));
 		case "BOOL_CONST":
 			return new BooleanLiteral(litTok.getPosition(), Boolean.parseBoolean(litTok.getValue()));
+		case "STRING_CONST":
+			return new StringLiteral(litTok.getPosition(), litTok.getValue().substring(1, litTok.getValue().length() - 1));
 		case "IDENTIFIER":
 			return new VarLiteral(new Identifier(litTok.getPosition(), litTok.getValue()), litTok.getPosition());
 		case "(":

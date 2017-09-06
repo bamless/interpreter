@@ -10,11 +10,11 @@ import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
+import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
-import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 
@@ -27,10 +27,6 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 
 	@Override
 	public T visit(IfStatement i, A arg) {
-		i.getThenStmt().accept(this, null);
-		if(i.getElseStmt() != null) {
-			i.getElseStmt().accept(this, null);
-		}
 		return null;
 	}
 
@@ -43,15 +39,11 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	
 	@Override
 	public T visit(ForStatement f, A arg) {
-		f.getBody().accept(this, null);
 		return null;
 	}
 
 	@Override
 	public T visit(BlockStatement b, A arg) {
-		for(Statement stmt : b.getStmts()) {
-			stmt.accept(this, null);
-		}
 		return null;
 	}
 
@@ -113,6 +105,11 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 
 	@Override
 	public T visit(Identifier i, A arg) {
+		return null;
+	}
+
+	@Override
+	public T visit(StringLiteral s, A arg) {
 		return null;
 	}
 

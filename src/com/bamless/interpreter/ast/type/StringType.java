@@ -1,16 +1,10 @@
 package com.bamless.interpreter.ast.type;
 
-/**
- * Can only use equality operations over a boolean, and the other
- * operand must also be a boolean.
- */
-public class BooleanType extends Type {
+public class StringType extends Type {
 
 	@Override
 	public Type plus(Type other) {
-		if(other == Type.STRING)
-			return Type.STRING;
-		return null;
+		return Type.STRING;
 	}
 
 	@Override
@@ -20,6 +14,8 @@ public class BooleanType extends Type {
 
 	@Override
 	public Type mul(Type other) {
+		if(other == Type.INT)
+			return Type.STRING;
 		return null;
 	}
 
@@ -34,34 +30,32 @@ public class BooleanType extends Type {
 	}
 
 	@Override
+	public Type logicalOp(Type other) {
+		return null;
+	}
+
+	@Override
 	public Type relationalOp(Type other) {
+		if(other == Type.STRING)
+			return Type.BOOLEAN;
 		return null;
 	}
 
 	@Override
 	public Type equalityOp(Type other) {
-		if(other == Type.BOOLEAN)
+		if(other == Type.STRING)
 			return Type.BOOLEAN;
-		
-		return null;
-	}
-	
-	@Override
-	public Type logicalOp(Type other) {
-		if(other == Type.BOOLEAN)
-			return Type.BOOLEAN;
-		
 		return null;
 	}
 
 	@Override
 	public boolean canAssign(Type other) {
-		return other == Type.BOOLEAN;
+		return other == Type.STRING;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "BOOLEAN";
+		return "STRING";
 	}
 
 }
