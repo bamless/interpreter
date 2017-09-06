@@ -64,10 +64,9 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		if(condition != Type.BOOLEAN)
 			typeError(f.getCond().getPosition(), "Type for condition must evaluate to boolean");
 		
-		//propagate visitor to the other 2 expressions an to the body
+		//propagate visitor to the other 2 expressions and to the body
 		f.getInit().accept(this, null);
 		f.getAct().accept(this, null);
-		
 		f.getBody().accept(this, null);
 
 		return null;
@@ -156,8 +155,8 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	public Type visit(EqualityExpression e, Void arg) {
 		Type left = e.getLeft().accept(this, null);
 		Type right = e.getRight().accept(this, null);
-		
 		Type res = left.equalityOp(right);
+		
 		if(res == null) {
 			undefOperatorError(e.getPosition(), e.getOperation().toString().toLowerCase(), 
 						left.toString().toLowerCase(), right.toString().toLowerCase());
@@ -171,8 +170,8 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	public Type visit(RelationalExpression r, Void arg) {
 		Type left = r.getLeft().accept(this, null);
 		Type right = r.getRight().accept(this, null);
-		
 		Type res = left.relationalOp(right);
+		
 		if(res == null) {
 			undefOperatorError(r.getPosition(), r.getOperation().toString().toLowerCase(), 
 						left.toString().toLowerCase(), right.toString().toLowerCase());
@@ -204,7 +203,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		}
 		
 		if(self == Type.INT && expr == Type.FLOAT) {
-			ErrUtils.warn("Warning %s: implicit conversion to int, possible loss of precision", e.getExpression().getPosition());
+			ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision", e.getExpression().getPosition());
 		}
 		
 		e.setType(self);
