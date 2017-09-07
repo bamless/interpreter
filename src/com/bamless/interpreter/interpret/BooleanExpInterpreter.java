@@ -15,9 +15,8 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	private StringExpInterpreter stringInterpreter;
 	private Runtime runtime;
 	
-	public BooleanExpInterpreter(Runtime runtime, ArithmeticExpInterpreter ai) {
+	public BooleanExpInterpreter(Runtime runtime) {
 		this.runtime = runtime;
-		this.arithmeticInterpreter = ai;
 	}
 
 	@Override
@@ -101,8 +100,9 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 		return res;
 	}
 	
-	public void setStringExpInterpreter(StringExpInterpreter si) {
-		this.stringInterpreter = si;
+	public void init(ArithmeticExpInterpreter ai, StringExpInterpreter si) {
+		arithmeticInterpreter = ai;
+		stringInterpreter = si;
 	}
 	
 }

@@ -22,11 +22,11 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	public Interpreter() {
 		this.runtime = new Runtime();
 		this.ai = new ArithmeticExpInterpreter(runtime);
-		this.bi = new BooleanExpInterpreter(runtime, ai);
-		this.si = new StringExpInterpreter(runtime, ai);
+		this.bi = new BooleanExpInterpreter(runtime);
+		this.si = new StringExpInterpreter(runtime);
 		
-		bi.setStringExpInterpreter(si);
-		si.setBooleanExpInterpreter(bi);
+		bi.init(ai, si);
+		si.init(ai, bi);
 	}
 	
 	@Override
