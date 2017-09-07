@@ -46,7 +46,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	public Type visit(IfStatement i, Void arg) {
 		Type condition = i.getCondition().accept(this, null);
 		if(condition != Type.BOOLEAN) {
-			typeError(i.getCondition().getPosition(), "if condition must evaluate to boolean");
+			typeError(i.getCondition().getPosition(), "cannot convert %s to boolean", condition.toString().toLowerCase());
 		}
 		
 		i.getThenStmt().accept(this, null);
@@ -61,7 +61,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		//check condition type
 		Type condition = f.getCond() == null ? Type.BOOLEAN : f.getCond().accept(this, null);
 		if(condition != Type.BOOLEAN) {
-			typeError(f.getCond().getPosition(), "Type for condition must evaluate to boolean");
+			typeError(f.getCond().getPosition(), "cannot convert %s to boolean", condition.toString().toLowerCase());
 		}
 		
 		//propagate visitor to the other 2 expressions and to the body
@@ -80,7 +80,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		Type condition = w.getCondition().accept(this, null);
 		
 		if(condition != Type.BOOLEAN) {
-			typeError(w.getCondition().getPosition(), "while condition must evaluate to boolean");
+			typeError(w.getCondition().getPosition(), "cannot convert %s to boolean", condition.toString().toLowerCase());
 		}
 		
 		w.getBody().accept(this, null);
@@ -91,7 +91,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	public Type visit(PrintStatement p, Void arg) {
 		Type e = p.getExpression().accept(this, null);
 		if(e != Type.STRING) {
-			typeError(p.getExpression().getPosition(), "print argument must evaluate to string");
+			typeError(p.getExpression().getPosition(), "cannot convert %s to string", e.toString().toLowerCase());
 		}
 		
 		return null;

@@ -344,9 +344,9 @@ public class ASTParser {
 
 	private Expression factor() {
 		if(lex.peek().getType().equals("!")) {
-			require("!");
+			Position pos = require("!").getPosition();
 			Expression e = factor();
-			return new LogicalNotExpression(e, e.getPosition());
+			return new LogicalNotExpression(e, pos);
 		}
 		
 		return literal();
@@ -384,22 +384,22 @@ public class ASTParser {
 		Token next = lex.next();
 		switch(next.getType()) {
 		case "=":
-			return new AssignExpression(next.getPosition(), id, expression());
+			return new AssignExpression(id.getPosition(), id, expression());
 		case "+=":
-			Expression add = new ArithmeticBinExpression(PLUS, new VarLiteral(id, id.getPosition()), expression(), next.getPosition());
-			return new AssignExpression(next.getPosition(), id, add);
+			Expression add = new ArithmeticBinExpression(PLUS, new VarLiteral(id, id.getPosition()), expression(), id.getPosition());
+			return new AssignExpression(id.getPosition(), id, add);
 		case "-=":
-			Expression min = new ArithmeticBinExpression(MINUS, new VarLiteral(id, id.getPosition()), expression(), next.getPosition());
-			return new AssignExpression(next.getPosition(), id, min);
+			Expression min = new ArithmeticBinExpression(MINUS, new VarLiteral(id, id.getPosition()), expression(), id.getPosition());
+			return new AssignExpression(id.getPosition(), id, min);
 		case "*=":
-			Expression mul = new ArithmeticBinExpression(MULT, new VarLiteral(id, id.getPosition()), expression(), next.getPosition());
-			return new AssignExpression(next.getPosition(), id, mul);
+			Expression mul = new ArithmeticBinExpression(MULT, new VarLiteral(id, id.getPosition()), expression(), id.getPosition());
+			return new AssignExpression(id.getPosition(), id, mul);
 		case "/=":
-			Expression div = new ArithmeticBinExpression(DIV, new VarLiteral(id, id.getPosition()), expression(), next.getPosition());
-			return new AssignExpression(next.getPosition(), id, div);
+			Expression div = new ArithmeticBinExpression(DIV, new VarLiteral(id, id.getPosition()), expression(), id.getPosition());
+			return new AssignExpression(id.getPosition(), id, div);
 		case "%=":
-			Expression mod = new ArithmeticBinExpression(MOD, new VarLiteral(id, id.getPosition()), expression(), next.getPosition());
-			return new AssignExpression(next.getPosition(), id, mod);
+			Expression mod = new ArithmeticBinExpression(MOD, new VarLiteral(id, id.getPosition()), expression(), id.getPosition());
+			return new AssignExpression(id.getPosition(), id, mod);
 		default:
 			error("Expected assignment oprator but instead found \"%s\"", next.getValue());
 			return null;
