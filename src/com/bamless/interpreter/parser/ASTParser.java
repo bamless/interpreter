@@ -224,10 +224,8 @@ public class ASTParser {
 	
 	private  Expression expression() {
 		//now the grammar is officially LL(2)
-		if(lex.peek().getType().equals("IDENTIFIER") && lex.peek(2).getType().equals("=")) {
-			Token id = lex.next();
-			require("=");
-			return new AssignExpression(id.getPosition(), new Identifier(id.getPosition(), id.getValue()), expression());
+		if(lex.peek().getType().equals("IDENTIFIER") && (lex.peek(2).getType().endsWith("="))) {
+			return assignmentExpr();
 		} else {
 			return primaryExpr();
 		}
@@ -375,6 +373,35 @@ public class ASTParser {
 			return e;
 		default:
 			error("expected expression before \"%s\"", litTok.getValue());
+			return null;
+		}
+	}
+	
+	public Expression assignmentExpr() {
+		Token idTok = lex.next();
+		Identifier id = new Identifier(idTok.getPosition(), idTok.getValue());
+		
+		Token next = lex.next();
+		switch(next.getType()) {
+		case "=":
+			return new AssignExpression(next.getPosition(), id, expression());
+		case "+=":
+			Expression add = new ArithmeticBinExpression(PLUS, new VarLiteral(id, id.getPosition()), expression(), next.getPosition());
+			return new AssignExpression(next.getPosition(), id, add);
+		case "-=":
+			Expression min = new ArithmeticBinExpression(MINUS, new VarLiteral(id, id.getPosition()), expression(), next.getPosition());
+			return new AssignExpression(next.getPosition(), id, min);
+		case "*=":
+			Expression mul = new ArithmeticBinExpression(MULT, new VarLiteral(id, id.getPosition()), expression(), next.getPosition());
+			return new AssignExpression(next.getPosition(), id, mul);
+		case "/=":
+			Expression div = new ArithmeticBinExpression(DIV, new VarLiteral(id, id.getPosition()), expression(), next.getPosition());
+			return new AssignExpression(next.getPosition(), id, div);
+		case "%=":
+			Expression mod = new ArithmeticBinExpression(MOD, new VarLiteral(id, id.getPosition()), expression(), next.getPosition());
+			return new AssignExpression(next.getPosition(), id, mod);
+		default:
+			error("Expected assignment oprator but instead found \"%s\"", next.getValue());
 			return null;
 		}
 	}
