@@ -1,22 +1,29 @@
 {
 
-string test = "testing strings \" does escape work? \"";
+boolean x = false || true;
 
-//let's fuck with the type checker
+string r = "repeat";
 
-string immarealstring = test * 4 + "yeah" + 5; //we can multiply a string by an int k, resulting in a string repeated k times
-float imastringtrustme = test + "yeah... a string";
+int i;
+for(i = 20; i > 0; i = i - 1) {
+	print "for iteration " + i + "\n"; 
+	r = r + i;
+}
 
-//let's fuck with the other types and statements indentation
-int a = 300 / 3.;
-boolean b = false;
+while((i = i + 1) < 20)
+	print "while iteration " + i + "\n";
+	
+if(!x){
+	print "x is false\n";
+} else if(!x == false) {
+	print r + "\n";
+}
 
-if((b == false && b))
-	if(a < 20) {
-		a = a - 2;
-	}
-else if(a > 20) //this would actually bind to if(a < 20) (dangling else problem)
-	b = true;
+int s = 45.3212333;
+
+4 + 20 / s;
+
+print s + "";
 
 
 }

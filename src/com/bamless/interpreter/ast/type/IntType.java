@@ -33,8 +33,6 @@ public class IntType extends Type {
 			return Type.INT;
 		if(other == Type.FLOAT)
 			return Type.FLOAT;
-		if(other == Type.STRING)
-			return Type.STRING;
 		
 		return null;
 	}

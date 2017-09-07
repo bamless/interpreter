@@ -21,7 +21,21 @@ public class SymbolTable<T> {
 	}
 	
 	public void define(String id, T val) {
+		if(scopes.peek().containsKey(id))
+			throw new IllegalArgumentException("Symbol " + id + " id already defined in this scope");
 		scopes.peek().put(id, val);
+	}
+	
+	public void set(String id, T val) {
+		Iterator<HashMap<String, T>> i = scopes.iterator();
+		while(i.hasNext()) {
+			HashMap<String, T> symTable = i.next();
+			if(symTable.containsKey(id)) {
+				symTable.put(id, val);
+				return;
+			}
+		}
+		throw new IllegalArgumentException("Symbol " + id + " does not exist in any scope");
 	}
 	
 	public T lookup(String id) {

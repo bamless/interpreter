@@ -2,7 +2,6 @@ package com.bamless.interpreter.semantic;
 
 import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.Position;
-import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
@@ -17,6 +16,7 @@ import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
+import com.bamless.interpreter.ast.statement.PrintStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
@@ -59,14 +59,17 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	@Override
 	public Type visit(ForStatement f, Void arg) {
 		//check condition type
-		Type condition = f.getCond().accept(this, null);
-		
-		if(condition != Type.BOOLEAN)
+		Type condition = f.getCond() == null ? Type.BOOLEAN : f.getCond().accept(this, null);
+		if(condition != Type.BOOLEAN) {
 			typeError(f.getCond().getPosition(), "Type for condition must evaluate to boolean");
+		}
 		
 		//propagate visitor to the other 2 expressions and to the body
-		f.getInit().accept(this, null);
-		f.getAct().accept(this, null);
+		if(f.getInit() != null)
+			f.getInit().accept(this, null);
+		if(f.getAct() != null)
+			f.getAct().accept(this, null);
+		
 		f.getBody().accept(this, null);
 
 		return null;
@@ -76,19 +79,26 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	public Type visit(WhileStatement w, Void arg) {
 		Type condition = w.getCondition().accept(this, null);
 		
-		if(condition != Type.BOOLEAN)
+		if(condition != Type.BOOLEAN) {
 			typeError(w.getCondition().getPosition(), "while condition must evaluate to boolean");
+		}
 		
 		w.getBody().accept(this, null);
 		return null;
 	}
 	
 	@Override
-	public Type visit(VarDecl v, Void arg) {
-		if(st.probe(v.getId().getVal()) != null) {
-			semanticError(v.getId().getPosition(), "duplicate local variable \"%s\"", v.getId().getVal());
+	public Type visit(PrintStatement p, Void arg) {
+		Type e = p.getExpression().accept(this, null);
+		if(e != Type.STRING) {
+			typeError(p.getExpression().getPosition(), "print argument must evaluate to string");
 		}
 		
+		return null;
+	}
+	
+	@Override
+	public Type visit(VarDecl v, Void arg) {
 		st.define(v.getId().getVal(), v.getType());
 		
 		if(v.getInitializer() != null) 
@@ -194,7 +204,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	
 	@Override
 	public Type visit(AssignExpression e, Void arg) {
-		Type self = e.getId().accept(this, null);
+		Type self = st.lookup(e.getId().getVal());
 		Type expr = e.getExpression().accept(this, null);
 		
 		if(!self.canAssign(expr)) {
@@ -232,22 +242,10 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	
 	@Override
 	public Type visit(VarLiteral v, Void arg) {
-		Type t = v.getId().accept(this, null);
+		Type t = st.lookup(v.getId().getVal());
+		
 		v.setType(t);
 		return t;
-	}
-	
-	@Override
-	public Type visit(Identifier i, Void arg) {
-		Type t = st.lookup(i.getVal());
-		if(t == null) {
-			semanticError(i.getPosition(), "variable %s cannot be resolved", i.getVal());
-		}
-		return t;
-	}
-	
-	private void semanticError(Position pos, String format, Object... args) {
-		throw new SemanticException(String.format("Semantic error at " + pos + ": " + format, args));
 	}
 	
 	private void typeError(Position pos, String format, Object... args) {

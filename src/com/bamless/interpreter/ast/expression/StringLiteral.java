@@ -30,7 +30,7 @@ public class StringLiteral extends Expression {
 	
 	@Override
 	public String toString() {
-		return "\"" + value + "\"";
+		return "\"" + value.replaceAll("\n", "\\\\n") + "\"";
 	}
 
 }

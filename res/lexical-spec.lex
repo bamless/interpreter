@@ -11,6 +11,8 @@ FLOAT			"float"
 BOOLEAN			"boolean"
 STRING			"string"
 
+PRINT			"print"
+
 //constants
 INT_CONST		"[0-9]+"
 FLOAT_CONST		"[0-9]+(\\.[0-9]*)?"

@@ -4,6 +4,7 @@ import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
+import com.bamless.interpreter.ast.statement.PrintStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
@@ -95,6 +96,11 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 			print(indent + 1, body.toString());
 		else
 			body.accept(this, indent + 1);
+	}
+	
+	@Override
+	public void visit(PrintStatement p, Integer indent) {
+		print(indent, "PRINT " + p.getExpression());
 	}
 	
 	@Override

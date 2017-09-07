@@ -1,6 +1,5 @@
 package com.bamless.interpreter.ast.visitor;
 
-import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
@@ -15,6 +14,7 @@ import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
+import com.bamless.interpreter.ast.statement.PrintStatement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 
@@ -104,12 +104,12 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	}
 
 	@Override
-	public T visit(Identifier i, A arg) {
+	public T visit(StringLiteral s, A arg) {
 		return null;
 	}
 
 	@Override
-	public T visit(StringLiteral s, A arg) {
+	public T visit(PrintStatement p, A arg) {
 		return null;
 	}
 

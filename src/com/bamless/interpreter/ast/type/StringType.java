@@ -14,8 +14,6 @@ public class StringType extends Type {
 
 	@Override
 	public Type mul(Type other) {
-		if(other == Type.INT)
-			return Type.STRING;
 		return null;
 	}
 
@@ -36,8 +34,6 @@ public class StringType extends Type {
 
 	@Override
 	public Type relationalOp(Type other) {
-		if(other == Type.STRING)
-			return Type.BOOLEAN;
 		return null;
 	}
 
