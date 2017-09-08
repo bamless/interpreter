@@ -5,6 +5,7 @@ import com.bamless.interpreter.Position;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.VarLiteral;
+import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
@@ -47,6 +48,15 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	}
 	
 	@Override
+	public void visit(ArrayDecl a, Void arg) {
+		try {
+			sym.define(a.getId().getVal(), true);
+		} catch(IllegalArgumentException e) {
+			semanticError(a.getPosition(), "double declaration of variable %s", a.getId().getVal());
+		}
+	}
+	
+	@Override
 	public void visit(IfStatement v, Void arg) {
 		v.getCondition().accept(this, null);
 		v.getThenStmt().accept(this, null);
@@ -80,7 +90,7 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	
 	@Override
 	public void visit(AssignExpression e, Void arg) {
-		sym.set(e.getId().getVal(), true);
+		sym.set(e.getLvalue().getId().getVal(), true);
 	}
 	
 	@Override

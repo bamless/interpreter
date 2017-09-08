@@ -1,16 +1,16 @@
-package com.bamless.interpreter.ast.expression;
+package com.bamless.interpreter.ast;
 
 import com.bamless.interpreter.Position;
-import com.bamless.interpreter.ast.Identifier;
+import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
-public class VarLiteral extends Lvalue {
-	private Identifier id;
+public class Program extends ASTNode {
+	private BlockStatement stmts;
 	
-	public VarLiteral(Identifier id, Position start) {
+	public Program(Position start, BlockStatement stmts) {
 		super(start);
-		this.id = id;
+		this.stmts = stmts;
 	}
 
 	@Override
@@ -23,14 +23,8 @@ public class VarLiteral extends Lvalue {
 		v.visit(this, arg);
 	}
 
-	@Override
-	public Identifier getId() {
-		return id;
-	}
-	
-	@Override
-	public String toString() {
-		return id.getVal();
+	public BlockStatement getBlock() {
+		return stmts;
 	}
 	
 }

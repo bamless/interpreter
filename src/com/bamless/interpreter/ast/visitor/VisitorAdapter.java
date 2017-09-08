@@ -1,5 +1,6 @@
 package com.bamless.interpreter.ast.visitor;
 
+import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
@@ -11,6 +12,7 @@ import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
+import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
@@ -23,6 +25,10 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	@Override
 	public T visit(Visitable v, A arg) {
 		return null;
+	}
+	
+	public T visit(Program p, A arg) {
+		return p.getBlock().accept(this, null);
 	}
 
 	@Override
@@ -49,6 +55,11 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 
 	@Override
 	public T visit(VarDecl v, A arg) {
+		return null;
+	}
+	
+	@Override
+	public T visit(ArrayDecl a, A arg) {
 		return null;
 	}
 

@@ -1,4 +1,4 @@
-package com.bamless.interpreter.interpret;
+package com.bamless.interpreter.interpret.runtime;
 
 import com.bamless.interpreter.semantic.SymbolTable;
 

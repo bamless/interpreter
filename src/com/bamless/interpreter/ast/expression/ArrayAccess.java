@@ -5,13 +5,16 @@ import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
-public class VarLiteral extends Lvalue {
-	private Identifier id;
-	
-	public VarLiteral(Identifier id, Position start) {
+public class ArrayAccess extends Lvalue {
+	private Lvalue lvalue;
+	private Expression index;
+
+	public ArrayAccess(Position start, Lvalue lvalue, Expression index) {
 		super(start);
-		this.id = id;
+		this.lvalue = lvalue;
+		this.index = index;
 	}
+
 
 	@Override
 	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
@@ -25,12 +28,15 @@ public class VarLiteral extends Lvalue {
 
 	@Override
 	public Identifier getId() {
-		return id;
+		return lvalue.getId();
 	}
 	
-	@Override
-	public String toString() {
-		return id.getVal();
+	public Lvalue getLvalue() {
+		return lvalue;
+	}
+	
+	public Expression getIndex() {
+		return index;
 	}
 	
 }

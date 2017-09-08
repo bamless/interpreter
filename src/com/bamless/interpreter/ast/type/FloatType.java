@@ -72,6 +72,11 @@ public class FloatType extends Type {
 	}
 	
 	@Override
+	public boolean isArray() {
+		return false;
+	}
+	
+	@Override
 	public String toString() {
 		return "FLOAT";
 	}

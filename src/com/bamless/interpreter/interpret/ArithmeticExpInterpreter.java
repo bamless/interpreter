@@ -7,6 +7,7 @@ import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
+import com.bamless.interpreter.interpret.runtime.Runtime;
 
 public class ArithmeticExpInterpreter extends VisitorAdapter<Float, Void> {
 	private Runtime runtime;
@@ -44,9 +45,9 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<Float, Void> {
 		float res = e.getExpression().accept(this, null).floatValue();
 		
 		if(e.getType() == Type.INT)
-			runtime.getEnv().set(e.getId().getVal(), (int) res);
+			runtime.getEnv().set(e.getLvalue().getId().getVal(), (int) res);
 		else
-			runtime.getEnv().set(e.getId().getVal(), res);
+			runtime.getEnv().set(e.getLvalue().getId().getVal(), res);
 		
 		return res;
 	}

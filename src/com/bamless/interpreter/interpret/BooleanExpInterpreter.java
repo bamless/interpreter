@@ -9,6 +9,7 @@ import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
+import com.bamless.interpreter.interpret.runtime.Runtime;
 
 public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	private ArithmeticExpInterpreter arithmeticInterpreter;
@@ -96,7 +97,7 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	@Override
 	public Boolean visit(AssignExpression e, Void arg) {
 		boolean res = e.getExpression().accept(this, null);
-		runtime.getEnv().set(e.getId().getVal(), res);
+		runtime.getEnv().set(e.getLvalue().getId().getVal(), res);
 		return res;
 	}
 	

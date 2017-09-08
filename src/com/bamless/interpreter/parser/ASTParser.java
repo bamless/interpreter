@@ -24,6 +24,7 @@ import java.util.List;
 import com.bamless.interpreter.Position;
 import com.bamless.interpreter.ast.ASTNode;
 import com.bamless.interpreter.ast.Identifier;
+import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
@@ -33,9 +34,11 @@ import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
+import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
+import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
@@ -72,7 +75,7 @@ public class ASTParser {
 	}
 	
 	private ASTNode parse() {
-		ASTNode root = block();
+		ASTNode root = program();
 		
 		if(!lex.isFinished()) {
 			throw new ParseException(String.format("Syntax error at %s: unexpected token \"%s\"", 
@@ -80,6 +83,25 @@ public class ASTParser {
 		}
 		
 		return root;
+	}
+	
+	private ASTNode program() {
+		Position start = new Position(0, 0);
+		
+		List<Statement> statements = new ArrayList<>();
+		while(lex.hasNext()) {
+			Token peek = lex.peek();
+			
+			//can only declare var 	inside a block
+			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || 
+					peek.getType().equals("FLOAT") || peek.getType().equals("STRING")) {
+				statements.add(declaration());
+			} else {
+				statements.add(statement());
+			}
+		}
+		
+		return new Program(start, new BlockStatement(statements, start));
 	}
 	
 	private Statement statement() {
@@ -119,7 +141,7 @@ public class ASTParser {
 			//can only declare var 	inside a block
 			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || 
 					peek.getType().equals("FLOAT") || peek.getType().equals("STRING")) {
-				statements.add(varDecl());
+				statements.add(declaration());
 			} else {
 				statements.add(statement());
 			}
@@ -130,22 +152,34 @@ public class ASTParser {
 		return new BlockStatement(statements, start);
 	}
 
-	private Statement varDecl() {	
+	private Statement declaration() {	
 		Token typeTok = lex.next();
 		Type t = Type.valueOf(typeTok.getType());
 		
 		Token idTok = require("IDENTIFIER");
 		Identifier id = new Identifier(idTok.getPosition(), idTok.getValue());
 		
-		Expression initializer = null;
-		if(lex.peek().getType().equals("=")) {
-			require("=");
-			initializer = new AssignExpression(idTok.getPosition(), id, expression());
+		if(lex.peek().getType().equals("[")) {
+			List<Expression> dim = new ArrayList<>();
+			while(lex.peek().getType().equals("[")) {
+				require("[");
+				t = Type.arrayType(t);
+				dim.add(expression());
+				require("]");
+			}
+			require(";");	
+			return new ArrayDecl(typeTok.getPosition(), t, dim, id);
+		} else {
+			Expression initializer = null;
+			if(lex.peek().getType().equals("=")) {
+				require("=");
+				initializer = new AssignExpression(id.getPosition(), new VarLiteral(id, id.getPosition()), expression());
+			}
+			
+			require(";");
+			
+			return new VarDecl(typeTok.getPosition(), t, id, initializer);
 		}
-		
-		require(";");
-		
-		return new VarDecl(typeTok.getPosition(), t, id, initializer);
 	}
 
 	private Statement ifStmt() {
@@ -223,12 +257,10 @@ public class ASTParser {
 	/* ************************* */
 	
 	private  Expression expression() {
-		//now the grammar is officially LL(2)
-		if(lex.peek().getType().equals("IDENTIFIER") && (lex.peek(2).getType().endsWith("="))) {
-			return assignmentExpr();
-		} else {
-			return primaryExpr();
-		}
+		Expression e = primaryExpr();
+		if(lex.peek().getType().endsWith("="))
+			e = assignmentExpr(e);
+		return e;
 	}
 
 	private Expression primaryExpr() {
@@ -377,29 +409,31 @@ public class ASTParser {
 		}
 	}
 	
-	public Expression assignmentExpr() {
-		Token idTok = lex.next();
-		Identifier id = new Identifier(idTok.getPosition(), idTok.getValue());
+	public Expression assignmentExpr(Expression left) {
+		if(!(left instanceof Lvalue))
+			error("left hand side is not an lvalue");
+		
+		Lvalue lval = (Lvalue) left;
 		
 		Token next = lex.next();
 		switch(next.getType()) {
 		case "=":
-			return new AssignExpression(id.getPosition(), id, expression());
+			return new AssignExpression(lval.getPosition(), lval, expression());
 		case "+=":
-			Expression add = new ArithmeticBinExpression(PLUS, new VarLiteral(id, id.getPosition()), expression(), id.getPosition());
-			return new AssignExpression(id.getPosition(), id, add);
+			Expression add = new ArithmeticBinExpression(PLUS, lval, expression(), lval.getPosition());
+			return new AssignExpression(lval.getPosition(), lval, add);
 		case "-=":
-			Expression min = new ArithmeticBinExpression(MINUS, new VarLiteral(id, id.getPosition()), expression(), id.getPosition());
-			return new AssignExpression(id.getPosition(), id, min);
+			Expression min = new ArithmeticBinExpression(MINUS, lval, expression(), lval.getPosition());
+			return new AssignExpression(lval.getPosition(), lval, min);
 		case "*=":
-			Expression mul = new ArithmeticBinExpression(MULT, new VarLiteral(id, id.getPosition()), expression(), id.getPosition());
-			return new AssignExpression(id.getPosition(), id, mul);
+			Expression mul = new ArithmeticBinExpression(MULT, lval, expression(), lval.getPosition());
+			return new AssignExpression(lval.getPosition(), lval, mul);
 		case "/=":
-			Expression div = new ArithmeticBinExpression(DIV, new VarLiteral(id, id.getPosition()), expression(), id.getPosition());
-			return new AssignExpression(id.getPosition(), id, div);
+			Expression div = new ArithmeticBinExpression(DIV, lval, expression(), lval.getPosition());
+			return new AssignExpression(lval.getPosition(), lval, div);
 		case "%=":
-			Expression mod = new ArithmeticBinExpression(MOD, new VarLiteral(id, id.getPosition()), expression(), id.getPosition());
-			return new AssignExpression(id.getPosition(), id, mod);
+			Expression mod = new ArithmeticBinExpression(MOD, lval, expression(), lval.getPosition());
+			return new AssignExpression(lval.getPosition(), lval, mod);
 		default:
 			error("Expected assignment oprator but instead found \"%s\"", next.getValue());
 			return null;

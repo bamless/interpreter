@@ -1,5 +1,6 @@
 package com.bamless.interpreter.ast.visitor;
 
+import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
@@ -11,6 +12,7 @@ import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
+import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
@@ -21,6 +23,8 @@ import com.bamless.interpreter.ast.statement.WhileStatement;
 public interface GenericVisitor<T, A> {
 	T visit(Visitable v, A arg);
 	
+	T visit(Program p, A arg);
+	
 	T visit(IfStatement i, A arg);
 	T visit(WhileStatement w, A arg);
 	T visit(BlockStatement b, A arg);
@@ -28,6 +32,7 @@ public interface GenericVisitor<T, A> {
 	T visit(PrintStatement p, A arg);
 	
 	T visit(VarDecl v, A arg);
+	T visit(ArrayDecl a, A arg);
 	
 	T visit(ArithmeticBinExpression e, A arg);
 	T visit(LogicalExpression l, A arg);

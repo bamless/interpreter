@@ -1,17 +1,16 @@
 package com.bamless.interpreter.ast.expression;
 
 import com.bamless.interpreter.Position;
-import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class AssignExpression extends Expression {
-	private Identifier id;
+	private Lvalue lvalue;
 	private Expression e;
 	
-	public AssignExpression(Position pos, Identifier id, Expression e) {
+	public AssignExpression(Position pos, Lvalue lvalue, Expression e) {
 		super(pos);
-		this.id = id;
+		this.lvalue = lvalue;
 		this.e = e;
 	}
 
@@ -25,8 +24,8 @@ public class AssignExpression extends Expression {
 		return v.visit(this, arg);
 	}
 
-	public Identifier getId() {
-		return id;
+	public Lvalue getLvalue() {
+		return lvalue;
 	}
 
 	public Expression getExpression() {
@@ -35,7 +34,7 @@ public class AssignExpression extends Expression {
 	
 	@Override
 	public String toString() {
-		return id.getVal() + " = " + e.toString();
+		return lvalue + " = " + e.toString();
 	}
 
 }

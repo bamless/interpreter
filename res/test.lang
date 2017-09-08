@@ -1,10 +1,8 @@
-{
-
 boolean x = false || true;
 
 string r = "repeat";
 
-int i;
+int k[4];
 for(i = 20; i > 0; i -= 1) {
 	print "for iteration " + i + "\n"; 
 	r = r + i;
@@ -22,9 +20,6 @@ else if(!x == false)
 int s = 45.3212333;
 
 4 + 20 / s;
-s -= 2;
+s -= i;
 
 print s + "";
-
-
-}

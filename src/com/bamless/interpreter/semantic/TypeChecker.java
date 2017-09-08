@@ -2,6 +2,7 @@ package com.bamless.interpreter.semantic;
 
 import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.Position;
+import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
@@ -13,6 +14,7 @@ import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
+import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
@@ -29,6 +31,10 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	
 	public TypeChecker() {
 		this.st = new SymbolTable<>();
+	}
+	
+	public Type visit(Program p, Void arg) {
+		return p.getBlock().accept(this, arg);
 	}
 	
 	@Override
@@ -103,6 +109,13 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		
 		if(v.getInitializer() != null) 
 			v.getInitializer().accept(this, null);
+		
+		return null;
+	}
+	
+	@Override
+	public Type visit(ArrayDecl a, Void arg) {
+		st.define(a.getId().getVal(), a.getType());
 		
 		return null;
 	}
@@ -204,7 +217,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	
 	@Override
 	public Type visit(AssignExpression e, Void arg) {
-		Type self = st.lookup(e.getId().getVal());
+		Type self = st.lookup(e.getLvalue().getId().getVal());
 		Type expr = e.getExpression().accept(this, null);
 		
 		if(!self.canAssign(expr)) {

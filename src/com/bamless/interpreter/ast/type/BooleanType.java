@@ -53,6 +53,11 @@ public class BooleanType extends Type {
 		
 		return null;
 	}
+	
+	@Override
+	public boolean isArray() {
+		return false;
+	}
 
 	@Override
 	public boolean canAssign(Type other) {

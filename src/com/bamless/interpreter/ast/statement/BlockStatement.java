@@ -1,6 +1,5 @@
 package com.bamless.interpreter.ast.statement;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -10,11 +9,11 @@ import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class BlockStatement extends Statement implements Iterable<Statement> {
-	private List<Statement> stmts = new ArrayList<>();
+	private List<Statement> stmts;
 
 	public BlockStatement(List<Statement> stmts, Position pos) {
 		super(pos);
-		this.stmts.addAll(stmts);
+		this.stmts = stmts;
 	}
 
 	@Override

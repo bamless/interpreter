@@ -1,11 +1,16 @@
 package com.bamless.interpreter.ast.type;
 
+import java.util.HashMap;
+
 public abstract class Type {
 	/**Singleton types*/
 	public static final Type INT = new IntType();
 	public static final Type FLOAT = new FloatType();
 	public static final Type BOOLEAN = new BooleanType();
 	public static final Type STRING = new StringType();
+	
+	private static final HashMap<Type, ArrayType> arrayFromType = new HashMap<>();
+	private static final HashMap<ArrayType, Type> typeFromArray = new HashMap<>();
 	
 	protected Type() {
 	}
@@ -25,6 +30,19 @@ public abstract class Type {
 		throw new IllegalArgumentException("Invalid type name");
 	}
 	
+	public static ArrayType arrayType(Type t) {
+		if(!arrayFromType.containsKey(t)) {
+			ArrayType at = new ArrayType(t);
+			arrayFromType.put(t, at);
+			typeFromArray.put(at, t);
+		}
+		return arrayFromType.get(t);
+	}
+	
+	public static Type typeOf(ArrayType t) {
+		return typeFromArray.get(t);
+	}
+	
 	/**
 	 * For any given operation, return the type result of applying that operation
 	 * over the given types (or null if the operation cannot be applied over the types)
@@ -40,6 +58,8 @@ public abstract class Type {
 	public abstract Type equalityOp(Type other);
 	
 	public abstract boolean canAssign(Type other);
+	
+	public abstract boolean isArray();
 	
 	public abstract String toString();
 }

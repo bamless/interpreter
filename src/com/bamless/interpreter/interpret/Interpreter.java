@@ -11,6 +11,7 @@ import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
+import com.bamless.interpreter.interpret.runtime.Runtime;
 
 public class Interpreter  extends VoidVisitorAdapter<Void> {
 	private ArithmeticExpInterpreter ai;

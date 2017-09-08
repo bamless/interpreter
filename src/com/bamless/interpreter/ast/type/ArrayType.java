@@ -1,10 +1,15 @@
 package com.bamless.interpreter.ast.type;
 
-public class StringType extends Type {
-
+public class ArrayType extends Type {
+	private Type elemType;
+	
+	protected ArrayType(Type elemType) {
+		this.elemType = elemType;
+	}
+	
 	@Override
 	public Type plus(Type other) {
-		return Type.STRING;
+		return null;
 	}
 
 	@Override
@@ -39,24 +44,28 @@ public class StringType extends Type {
 
 	@Override
 	public Type equalityOp(Type other) {
-		if(other == Type.STRING)
+		if(this == other)
 			return Type.BOOLEAN;
 		return null;
 	}
 
 	@Override
 	public boolean canAssign(Type other) {
-		return other == Type.STRING;
+		return this == other;
 	}
 	
 	@Override
 	public boolean isArray() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "STRING";
+		return elemType + "[]";
+	}
+	
+	public Type getElemType() {
+		return elemType;
 	}
 
 }

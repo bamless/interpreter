@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import com.bamless.interpreter.ast.ASTNode;
 import com.bamless.interpreter.ast.visitor.PrinterVisitor;
-import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.parser.ASTParser;
 import com.bamless.interpreter.semantic.SemanticAnalyzer;
 import com.bamless.interpreter.semantic.TypeChecker;
@@ -32,13 +31,13 @@ public class Main {
 		root.accept(tc, null);
 		
 		System.out.println("Done");
-		
-		System.out.println("Executing program...\n");
-		
-		Interpreter i = new Interpreter();
-		root.accept(i, null);
-		
-		System.out.println("\nDone executing");
+//		
+//		System.out.println("Executing program...\n");
+//		
+//		Interpreter i = new Interpreter();
+//		root.accept(i, null);
+//		
+//		System.out.println("\nDone executing");
 	}
 	
 }
