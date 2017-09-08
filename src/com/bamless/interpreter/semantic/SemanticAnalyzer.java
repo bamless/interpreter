@@ -31,7 +31,7 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 		sym.enterScope();
 		for(Statement s : v.getStmts()) {
 			if(s instanceof Expression && !(s instanceof AssignExpression))
-				ErrUtils.warn("Warning %s: statement with no effect", s.getPosition());
+				ErrUtils.warn("Warning %s: computed value is not used", s.getPosition());
 			s.accept(this, null);
 		}
 		sym.exitScope();
