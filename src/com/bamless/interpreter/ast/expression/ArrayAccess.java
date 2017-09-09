@@ -39,4 +39,9 @@ public class ArrayAccess extends Lvalue {
 		return index;
 	}
 	
+	@Override
+	public String toString() {
+		return lvalue + "[" + index + "]";
+	}
+	
 }

@@ -26,6 +26,7 @@ import com.bamless.interpreter.ast.ASTNode;
 import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
+import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
@@ -95,7 +96,7 @@ public class ASTParser {
 			//can only declare var 	inside a block
 			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || 
 					peek.getType().equals("FLOAT") || peek.getType().equals("STRING")) {
-				statements.add(declaration());
+				statements.add(varDecl());
 			} else {
 				statements.add(statement());
 			}
@@ -141,7 +142,7 @@ public class ASTParser {
 			//can only declare var 	inside a block
 			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || 
 					peek.getType().equals("FLOAT") || peek.getType().equals("STRING")) {
-				statements.add(declaration());
+				statements.add(varDecl());
 			} else {
 				statements.add(statement());
 			}
@@ -152,24 +153,31 @@ public class ASTParser {
 		return new BlockStatement(statements, start);
 	}
 
-	private Statement declaration() {	
+	private Statement varDecl() {	
 		Token typeTok = lex.next();
 		Type t = Type.valueOf(typeTok.getType());
 		
 		Token idTok = require("IDENTIFIER");
 		Identifier id = new Identifier(idTok.getPosition(), idTok.getValue());
 		
+		//Array delcaration
 		if(lex.peek().getType().equals("[")) {
 			List<Expression> dim = new ArrayList<>();
 			while(lex.peek().getType().equals("[")) {
 				require("[");
+				
 				t = Type.arrayType(t);
 				dim.add(expression());
+				
 				require("]");
 			}
-			require(";");	
+			
+			require(";");
+			
 			return new ArrayDecl(typeTok.getPosition(), t, dim, id);
-		} else {
+		}
+		//Normal declaration
+		else {
 			Expression initializer = null;
 			if(lex.peek().getType().equals("=")) {
 				require("=");
@@ -381,7 +389,23 @@ public class ASTParser {
 			return new LogicalNotExpression(e, pos);
 		}
 		
-		return literal();
+		return postfix();
+	}
+	
+	private Expression postfix() {
+		Expression l = literal();
+		
+		while(lex.peek().getType().equals("[")) {
+			require("[");
+			
+			if(!(l instanceof Lvalue))
+				error("left hand side is not an lvalue");
+			
+			l = new ArrayAccess(l.getPosition(), (Lvalue) l, expression());
+			require("]");
+		}
+		
+		return l;
 	}
 	
 	private Expression literal() {
@@ -409,13 +433,14 @@ public class ASTParser {
 		}
 	}
 	
-	public Expression assignmentExpr(Expression left) {
+	private Expression assignmentExpr(Expression left) {
+		Token next = lex.next();
+		
 		if(!(left instanceof Lvalue))
 			error("left hand side is not an lvalue");
 		
 		Lvalue lval = (Lvalue) left;
 		
-		Token next = lex.next();
 		switch(next.getType()) {
 		case "=":
 			return new AssignExpression(lval.getPosition(), lval, expression());

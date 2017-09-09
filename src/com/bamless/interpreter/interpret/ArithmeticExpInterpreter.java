@@ -1,6 +1,7 @@
 package com.bamless.interpreter.interpret;
 
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
+import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
@@ -43,11 +44,10 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<Float, Void> {
 	@Override
 	public Float visit(AssignExpression e, Void arg) {
 		float res = e.getExpression().accept(this, null).floatValue();
-		
 		if(e.getType() == Type.INT)
-			runtime.getEnv().set(e.getLvalue().getId().getVal(), (int) res);
+			runtime.set(e.getLvalue(), (int) res);
 		else
-			runtime.getEnv().set(e.getLvalue().getId().getVal(), res);
+			runtime.set(e.getLvalue(), res);
 		
 		return res;
 	}
@@ -55,9 +55,17 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<Float, Void> {
 	@Override
 	public Float visit(VarLiteral v, Void arg) {
 		if(v.getType() == Type.INT)
-			return ((Integer) runtime.getEnv().lookup(v.getId().getVal())).floatValue();
+			return ((Integer) runtime.retrieve(v)).floatValue();
 		else 
-			return (Float) runtime.getEnv().lookup(v.getId().getVal());
+			return (Float) runtime.retrieve(v);
+	}
+	
+	@Override
+	public Float visit(ArrayAccess a, Void arg) {
+		if(a.getType() == Type.INT)
+			return ((Integer) runtime.retrieve(a)).floatValue();
+		else 
+			return (Float) runtime.retrieve(a);
 	}
 	
 	@Override

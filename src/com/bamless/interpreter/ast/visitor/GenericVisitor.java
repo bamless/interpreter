@@ -2,6 +2,7 @@ package com.bamless.interpreter.ast.visitor;
 
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
+import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
@@ -46,4 +47,5 @@ public interface GenericVisitor<T, A> {
 	T visit(BooleanLiteral b, A arg);
 	T visit(StringLiteral s, A arg);
 	T visit(VarLiteral v, A arg);
+	T visit(ArrayAccess a, A arg);
 }

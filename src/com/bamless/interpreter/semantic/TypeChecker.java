@@ -4,9 +4,11 @@ import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.Position;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
+import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
+import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
@@ -22,6 +24,7 @@ import com.bamless.interpreter.ast.statement.PrintStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
+import com.bamless.interpreter.ast.type.ArrayType;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.Visitable;
@@ -116,6 +119,12 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	@Override
 	public Type visit(ArrayDecl a, Void arg) {
 		st.define(a.getId().getVal(), a.getType());
+		
+		for(Expression e : a.getDimensions()) {
+			Type ind = e.accept(this, arg);
+			if(ind != Type.INT)
+				typeError(e.getPosition(), "cannot convert from %s to int", ind.toString().toLowerCase());
+		}
 		
 		return null;
 	}
@@ -217,7 +226,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	
 	@Override
 	public Type visit(AssignExpression e, Void arg) {
-		Type self = st.lookup(e.getLvalue().getId().getVal());
+		Type self = e.getLvalue().accept(this, arg);
 		Type expr = e.getExpression().accept(this, null);
 		
 		if(!self.canAssign(expr)) {
@@ -259,6 +268,24 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		
 		v.setType(t);
 		return t;
+	}
+	
+	@Override
+	public Type visit(ArrayAccess a, Void arg) {
+		Type ltype = a.getLvalue().accept(this, arg);
+		
+		if(!ltype.isArray()) {
+			typeError(a.getPosition(), "The type of the expression must be an array type,"
+					+ " but instead resolved to %s", ltype.toString().toLowerCase());
+		}
+		
+		Type index = a.getIndex().accept(this, arg);
+		if(index != Type.INT)
+			typeError(a.getIndex().getPosition(), "array access indices must evaluate to int");
+		
+		Type type = Type.internalTypeOf((ArrayType) ltype);
+		a.setType(type);
+		return type;
 	}
 	
 	private void typeError(Position pos, String format, Object... args) {

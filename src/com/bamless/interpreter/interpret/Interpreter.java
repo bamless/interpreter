@@ -1,7 +1,10 @@
 package com.bamless.interpreter.interpret;
 
+import java.util.LinkedList;
+
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Expression;
+import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
@@ -11,12 +14,14 @@ import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
+import com.bamless.interpreter.interpret.runtime.Array;
 import com.bamless.interpreter.interpret.runtime.Runtime;
 
 public class Interpreter  extends VoidVisitorAdapter<Void> {
 	private ArithmeticExpInterpreter ai;
 	private BooleanExpInterpreter bi;
 	private StringExpInterpreter si;
+	private ArrayExpInterpreter arri;
 	
 	private Runtime runtime;
 	
@@ -25,18 +30,20 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 		this.ai = new ArithmeticExpInterpreter(runtime);
 		this.bi = new BooleanExpInterpreter(runtime);
 		this.si = new StringExpInterpreter(runtime);
+		this.arri = new ArrayExpInterpreter(runtime);
 		
 		bi.init(ai, si);
 		si.init(ai, bi);
+		arri.init(ai);
 	}
 	
 	@Override
 	public void visit(BlockStatement v, Void arg) {
-		runtime.getEnv().enterScope();
+		runtime.enterScope();
 		for(Statement s : v.getStmts()) {
 			s.accept(this, null);
 		}
-		runtime.getEnv().exitScope();
+		runtime.exitScope();
 	}
 	
 	@Override
@@ -77,9 +84,19 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(VarDecl v, Void arg) {
-		runtime.getEnv().define(v.getId().getVal(), null);
+		runtime.define(v.getId(), null);
 		if(v.getInitializer() != null)
 			v.getInitializer().accept(this, null);
+	}
+	
+	@Override
+	public void visit(ArrayDecl a, Void arg) {
+		LinkedList<Integer> computetDim = new LinkedList<>();
+		for(Expression e : a.getDimensions()) {
+			computetDim.add(e.accept(ai, null).intValue());
+		}
+		
+		runtime.define(a.getId(), new Array(computetDim));
 	}
 	
 	@Override
@@ -90,6 +107,8 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 			e.accept(si, null);
 		if(e.getType() == Type.INT || e.getType() == Type.FLOAT)
 			e.accept(ai, null);
+		if(e.getType().isArray())
+			e.accept(arri, null);
 	}
 	
 }

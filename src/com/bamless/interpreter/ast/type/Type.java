@@ -39,7 +39,7 @@ public abstract class Type {
 		return arrayFromType.get(t);
 	}
 	
-	public static Type typeOf(ArrayType t) {
+	public static Type internalTypeOf(ArrayType t) {
 		return typeFromArray.get(t);
 	}
 	

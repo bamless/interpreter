@@ -1,6 +1,7 @@
 package com.bamless.interpreter.interpret;
 
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
+import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
@@ -53,7 +54,12 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 	
 	@Override
 	public String visit(VarLiteral v, Void arg) {
-		return (String) runtime.getEnv().lookup(v.getId().getVal());
+		return (String) runtime.retrieve(v);
+	}
+	
+	@Override
+	public String visit(ArrayAccess a, Void arg) {
+		return (String) runtime.retrieve(a);
 	}
 	
 	@Override
@@ -64,7 +70,7 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 	@Override
 	public String visit(AssignExpression e, Void arg) {
 		String res = e.getExpression().accept(this, null);
-		runtime.getEnv().set(e.getLvalue().getId().getVal(), res);
+		runtime.set(e.getLvalue(), res);
 		return res;
 	}
 	

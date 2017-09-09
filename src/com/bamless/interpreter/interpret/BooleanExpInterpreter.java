@@ -1,5 +1,6 @@
 package com.bamless.interpreter.interpret;
 
+import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
@@ -86,7 +87,12 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	
 	@Override
 	public Boolean visit(VarLiteral v, Void arg) {
-		return (Boolean) runtime.getEnv().lookup(v.getId().getVal());
+		return (Boolean) runtime.retrieve(v);
+	}
+	
+	@Override
+	public Boolean visit(ArrayAccess a, Void arg) {
+		return (Boolean) runtime.retrieve(a);
 	}
 	
 	@Override
@@ -97,7 +103,7 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	@Override
 	public Boolean visit(AssignExpression e, Void arg) {
 		boolean res = e.getExpression().accept(this, null);
-		runtime.getEnv().set(e.getLvalue().getId().getVal(), res);
+		runtime.set(e.getLvalue(), res);
 		return res;
 	}
 	

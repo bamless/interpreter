@@ -2,9 +2,11 @@ package com.bamless.interpreter.ast.visitor;
 
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
+import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
+import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
@@ -17,6 +19,7 @@ import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
+import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 
@@ -26,64 +29,127 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(Visitable v, A arg) {
 		return null;
 	}
-	
+
+
+	@Override
 	public T visit(Program p, A arg) {
-		return p.getBlock().accept(this, null);
+		p.getBlock().accept(this, arg);
+		
+		return null;
 	}
-
+	
 	@Override
-	public T visit(IfStatement i, A arg) {
+	public T visit(IfStatement v, A arg) {
+		v.getCondition().accept(this, arg);
+		v.getThenStmt().accept(this, arg);
+		if(v.getElseStmt() != null)
+			v.getElseStmt().accept(this, arg);
+		
 		return null;
 	}
 
 	@Override
-	public T visit(WhileStatement w, A arg) {
-		w.getBody().accept(this, null);
+	public T visit(WhileStatement v, A arg) {
+		v.getCondition().accept(this, arg);
+		v.getBody().accept(this, null);
+		
 		return null;
 	}
 
 	
 	@Override
-	public T visit(ForStatement f, A arg) {
+	public T visit(ForStatement v, A arg) {
+		if(v.getInit() != null)
+			v.getInit().accept(this, arg);
+		if(v.getCond() != null)
+			v.getCond().accept(this, arg);
+		if(v.getAct() != null)
+			v.getAct().accept(this, arg);
+		v.getBody().accept(this, arg);
+		
 		return null;
 	}
 
 	@Override
-	public T visit(BlockStatement b, A arg) {
+	public T visit(BlockStatement v, A arg) {
+		for(Statement s : v.getStmts()) {
+			s.accept(this, arg);
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public T visit(PrintStatement p, A arg) {
+		p.getExpression().accept(this, arg);
+		
 		return null;
 	}
 
 	@Override
 	public T visit(VarDecl v, A arg) {
+		if(v.getInitializer() != null)
+			v.getInitializer().accept(this, arg);
+		
 		return null;
 	}
 	
 	@Override
 	public T visit(ArrayDecl a, A arg) {
+		for(Expression e : a.getDimensions()) {
+			e.accept(this, arg);
+		}
+		
 		return null;
 	}
 
 	@Override
 	public T visit(ArithmeticBinExpression e, A arg) {
+		e.getLeft().accept(this, arg);
+		e.getRight().accept(this, arg);
+		
 		return null;
 	}
 
 	@Override
 	public T visit(LogicalExpression l, A arg) {
-		return null;
-	}
-
-
-	@Override
-	public T visit(RelationalExpression r, A arg) {
+		l.getLeft().accept(this, arg);
+		l.getRight().accept(this, arg);
+		
 		return null;
 	}
 	
 	@Override
-	public T visit(EqualityExpression e, A arg) {
+	public T visit(RelationalExpression r, A arg) {
+		r.getLeft().accept(this, arg);
+		r.getRight().accept(this, arg);
+		
 		return null;
 	}
 
+	@Override
+	public T visit(EqualityExpression e, A arg) {
+		e.getLeft().accept(this, arg);
+		e.getRight().accept(this, arg);
+		
+		return null;
+	}
+
+	@Override
+	public T visit(LogicalNotExpression n, A arg) {
+		n.getExpression().accept(this, arg);
+		
+		return null;
+	}
+
+	@Override
+	public T visit(AssignExpression e, A arg) {
+		e.getLvalue().accept(this, arg);
+		e.getExpression().accept(this, arg);
+		
+		return null;
+	}
+	
 	@Override
 	public T visit(FloatLiteral f, A arg) {
 		return null;
@@ -98,6 +164,11 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(BooleanLiteral b, A arg) {
 		return null;
 	}
+	
+	@Override
+	public T visit(StringLiteral s, A arg) {
+		return null;
+	}
 
 	@Override
 	public T visit(VarLiteral v, A arg) {
@@ -105,22 +176,10 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	}
 
 	@Override
-	public T visit(LogicalNotExpression n, A arg) {
-		return null;
-	}
-
-	@Override
-	public T visit(AssignExpression e, A arg) {
-		return null;
-	}
-
-	@Override
-	public T visit(StringLiteral s, A arg) {
-		return null;
-	}
-
-	@Override
-	public T visit(PrintStatement p, A arg) {
+	public T visit(ArrayAccess a, A arg) {
+		a.getLvalue().accept(this, arg);
+		a.getIndex().accept(this, arg);
+		
 		return null;
 	}
 

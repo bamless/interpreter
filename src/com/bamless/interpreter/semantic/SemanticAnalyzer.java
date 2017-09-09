@@ -7,12 +7,8 @@ import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
-import com.bamless.interpreter.ast.statement.ForStatement;
-import com.bamless.interpreter.ast.statement.IfStatement;
-import com.bamless.interpreter.ast.statement.PrintStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
-import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 
 public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
@@ -54,43 +50,23 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 		} catch(IllegalArgumentException e) {
 			semanticError(a.getPosition(), "double declaration of variable %s", a.getId().getVal());
 		}
-	}
-	
-	@Override
-	public void visit(IfStatement v, Void arg) {
-		v.getCondition().accept(this, null);
-		v.getThenStmt().accept(this, null);
-		if(v.getElseStmt() != null) {
-			v.getElseStmt().accept(this, null);
+		
+		for(Expression e : a.getDimensions()) {
+			e.accept(this, arg);
 		}
 	}
 	
 	@Override
-	public void visit(WhileStatement v, Void arg) {
-		v.getCondition().accept(this, null);
-		v.getBody().accept(this, null);
-	}
-	
-	@Override
-	public void visit(ForStatement f, Void arg) {
-		if(f.getInit() != null)
-			f.getInit().accept(this, null);
-		if(f.getCond() != null)
-			f.getCond().accept(this, null);
-		if(f.getAct() != null)
-			f.getCond().accept(this, null);
-		
-		f.getBody().accept(this, null);
-	}
-	
-	@Override
-	public void visit(PrintStatement p, Void arg) {
-		p.getExpression().accept(this, null);
-	}
-	
-	@Override
 	public void visit(AssignExpression e, Void arg) {
-		sym.set(e.getLvalue().getId().getVal(), true);
+		try {
+			sym.set(e.getLvalue().getId().getVal(), true);
+		} catch(IllegalArgumentException ex) {
+			semanticError(e.getLvalue().getId().getPosition(), 
+					"variable %s cannot be resolved", e.getLvalue().getId().getVal());
+		}
+		
+		e.getLvalue().accept(this, arg);
+		e.getExpression().accept(this, arg);		
 	}
 	
 	@Override

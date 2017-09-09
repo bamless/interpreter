@@ -1,25 +1,16 @@
-boolean x = false || true;
+int x = 10;
 
-string r = "repeat";
+int arr1[x][x];
+int arr2[20][20];
 
-int k[4];
-for(i = 20; i > 0; i -= 1) {
-	print "for iteration " + i + "\n"; 
-	r = r + i;
-}
+int i; int j;
+for(i = 0; i < x; i += 1)
+	for(j = 0; j < x; j += 1)
+		arr1[i][j] = 20;
 
-while((i += 1) < 20)
-	print "while iteration " + i + "\n";
-	
-if(!x)
-	print "x is false\n";
-else if(!x == false)
-	print r + "\n";
+arr2[3][8] = arr1[2][9];
 
+int z = arr2[3][8];
 
-int s = 45.3212333;
-
-4 + 20 / s;
-s -= i;
-
-print s + "";
+print arr2[3][8] + "\n";
+print arr1[4][6] + "\n";
