@@ -61,12 +61,13 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	@Override
 	public void visit(AssignExpression e, Void arg) {
 		if(e.getLvalue() instanceof VarLiteral) {
-		try {
-			sym.set(((VarLiteral)e.getLvalue()).getId().getVal(), true);
-		} catch(IllegalArgumentException ex) {
-			semanticError(((VarLiteral)e.getLvalue()).getId().getPosition(), 
-					"variable %s cannot be resolved", ((VarLiteral)e.getLvalue()).getId().getVal());
-		}
+			VarLiteral v = (VarLiteral) e.getLvalue();
+			try {
+				sym.set(v.getId().getVal(), true);
+			} catch(IllegalArgumentException ex) {
+				semanticError(v.getId().getPosition(), 
+						"variable %s cannot be resolved", v.getId().getVal());
+			}
 		}
 		
 		e.getLvalue().accept(this, arg);
