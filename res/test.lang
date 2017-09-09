@@ -8,10 +8,7 @@ for(i = 0; i < x; i += 1)
 	for(j = 0; j < x; j += 1)
 		arr1[i][j] = false;
 
-boolean z = ((arr2[3] = arr1[2])[5]);
+boolean z = (arr2[3] = arr1[2])[5];
 print z + "\n";
 
 print( (arr2[3] == arr1[2]) + "");
-
-
-4[5];

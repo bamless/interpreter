@@ -35,7 +35,8 @@ public class ArrayAccess extends Lvalue {
 	
 	@Override
 	public String toString() {
-		return lvalue + "[" + index + "]";
+		boolean par = lvalue instanceof AssignExpression;
+		return (par ? "(" : "") + lvalue + (par ? ")" : "") + "[" + index + "]";
 	}
 	
 }
