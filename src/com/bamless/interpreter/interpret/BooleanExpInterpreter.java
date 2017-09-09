@@ -11,15 +11,16 @@ import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
-import com.bamless.interpreter.interpret.runtime.Runtime;
+import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 
 public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	private ArithmeticExpInterpreter arithmeticInterpreter;
 	private StringExpInterpreter stringInterpreter;
-	private Runtime runtime;
 	
-	public BooleanExpInterpreter(Runtime runtime) {
-		this.runtime = runtime;
+	private MemoryEnvironment memEnv;
+	
+	public BooleanExpInterpreter(MemoryEnvironment memEnv) {
+		this.memEnv = memEnv;
 	}
 
 	@Override
@@ -52,8 +53,8 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 			l = e.getLeft().accept(stringInterpreter, null);
 			r = e.getRight().accept(stringInterpreter, null);
 		} else if(e.getLeft().getType().isArray()){
-			l = runtime.retrieve((Lvalue) e.getLeft());
-			r = runtime.retrieve((Lvalue) e.getRight());
+			l = memEnv.retrieve((Lvalue) e.getLeft());
+			r = memEnv.retrieve((Lvalue) e.getRight());
 		} else {
 			l = e.getLeft().accept(this, null);
 			r = e.getRight().accept(this, null);
@@ -91,12 +92,12 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	
 	@Override
 	public Boolean visit(VarLiteral v, Void arg) {
-		return (Boolean) runtime.retrieve(v);
+		return (Boolean) memEnv.retrieve(v);
 	}
 	
 	@Override
 	public Boolean visit(ArrayAccess a, Void arg) {
-		return (Boolean) runtime.retrieve(a);
+		return (Boolean) memEnv.retrieve(a);
 	}
 	
 	@Override
@@ -107,7 +108,7 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	@Override
 	public Boolean visit(AssignExpression e, Void arg) {
 		boolean res = e.getExpression().accept(this, null);
-		runtime.set((Lvalue) e.getLvalue(), res);
+		memEnv.set((Lvalue) e.getLvalue(), res);
 		return res;
 	}
 	

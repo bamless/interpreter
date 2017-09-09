@@ -1,4 +1,4 @@
-package com.bamless.interpreter.interpret.runtime;
+package com.bamless.interpreter.interpret.memenvironment;
 
 import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
@@ -10,7 +10,7 @@ import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 import com.bamless.interpreter.interpret.ArithmeticExpInterpreter;
 import com.bamless.interpreter.semantic.SymbolTable;
 
-public class Runtime {
+public class MemoryEnvironment {
 	private SymbolTable<Object> environmet;
 	
 	private VarRetriever varRetriever;
@@ -18,7 +18,7 @@ public class Runtime {
 	
 	private ArithmeticExpInterpreter ai;
 	
-	public Runtime() {
+	public MemoryEnvironment() {
 		environmet = new SymbolTable<>();
 		varRetriever = new VarRetriever();
 		varSetter = new VarSetter();
@@ -46,7 +46,6 @@ public class Runtime {
 	}
 	
 	private class VarSetter extends VoidVisitorAdapter<Object> {
-		
 		@Override
 		public void visit(VarLiteral v, Object val) {
 			environmet.set(v.getId().getVal(), val);
@@ -57,7 +56,6 @@ public class Runtime {
 			Array l = (Array) a.getLvalue().accept(varRetriever, null);
 			l.set(a.getIndex().accept(ai, null).intValue(), arg);
 		}
-		
 	}
 	
 	private class VarRetriever extends VisitorAdapter<Object, Void> {

@@ -15,8 +15,8 @@ import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.type.ArrayType;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
-import com.bamless.interpreter.interpret.runtime.Array;
-import com.bamless.interpreter.interpret.runtime.Runtime;
+import com.bamless.interpreter.interpret.memenvironment.Array;
+import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 
 public class Interpreter  extends VoidVisitorAdapter<Void> {
 	private ArithmeticExpInterpreter ai;
@@ -24,14 +24,15 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	private StringExpInterpreter si;
 	private ArrayExpInterpreter arri;
 	
-	private Runtime runtime;
+	private MemoryEnvironment memEnv;
 	
 	public Interpreter() {
-		this.runtime = new Runtime();
-		this.ai = new ArithmeticExpInterpreter(runtime);
-		this.bi = new BooleanExpInterpreter(runtime);
-		this.si = new StringExpInterpreter(runtime);
-		this.arri = new ArrayExpInterpreter(runtime);
+		this.memEnv = new MemoryEnvironment();
+		
+		this.ai = new ArithmeticExpInterpreter(memEnv);
+		this.bi = new BooleanExpInterpreter(memEnv);
+		this.si = new StringExpInterpreter(memEnv);
+		this.arri = new ArrayExpInterpreter(memEnv);
 		
 		bi.init(ai, si);
 		si.init(ai, bi);
@@ -39,11 +40,11 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	
 	@Override
 	public void visit(BlockStatement v, Void arg) {
-		runtime.enterScope();
+		memEnv.enterScope();
 		for(Statement s : v.getStmts()) {
 			s.accept(this, null);
 		}
-		runtime.exitScope();
+		memEnv.exitScope();
 	}
 	
 	@Override
@@ -84,7 +85,7 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(VarDecl v, Void arg) {
-		runtime.define(v.getId(), null);
+		memEnv.define(v.getId(), null);
 		if(v.getInitializer() != null)
 			v.getInitializer().accept(this, null);
 	}
@@ -96,7 +97,7 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 			computetDim.add(e.accept(ai, null).intValue());
 		}
 		
-		runtime.define(a.getId(), new Array(computetDim, Type.internalTypeOf((ArrayType) a.getType())));
+		memEnv.define(a.getId(), new Array(computetDim, Type.internalTypeOf((ArrayType) a.getType())));
 	}
 	
 	@Override

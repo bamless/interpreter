@@ -9,13 +9,13 @@ import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
-import com.bamless.interpreter.interpret.runtime.Runtime;
+import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 
 public class ArithmeticExpInterpreter extends VisitorAdapter<Float, Void> {
-	private Runtime runtime;
+	private MemoryEnvironment memEnv;
 
-	public ArithmeticExpInterpreter(Runtime runtime) {
-		this.runtime = runtime;
+	public ArithmeticExpInterpreter(MemoryEnvironment memEnv) {
+		this.memEnv = memEnv;
 	}
 	
 	@Override
@@ -46,9 +46,9 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<Float, Void> {
 	public Float visit(AssignExpression e, Void arg) {
 		float res = e.getExpression().accept(this, null).floatValue();
 		if(e.getType() == Type.INT)
-			runtime.set((Lvalue) e.getLvalue(), (int) res);
+			memEnv.set((Lvalue) e.getLvalue(), (int) res);
 		else
-			runtime.set((Lvalue) e.getLvalue(), res);
+			memEnv.set((Lvalue) e.getLvalue(), res);
 		
 		return res;
 	}
@@ -56,17 +56,17 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<Float, Void> {
 	@Override
 	public Float visit(VarLiteral v, Void arg) {
 		if(v.getType() == Type.INT)
-			return ((Integer) runtime.retrieve(v)).floatValue();
+			return ((Integer) memEnv.retrieve(v)).floatValue();
 		else 
-			return (Float) runtime.retrieve(v);
+			return (Float) memEnv.retrieve(v);
 	}
 	
 	@Override
 	public Float visit(ArrayAccess a, Void arg) {
 		if(a.getType() == Type.INT) {
-			return ((Integer) runtime.retrieve(a)).floatValue();
+			return ((Integer) memEnv.retrieve(a)).floatValue();
 		}else {
-			return (Float) runtime.retrieve(a);
+			return (Float) memEnv.retrieve(a);
 		}
 	}
 	

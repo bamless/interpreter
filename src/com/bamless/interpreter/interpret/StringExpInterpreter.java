@@ -9,15 +9,16 @@ import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
-import com.bamless.interpreter.interpret.runtime.Runtime;
+import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 
 public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 	private ArithmeticExpInterpreter arithmeticInterpreter;
 	private BooleanExpInterpreter booleanInterpreter;
-	private Runtime runtime;
 	
-	public StringExpInterpreter(Runtime runtime) {
-		this.runtime = runtime;
+	private MemoryEnvironment memEnv;
+	
+	public StringExpInterpreter(MemoryEnvironment memEnv) {
+		this.memEnv = memEnv;
 	}
 	
 	@Override
@@ -55,12 +56,12 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 	
 	@Override
 	public String visit(VarLiteral v, Void arg) {
-		return (String) runtime.retrieve(v);
+		return (String) memEnv.retrieve(v);
 	}
 	
 	@Override
 	public String visit(ArrayAccess a, Void arg) {
-		return (String) runtime.retrieve(a);
+		return (String) memEnv.retrieve(a);
 	}
 	
 	@Override
@@ -71,7 +72,7 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 	@Override
 	public String visit(AssignExpression e, Void arg) {
 		String res = e.getExpression().accept(this, null);
-		runtime.set((Lvalue) e.getLvalue(), res);
+		memEnv.set((Lvalue) e.getLvalue(), res);
 		return res;
 	}
 	
