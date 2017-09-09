@@ -13,22 +13,18 @@ import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
-import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 
 public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
-	private ArithmeticExpInterpreter arithmeticInterpreter;
-	private StringExpInterpreter stringInterpreter;
+	private Interpreter interpreter;
 	
-	private MemoryEnvironment memEnv;
-	
-	public BooleanExpInterpreter(MemoryEnvironment memEnv) {
-		this.memEnv = memEnv;
+	public BooleanExpInterpreter(Interpreter interpreter) {
+		this.interpreter = interpreter;
 	}
 
 	@Override
 	public Boolean visit(RelationalExpression r, Void arg) {
-		BigDecimal left  = r.getLeft().accept(arithmeticInterpreter, null);
-		BigDecimal right = r.getRight().accept(arithmeticInterpreter, null);
+		BigDecimal left  = r.getLeft().accept(interpreter.getArithmeticExpInterpreter(), null);
+		BigDecimal right = r.getRight().accept(interpreter.getArithmeticExpInterpreter(), null);
 		
 		switch(r.getOperation()) {
 		case LT:
@@ -49,14 +45,14 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 		Object l;
 		Object r;
 		if(e.getLeft().getType() == Type.INT || e.getLeft().getType() == Type.FLOAT) {
-			l = e.getLeft().accept(arithmeticInterpreter, null);
-			r = e.getRight().accept(arithmeticInterpreter, null);
+			l = e.getLeft().accept(interpreter.getArithmeticExpInterpreter(), null);
+			r = e.getRight().accept(interpreter.getArithmeticExpInterpreter(), null);
 		} else if(e.getLeft().getType() == Type.STRING) {
-			l = e.getLeft().accept(stringInterpreter, null);
-			r = e.getRight().accept(stringInterpreter, null);
+			l = e.getLeft().accept(interpreter.getStringExpInterpreter(), null);
+			r = e.getRight().accept(interpreter.getStringExpInterpreter(), null);
 		} else if(e.getLeft().getType().isArray()){
-			l = memEnv.retrieve((Lvalue) e.getLeft());
-			r = memEnv.retrieve((Lvalue) e.getRight());
+			l = interpreter.getMemEnv().retrieve((Lvalue) e.getLeft());
+			r = interpreter.getMemEnv().retrieve((Lvalue) e.getRight());
 		} else {
 			l = e.getLeft().accept(this, null);
 			r = e.getRight().accept(this, null);
@@ -94,12 +90,12 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	
 	@Override
 	public Boolean visit(VarLiteral v, Void arg) {
-		return (Boolean) memEnv.retrieve(v);
+		return (Boolean) interpreter.getMemEnv().retrieve(v);
 	}
 	
 	@Override
 	public Boolean visit(ArrayAccess a, Void arg) {
-		return (Boolean) memEnv.retrieve(a);
+		return (Boolean) interpreter.getMemEnv().retrieve(a);
 	}
 	
 	@Override
@@ -110,13 +106,8 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	@Override
 	public Boolean visit(AssignExpression e, Void arg) {
 		boolean res = e.getExpression().accept(this, null);
-		memEnv.set((Lvalue) e.getLvalue(), res);
+		interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res);
 		return res;
 	}
-	
-	public void init(ArithmeticExpInterpreter ai, StringExpInterpreter si) {
-		arithmeticInterpreter = ai;
-		stringInterpreter = si;
-	}
-	
+
 }

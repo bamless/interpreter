@@ -3,24 +3,20 @@ package com.bamless.interpreter.interpret;
 import java.math.BigDecimal;
 
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
+import com.bamless.interpreter.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
-import com.bamless.interpreter.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
-import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 
 public class StringExpInterpreter extends VisitorAdapter<String, Void> {
-	private ArithmeticExpInterpreter arithmeticInterpreter;
-	private BooleanExpInterpreter booleanInterpreter;
+	private Interpreter interpreter;
 	
-	private MemoryEnvironment memEnv;
-	
-	public StringExpInterpreter(MemoryEnvironment memEnv) {
-		this.memEnv = memEnv;
+	public StringExpInterpreter(Interpreter interpreter) {
+		this.interpreter = interpreter;
 	}
 	
 	@Override
@@ -32,14 +28,14 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 		Type rightType = e.getRight().getType();
 		
 		if(leftType == Type.FLOAT || leftType == Type.INT) {
-			BigDecimal res = e.getLeft().accept(arithmeticInterpreter, null);
+			BigDecimal res = e.getLeft().accept(interpreter.getArithmeticExpInterpreter(), null);
 			
 			String l = leftType == Type.FLOAT ? res.floatValue() + "" : res.intValue() + "";
 			String r = e.getRight().accept(this, null);
 			
 			return l + r;
 		} else if(rightType == Type.FLOAT || rightType == Type.INT) {
-			BigDecimal res = e.getRight().accept(arithmeticInterpreter, null);
+			BigDecimal res = e.getRight().accept(interpreter.getArithmeticExpInterpreter(), null);
 			
 			String l = e.getLeft().accept(this, null);
 			String r = rightType == Type.FLOAT ? res.floatValue() + "" : res.intValue() + "";
@@ -48,13 +44,13 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 		}
 		
 		if(leftType == Type.BOOLEAN) {
-			String l = e.getLeft().accept(booleanInterpreter, null).toString();
+			String l = e.getLeft().accept(interpreter.getBoolExpInterpreter(), null).toString();
 			String r = e.getRight().accept(this, null);
 			
 			return l + r;
 		} else if(rightType == Type.BOOLEAN) {
 			String l = e.getLeft().accept(this, null);
-			String r = e.getRight().accept(booleanInterpreter, null).toString();
+			String r = e.getRight().accept(interpreter.getBoolExpInterpreter(), null).toString();
 			
 			return l + r;
 		}
@@ -64,12 +60,12 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 	
 	@Override
 	public String visit(VarLiteral v, Void arg) {
-		return (String) memEnv.retrieve(v);
+		return (String) interpreter.getMemEnv().retrieve(v);
 	}
 	
 	@Override
 	public String visit(ArrayAccess a, Void arg) {
-		return (String) memEnv.retrieve(a);
+		return (String) interpreter.getMemEnv().retrieve(a);
 	}
 	
 	@Override
@@ -80,12 +76,8 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 	@Override
 	public String visit(AssignExpression e, Void arg) {
 		String res = e.getExpression().accept(this, null);
-		memEnv.set((Lvalue) e.getLvalue(), res);
+		interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res);
 		return res;
 	}
 	
-	public void init(ArithmeticExpInterpreter ai, BooleanExpInterpreter bi) {
-		this.arithmeticInterpreter = ai;
-		this.booleanInterpreter = bi;
-	}
 }

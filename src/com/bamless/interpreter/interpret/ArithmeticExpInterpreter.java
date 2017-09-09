@@ -11,13 +11,12 @@ import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
-import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 
 public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
-	private MemoryEnvironment memEnv;
+	private Interpreter interpreter;
 
-	public ArithmeticExpInterpreter(MemoryEnvironment memEnv) {
-		this.memEnv = memEnv;
+	public ArithmeticExpInterpreter(Interpreter interpreter) {
+		this.interpreter = interpreter;
 	}
 	
 	@Override
@@ -48,9 +47,9 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 	public BigDecimal visit(AssignExpression e, Void arg) {
 		BigDecimal res = e.getExpression().accept(this, null);
 		if(e.getType() == Type.INT)
-			memEnv.set((Lvalue) e.getLvalue(), res.intValue());
+			interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res.intValue());
 		else
-			memEnv.set((Lvalue) e.getLvalue(), res.floatValue());
+			interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res.floatValue());
 		
 		return res;
 	}
@@ -58,17 +57,17 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 	@Override
 	public BigDecimal visit(VarLiteral v, Void arg) {
 		if(v.getType() == Type.INT)
-			return BigDecimal.valueOf(((Integer) memEnv.retrieve(v)));
+			return BigDecimal.valueOf(((Integer) interpreter.getMemEnv().retrieve(v)));
 		else 
-			return BigDecimal.valueOf(((Float) memEnv.retrieve(v)));
+			return BigDecimal.valueOf(((Float) interpreter.getMemEnv().retrieve(v)));
 	}
 	
 	@Override
 	public BigDecimal visit(ArrayAccess a, Void arg) {
 		if(a.getType() == Type.INT) {
-			return BigDecimal.valueOf(((Integer) memEnv.retrieve(a)));
+			return BigDecimal.valueOf(((Integer) interpreter.getMemEnv().retrieve(a)));
 		}else {
-			return BigDecimal.valueOf(((Float) memEnv.retrieve(a)));
+			return BigDecimal.valueOf(((Float) interpreter.getMemEnv().retrieve(a)));
 		}
 	}
 	

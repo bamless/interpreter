@@ -7,7 +7,7 @@ import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
-import com.bamless.interpreter.interpret.ArithmeticExpInterpreter;
+import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.semantic.SymbolTable;
 
 public class MemoryEnvironment {
@@ -16,13 +16,14 @@ public class MemoryEnvironment {
 	private VarRetriever varRetriever;
 	private VarSetter varSetter;
 	
-	private ArithmeticExpInterpreter ai;
+	private Interpreter interpreter;
 	
-	public MemoryEnvironment() {
+	public MemoryEnvironment(Interpreter interpreter) {
 		environmet = new SymbolTable<>();
 		varRetriever = new VarRetriever();
 		varSetter = new VarSetter();
-		ai = new ArithmeticExpInterpreter(this);
+		
+		this.interpreter = interpreter;
 	}
 	
 	public void define(Identifier id, Object val) {
@@ -54,7 +55,7 @@ public class MemoryEnvironment {
 		@Override
 		public void visit(ArrayAccess a, Object arg) {
 			Array l = (Array) a.getLvalue().accept(varRetriever, null);
-			l.set(a.getIndex().accept(ai, null).intValue(), arg);
+			l.set(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), null).intValue(), arg);
 		}
 	}
 	
@@ -74,7 +75,7 @@ public class MemoryEnvironment {
 		@Override
 		public Object visit(ArrayAccess a, Void arg) {
 			Array array = (Array) a.getLvalue().accept(this, arg);
-			return array.get(a.getIndex().accept(ai, arg).intValue());
+			return array.get(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), arg).intValue());
 		}
 	}
 

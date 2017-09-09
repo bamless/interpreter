@@ -27,15 +27,12 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	private MemoryEnvironment memEnv;
 	
 	public Interpreter() {
-		this.memEnv = new MemoryEnvironment();
+		this.memEnv = new MemoryEnvironment(this);
 		
-		this.ai = new ArithmeticExpInterpreter(memEnv);
-		this.bi = new BooleanExpInterpreter(memEnv);
-		this.si = new StringExpInterpreter(memEnv);
-		this.arri = new ArrayExpInterpreter(memEnv);
-		
-		bi.init(ai, si);
-		si.init(ai, bi);
+		this.ai = new ArithmeticExpInterpreter(this);
+		this.bi = new BooleanExpInterpreter(this);
+		this.si = new StringExpInterpreter(this);
+		this.arri = new ArrayExpInterpreter(this);
 	}
 	
 	@Override
@@ -110,6 +107,26 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 			e.accept(ai, null);
 		if(e.getType().isArray())
 			e.accept(arri, null);
+	}
+
+	public ArithmeticExpInterpreter getArithmeticExpInterpreter() {
+		return ai;
+	}
+
+	public BooleanExpInterpreter getBoolExpInterpreter() {
+		return bi;
+	}
+
+	public StringExpInterpreter getStringExpInterpreter() {
+		return si;
+	}
+
+	public ArrayExpInterpreter getArrayExpInterpreter() {
+		return arri;
+	}
+
+	public MemoryEnvironment getMemEnv() {
+		return memEnv;
 	}
 	
 }
