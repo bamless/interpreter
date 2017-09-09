@@ -12,6 +12,7 @@ import com.bamless.interpreter.ast.statement.PrintStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
+import com.bamless.interpreter.ast.type.ArrayType;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 import com.bamless.interpreter.interpret.runtime.Array;
@@ -95,7 +96,7 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 			computetDim.add(e.accept(ai, null).intValue());
 		}
 		
-		runtime.define(a.getId(), new Array(computetDim));
+		runtime.define(a.getId(), new Array(computetDim, Type.internalTypeOf((ArrayType) a.getType())));
 	}
 	
 	@Override

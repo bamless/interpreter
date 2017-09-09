@@ -39,11 +39,6 @@ public class Main {
 		root.accept(i, null);
 		
 		System.out.println("\nDone executing");
-		
-//		int[][] x = new int[20][20];
-//		int[][] y = new int[20][20];
-//		
-//		int z = 34 + (x[1] = y[4])[5];
 	}
 	
 }

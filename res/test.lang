@@ -11,4 +11,8 @@ for(i = 0; i < x; i += 1)
 boolean z = (arr2[3] = arr1[2])[5];
 print z + "\n";
 
-print( (arr2[3] == arr1[2]) + "");
+print( (arr2[3] == arr1[2]) + "\n");
+
+float farray[50];
+
+print farray[1] + "";
