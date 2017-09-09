@@ -226,20 +226,24 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	
 	@Override
 	public Type visit(AssignExpression e, Void arg) {
-		Type self = e.getLvalue().accept(this, arg);
+		Type lval = e.getLvalue().accept(this, arg);
 		Type expr = e.getExpression().accept(this, null);
 		
-		if(!self.canAssign(expr)) {
-			typeError(e.getPosition(), "type mismatch, cannot assign %s to %s", 
-					 expr.toString().toLowerCase(), self.toString().toLowerCase());
+		if(lval.isArray()) {
+			typeError(e.getExpression().getPosition(), "assignment to expression with array type");
 		}
 		
-		if(self == Type.INT && expr == Type.FLOAT) {
+		if(!lval.canAssign(expr)) {
+			typeError(e.getPosition(), "type mismatch, cannot assign %s to %s", 
+					 expr.toString().toLowerCase(), lval.toString().toLowerCase());
+		}
+		
+		if(lval == Type.INT && expr == Type.FLOAT) {
 			ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision", e.getExpression().getPosition());
 		}
 		
-		e.setType(self);
-		return self;
+		e.setType(lval);
+		return lval;
 	}
 	
 	@Override
@@ -274,7 +278,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	public Type visit(ArrayAccess a, Void arg) {
 		Type ltype = a.getLvalue().accept(this, arg);
 		
-		if(!ltype.isArray()) {
+		if(ltype != null && !ltype.isArray()) {
 			typeError(a.getPosition(), "The type of the expression must be an array type,"
 					+ " but instead resolved to %s", ltype.toString().toLowerCase());
 		}

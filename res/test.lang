@@ -9,8 +9,8 @@ for(i = 0; i < x; i += 1)
 		arr1[i][j] = 20;
 
 arr2[3][8] = arr1[2][9];
-
-int z = arr2[3][8];
+int z = arr[3][8];
+print z + "\n";
 
 print arr2[3][8] + "\n";
 print arr1[4][6] + "\n";

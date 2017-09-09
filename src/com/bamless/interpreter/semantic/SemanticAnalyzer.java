@@ -41,6 +41,8 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 		} catch(IllegalArgumentException e) {
 			semanticError(v.getPosition(), "double declaration of variable %s", v.getId().getVal());
 		}
+		if(v.getInitializer() != null)
+			v.getInitializer().accept(this, arg);
 	}
 	
 	@Override

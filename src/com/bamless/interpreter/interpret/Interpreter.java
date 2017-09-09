@@ -21,7 +21,6 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	private ArithmeticExpInterpreter ai;
 	private BooleanExpInterpreter bi;
 	private StringExpInterpreter si;
-	private ArrayExpInterpreter arri;
 	
 	private Runtime runtime;
 	
@@ -30,11 +29,9 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 		this.ai = new ArithmeticExpInterpreter(runtime);
 		this.bi = new BooleanExpInterpreter(runtime);
 		this.si = new StringExpInterpreter(runtime);
-		this.arri = new ArrayExpInterpreter(runtime);
 		
 		bi.init(ai, si);
 		si.init(ai, bi);
-		arri.init(ai);
 	}
 	
 	@Override
@@ -107,8 +104,6 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 			e.accept(si, null);
 		if(e.getType() == Type.INT || e.getType() == Type.FLOAT)
 			e.accept(ai, null);
-		if(e.getType().isArray())
-			e.accept(arri, null);
 	}
 	
 }

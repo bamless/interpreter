@@ -28,14 +28,6 @@ public class Runtime {
 		environmet.define(id.getVal(), val);
 	}
 	
-	public Object retrieve(Identifier id) {
-		return environmet.lookup(id.getVal());
-	}
-	
-	public void set(Identifier id, Object val) {
-		environmet.set(id.getVal(), val);
-	}
-	
 	public void set(Lvalue var, Object val) {
 		var.accept(varSetter, val);
 	}
