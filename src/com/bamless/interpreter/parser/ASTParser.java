@@ -436,9 +436,6 @@ public class ASTParser {
 	private Expression assignmentExpr(Expression left) {
 		Token next = lex.next();
 		
-		if(!(left instanceof Lvalue))
-			error("left hand side is not an lvalue");
-		
 		Lvalue lval = (Lvalue) left;
 		
 		switch(next.getType()) {

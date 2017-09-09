@@ -23,7 +23,6 @@ public class VarLiteral extends Lvalue {
 		v.visit(this, arg);
 	}
 
-	@Override
 	public Identifier getId() {
 		return id;
 	}

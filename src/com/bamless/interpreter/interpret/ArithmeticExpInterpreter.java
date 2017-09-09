@@ -62,10 +62,11 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<Float, Void> {
 	
 	@Override
 	public Float visit(ArrayAccess a, Void arg) {
-		if(a.getType() == Type.INT)
+		if(a.getType() == Type.INT) {
 			return ((Integer) runtime.retrieve(a)).floatValue();
-		else 
+		}else {
 			return (Float) runtime.retrieve(a);
+		}
 	}
 	
 	@Override

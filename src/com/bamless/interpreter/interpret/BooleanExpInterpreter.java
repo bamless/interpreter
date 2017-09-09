@@ -6,6 +6,7 @@ import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
+import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
@@ -50,6 +51,9 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 		} else if(e.getLeft().getType() == Type.STRING) {
 			l = e.getLeft().accept(stringInterpreter, null);
 			r = e.getRight().accept(stringInterpreter, null);
+		} else if(e.getLeft().getType().isArray()){
+			l = runtime.retrieve((Lvalue) e.getLeft());
+			r = runtime.retrieve((Lvalue) e.getRight());
 		} else {
 			l = e.getLeft().accept(this, null);
 			r = e.getRight().accept(this, null);

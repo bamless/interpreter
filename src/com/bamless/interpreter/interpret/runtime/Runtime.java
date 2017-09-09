@@ -2,6 +2,7 @@ package com.bamless.interpreter.interpret.runtime;
 
 import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
+import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
@@ -63,6 +64,13 @@ public class Runtime {
 		@Override
 		public Object visit(VarLiteral v, Void arg) {
 			return environmet.lookup(v.getId().getVal());
+		}
+		
+		@Override
+		public Object visit(AssignExpression e, Void arg) {
+			Array arr = (Array) e.getExpression().accept(this, arg);
+			set(e.getLvalue(), arr);
+			return arr;
 		}
 		
 		@Override

@@ -229,10 +229,6 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		Type lval = e.getLvalue().accept(this, arg);
 		Type expr = e.getExpression().accept(this, null);
 		
-		if(lval.isArray()) {
-			typeError(e.getExpression().getPosition(), "assignment to expression with array type");
-		}
-		
 		if(!lval.canAssign(expr)) {
 			typeError(e.getPosition(), "type mismatch, cannot assign %s to %s", 
 					 expr.toString().toLowerCase(), lval.toString().toLowerCase());

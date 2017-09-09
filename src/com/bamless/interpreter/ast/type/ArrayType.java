@@ -44,12 +44,14 @@ public class ArrayType extends Type {
 
 	@Override
 	public Type equalityOp(Type other) {
+		if(this == other)
+			return Type.BOOLEAN;
 		return null;
 	}
 
 	@Override
 	public boolean canAssign(Type other) {
-		return false;
+		return this == other;
 	}
 	
 	@Override

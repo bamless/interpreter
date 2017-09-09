@@ -4,7 +4,7 @@ import com.bamless.interpreter.Position;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
-public class AssignExpression extends Expression {
+public class AssignExpression extends Lvalue {
 	private Lvalue lvalue;
 	private Expression e;
 	
@@ -36,5 +36,6 @@ public class AssignExpression extends Expression {
 	public String toString() {
 		return lvalue + " = " + e.toString();
 	}
+
 
 }
