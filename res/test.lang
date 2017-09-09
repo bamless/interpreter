@@ -15,4 +15,6 @@ print( (arr2[3] == arr1[2]) + "\n");
 
 float farray[50];
 
-print farray[1] + "";
+print 1 + (farray[8] = 2.0) + "\n";
+
+print farray[8] + "";
