@@ -1,5 +1,7 @@
 package com.bamless.interpreter.interpret;
 
+import java.math.BigDecimal;
+
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
@@ -30,24 +32,30 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 		Type rightType = e.getRight().getType();
 		
 		if(leftType == Type.FLOAT || leftType == Type.INT) {
-			String l = e.getLeft().accept(arithmeticInterpreter, null).toString();
-			if(leftType == Type.INT) l = l.replaceAll("\\..*", "");
+			BigDecimal res = e.getLeft().accept(arithmeticInterpreter, null);
+			
+			String l = leftType == Type.FLOAT ? res.floatValue() + "" : res.intValue() + "";
 			String r = e.getRight().accept(this, null);
+			
 			return l + r;
 		} else if(rightType == Type.FLOAT || rightType == Type.INT) {
+			BigDecimal res = e.getRight().accept(arithmeticInterpreter, null);
+			
 			String l = e.getLeft().accept(this, null);
-			String r = e.getRight().accept(arithmeticInterpreter, null).toString();
-			if(rightType == Type.INT) r = r.replaceAll("\\..*", "");
+			String r = rightType == Type.FLOAT ? res.floatValue() + "" : res.intValue() + "";
+			
 			return l + r;
 		}
 		
 		if(leftType == Type.BOOLEAN) {
 			String l = e.getLeft().accept(booleanInterpreter, null).toString();
 			String r = e.getRight().accept(this, null);
+			
 			return l + r;
 		} else if(rightType == Type.BOOLEAN) {
 			String l = e.getLeft().accept(this, null);
 			String r = e.getRight().accept(booleanInterpreter, null).toString();
+			
 			return l + r;
 		}
 		

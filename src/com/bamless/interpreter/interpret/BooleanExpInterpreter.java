@@ -1,5 +1,7 @@
 package com.bamless.interpreter.interpret;
 
+import java.math.BigDecimal;
+
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
@@ -25,18 +27,18 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 
 	@Override
 	public Boolean visit(RelationalExpression r, Void arg) {
-		float left  = r.getLeft().accept(arithmeticInterpreter, null);
-		float right = r.getRight().accept(arithmeticInterpreter, null);
+		BigDecimal left  = r.getLeft().accept(arithmeticInterpreter, null);
+		BigDecimal right = r.getRight().accept(arithmeticInterpreter, null);
 		
 		switch(r.getOperation()) {
 		case LT:
-			return left < right;
+			return left.compareTo(right) < 0;
 		case LE:
-			return left <= right;
+			return left.compareTo(right) <= 0;
 		case GT:
-			return left > right;
+			return left.compareTo(right) > 0;
 		case GE:
-			return left >= right;
+			return left.compareTo(right) >= 0;
 		default:
 			throw new RuntimeError("fatal error");
 		}

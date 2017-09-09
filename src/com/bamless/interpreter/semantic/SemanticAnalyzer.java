@@ -8,6 +8,7 @@ import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
+import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
@@ -33,6 +34,22 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 			s.accept(this, null);
 		}
 		sym.exitScope();
+	}
+	
+	@Override
+	public void visit(ForStatement v, Void arg) {
+		if(v.getInit() != null && !(v.getInit() instanceof AssignExpression))
+			ErrUtils.warn("Warning %s: computed value is not used", v.getInit().getPosition());
+		if(v.getAct() != null && !(v.getAct() instanceof AssignExpression))
+			ErrUtils.warn("Warning %s: computed value is not used", v.getAct().getPosition());
+		
+		if(v.getInit() != null)
+			v.getInit().accept(this, arg);
+		if(v.getCond() != null)
+			v.getCond().accept(this, arg);
+		if(v.getAct() != null)
+			v.getAct().accept(this, arg);
+		v.getBody().accept(this, arg);
 	}
 	
 	@Override

@@ -1,5 +1,7 @@
 package com.bamless.interpreter.interpret;
 
+import java.math.BigDecimal;
+
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
@@ -11,7 +13,7 @@ import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 
-public class ArithmeticExpInterpreter extends VisitorAdapter<Float, Void> {
+public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 	private MemoryEnvironment memEnv;
 
 	public ArithmeticExpInterpreter(MemoryEnvironment memEnv) {
@@ -19,65 +21,65 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<Float, Void> {
 	}
 	
 	@Override
-	public Float visit(ArithmeticBinExpression e, Void arg) {
-		float l = e.getLeft().accept(this, null);
-		float r = e.getRight().accept(this, null);
+	public BigDecimal visit(ArithmeticBinExpression e, Void arg) {
+		BigDecimal l = e.getLeft().accept(this, null);
+		BigDecimal r = e.getRight().accept(this, null);
 		
 		switch(e.getOperation()) {
 		case PLUS:
-			return l + r;
+			return l.add(r);
 		case MINUS:
-			return l - r;
+			return l.subtract(r);
 		case MULT:
-			return l * r;
+			return l.multiply(r);
 		case MOD:
-			return l % r;
+			return l.remainder(r);
 		case DIV:
 			if(e.getLeft().getType() == Type.INT && e.getRight().getType() == Type.INT)
-				return (float) ((int) l / (int) r);
+				return l.divide(r).abs();
 			else
-				return l / r;
+				return l.divide(r);
 		default:
 			throw new RuntimeError("fatal error");
 		}
 	}
 	
 	@Override
-	public Float visit(AssignExpression e, Void arg) {
-		float res = e.getExpression().accept(this, null).floatValue();
+	public BigDecimal visit(AssignExpression e, Void arg) {
+		BigDecimal res = e.getExpression().accept(this, null);
 		if(e.getType() == Type.INT)
-			memEnv.set((Lvalue) e.getLvalue(), (int) res);
+			memEnv.set((Lvalue) e.getLvalue(), res.intValue());
 		else
-			memEnv.set((Lvalue) e.getLvalue(), res);
+			memEnv.set((Lvalue) e.getLvalue(), res.floatValue());
 		
 		return res;
 	}
 	
 	@Override
-	public Float visit(VarLiteral v, Void arg) {
+	public BigDecimal visit(VarLiteral v, Void arg) {
 		if(v.getType() == Type.INT)
-			return ((Integer) memEnv.retrieve(v)).floatValue();
+			return BigDecimal.valueOf(((Integer) memEnv.retrieve(v)));
 		else 
-			return (Float) memEnv.retrieve(v);
+			return BigDecimal.valueOf(((Float) memEnv.retrieve(v)));
 	}
 	
 	@Override
-	public Float visit(ArrayAccess a, Void arg) {
+	public BigDecimal visit(ArrayAccess a, Void arg) {
 		if(a.getType() == Type.INT) {
-			return ((Integer) memEnv.retrieve(a)).floatValue();
+			return BigDecimal.valueOf(((Integer) memEnv.retrieve(a)));
 		}else {
-			return (Float) memEnv.retrieve(a);
+			return BigDecimal.valueOf(((Float) memEnv.retrieve(a)));
 		}
 	}
 	
 	@Override
-	public Float visit(FloatLiteral f, Void arg) {
-		return f.getValue();
+	public BigDecimal visit(FloatLiteral f, Void arg) {
+		return BigDecimal.valueOf(f.getValue());
 	}
 	
 	@Override
-	public Float visit(IntegerLiteral i, Void arg) {
-		return (float) i.getValue();
+	public BigDecimal visit(IntegerLiteral i, Void arg) {
+		return BigDecimal.valueOf(i.getValue());
 	}
 
 }
