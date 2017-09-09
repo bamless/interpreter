@@ -68,9 +68,9 @@ public class Runtime {
 		
 		@Override
 		public Object visit(AssignExpression e, Void arg) {
-			Array arr = (Array) e.getExpression().accept(this, arg);
-			set(e.getLvalue(), arr);
-			return arr;
+			Object o = e.getExpression().accept(this, arg);
+			set((Lvalue) e.getLvalue(), o);
+			return o;
 		}
 		
 		@Override

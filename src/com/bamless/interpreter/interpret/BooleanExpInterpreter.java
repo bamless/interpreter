@@ -107,7 +107,7 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	@Override
 	public Boolean visit(AssignExpression e, Void arg) {
 		boolean res = e.getExpression().accept(this, null);
-		runtime.set(e.getLvalue(), res);
+		runtime.set((Lvalue) e.getLvalue(), res);
 		return res;
 	}
 	

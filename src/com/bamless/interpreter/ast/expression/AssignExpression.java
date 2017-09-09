@@ -5,10 +5,10 @@ import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class AssignExpression extends Lvalue {
-	private Lvalue lvalue;
+	private Expression lvalue;
 	private Expression e;
 	
-	public AssignExpression(Position pos, Lvalue lvalue, Expression e) {
+	public AssignExpression(Position pos, Expression lvalue, Expression e) {
 		super(pos);
 		this.lvalue = lvalue;
 		this.e = e;
@@ -24,7 +24,7 @@ public class AssignExpression extends Lvalue {
 		return v.visit(this, arg);
 	}
 
-	public Lvalue getLvalue() {
+	public Expression getLvalue() {
 		return lvalue;
 	}
 

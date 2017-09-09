@@ -2,6 +2,7 @@ package com.bamless.interpreter.interpret;
 
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
+import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
 import com.bamless.interpreter.interpret.runtime.Array;
@@ -27,7 +28,7 @@ public class ArrayExpInterpreter extends VisitorAdapter<Array, Void> {
 	@Override
 	public Array visit(AssignExpression e, Void arg) {
 		Array res = e.getExpression().accept(this, null);
-		runtime.set(e.getLvalue(), res);
+		runtime.set((Lvalue) e.getLvalue(), res);
 		return res;
 	}
 

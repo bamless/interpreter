@@ -5,10 +5,10 @@ import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class ArrayAccess extends Lvalue {
-	private Lvalue lvalue;
+	private Expression lvalue;
 	private Expression index;
 
-	public ArrayAccess(Position start, Lvalue lvalue, Expression index) {
+	public ArrayAccess(Position start, Expression lvalue, Expression index) {
 		super(start);
 		this.lvalue = lvalue;
 		this.index = index;
@@ -25,7 +25,7 @@ public class ArrayAccess extends Lvalue {
 		v.visit(this, arg);
 	}
 	
-	public Lvalue getLvalue() {
+	public Expression getLvalue() {
 		return lvalue;
 	}
 	

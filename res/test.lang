@@ -1,14 +1,14 @@
 int x = 10;
 
-boolean arr1[x][x];
-boolean arr2[20][20];
+string arr1[x][x];
+string arr2[20][20];
 
 int i; int j;
 for(i = 0; i < x; i += 1)
 	for(j = 0; j < x; j += 1)
-		arr1[i][j] = false;
+		arr1[i][j] = "hello";
 
-boolean z = (arr2[3] = arr1[2])[5];
+string z = (arr2[3] = arr1[2])[5];
 print z + "\n";
 
 print( (arr2[3] == arr1[2]) + "\n");

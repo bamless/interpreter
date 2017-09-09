@@ -5,6 +5,7 @@ import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
+import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
@@ -45,9 +46,9 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<Float, Void> {
 	public Float visit(AssignExpression e, Void arg) {
 		float res = e.getExpression().accept(this, null).floatValue();
 		if(e.getType() == Type.INT)
-			runtime.set(e.getLvalue(), (int) res);
+			runtime.set((Lvalue) e.getLvalue(), (int) res);
 		else
-			runtime.set(e.getLvalue(), res);
+			runtime.set((Lvalue) e.getLvalue(), res);
 		
 		return res;
 	}
