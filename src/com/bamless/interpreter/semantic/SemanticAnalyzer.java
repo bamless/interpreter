@@ -60,6 +60,9 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	
 	@Override
 	public void visit(AssignExpression e, Void arg) {
+		if(e.getLvalue() instanceof AssignExpression)
+			semanticError(e.getPosition(), "left hand side must be a variable");
+			
 		if(e.getLvalue() instanceof VarLiteral) {
 			VarLiteral v = (VarLiteral) e.getLvalue();
 			try {

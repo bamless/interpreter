@@ -39,6 +39,12 @@ public class Main {
 		root.accept(i, null);
 		
 		System.out.println("\nDone executing");
+		
+//		int[][] x = new int[10][20];
+//		int[][] y = new int[10][20];
+//		int[][] z = new int[10][20];
+//		
+//		int s = (z[1] = z[3])[4] = 4;
 	}
 	
 }
