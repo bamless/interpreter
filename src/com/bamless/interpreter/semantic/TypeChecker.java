@@ -275,7 +275,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		Type ltype = a.getLvalue().accept(this, arg);
 		
 		if(!ltype.isArray()) {
-			typeError(a.getIndex().getPosition(), "The type of the expression must be an array type,"
+			typeError(a.getPosition(), "The type of the expression must be an array type,"
 					+ " but instead resolved to %s", ltype.toString().toLowerCase());
 		}
 		
