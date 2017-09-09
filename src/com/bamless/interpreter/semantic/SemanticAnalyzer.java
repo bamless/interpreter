@@ -49,6 +49,7 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	@Override
 	public void visit(ArrayDecl a, Void arg) {
 		try {
+			//true because arrays get initialized automagically
 			sym.define(a.getId().getVal(), true);
 		} catch(IllegalArgumentException e) {
 			semanticError(a.getPosition(), "double declaration of variable %s", a.getId().getVal());
@@ -62,7 +63,7 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	@Override
 	public void visit(AssignExpression e, Void arg) {
 		if(!(e.getLvalue() instanceof Lvalue))
-			semanticError(e.getPosition(), "left hand side must be an lvalue");
+			semanticError(e.getPosition(), "left hand side of assignement must be an lvalue");
 			
 		if(e.getLvalue() instanceof VarLiteral) {
 			VarLiteral v = (VarLiteral) e.getLvalue();
