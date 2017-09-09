@@ -274,14 +274,14 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	public Type visit(ArrayAccess a, Void arg) {
 		Type ltype = a.getLvalue().accept(this, arg);
 		
-		if(ltype != null && !ltype.isArray()) {
+		if(!ltype.isArray()) {
 			typeError(a.getPosition(), "The type of the expression must be an array type,"
 					+ " but instead resolved to %s", ltype.toString().toLowerCase());
 		}
 		
 		Type index = a.getIndex().accept(this, arg);
 		if(index != Type.INT)
-			typeError(a.getIndex().getPosition(), "array access indices must evaluate to int");
+			typeError(a.getIndex().getPosition(), "array access index must evaluate to int");
 		
 		Type type = Type.internalTypeOf((ArrayType) ltype);
 		a.setType(type);

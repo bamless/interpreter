@@ -2,7 +2,6 @@ package com.bamless.interpreter.semantic;
 
 import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.Position;
-import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.Lvalue;
@@ -64,9 +63,6 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	public void visit(AssignExpression e, Void arg) {
 		if(!(e.getLvalue() instanceof Lvalue))
 			semanticError(e.getPosition(), "left hand side must be an lvalue");
-		
-		if(e.getLvalue() instanceof AssignExpression)
-			semanticError(e.getPosition(), "left hand side must be a variable");
 			
 		if(e.getLvalue() instanceof VarLiteral) {
 			VarLiteral v = (VarLiteral) e.getLvalue();
@@ -91,15 +87,6 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 		if(!isInit) {
 			semanticError(v.getId().getPosition(), "the local variable %s may not have been initialized", v.getId().getVal());
 		}
-	}
-	
-	@Override
-	public void visit(ArrayAccess a, Void arg) {
-		if(!(a.getLvalue() instanceof Lvalue))
-			semanticError(a.getPosition(), "left hand must be an lvalue");
-		
-		a.getLvalue().accept(this, arg);
-		a.getIndex().accept(this, arg);
 	}
 	
 	private void semanticError(Position pos, String format, Object... args) {

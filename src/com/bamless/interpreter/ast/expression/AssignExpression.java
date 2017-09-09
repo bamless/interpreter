@@ -4,7 +4,7 @@ import com.bamless.interpreter.Position;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
-public class AssignExpression extends Lvalue {
+public class AssignExpression extends Expression {
 	private Expression lvalue;
 	private Expression e;
 	
