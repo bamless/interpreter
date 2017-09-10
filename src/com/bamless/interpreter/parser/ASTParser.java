@@ -264,13 +264,13 @@ public class ASTParser {
 	/* ************************* */
 	
 	private  Expression expression() {
-		Expression e = primaryExpr();
+		Expression e = logicalExpr();
 		if(lex.peek().getType().endsWith("="))
 			e = assignmentExpr(e);
 		return e;
 	}
 
-	private Expression primaryExpr() {
+	private Expression logicalExpr() {
 		Expression left = equalityExpr();
 		
 		Token op;
@@ -358,13 +358,13 @@ public class ASTParser {
 	}
 	
 	private Expression term() {
-		Expression left = factor();
+		Expression left = unaryExpr();
 		
 		Token op;
 		while((op = lex.peek()).getType().equals("/") || op.getType().equals("*") ||
 				op.getType().equals("%")) {
 			lex.next();
-			Expression right = factor();
+			Expression right = unaryExpr();
 			
 			switch(op.getType()) {
 			case "/":
@@ -381,17 +381,16 @@ public class ASTParser {
 		return left;
 	}
 
-	private Expression factor() {
+	private Expression unaryExpr() {
 		if(lex.peek().getType().equals("!")) {
 			Position pos = require("!").getPosition();
-			Expression e = factor();
-			return new LogicalNotExpression(e, pos);
+			return new LogicalNotExpression(unaryExpr(), pos);
 		}
 		
-		return postfix();
+		return postfixExpr();
 	}
 	
-	private Expression postfix() {
+	private Expression postfixExpr() {
 		Expression l = literal();
 		
 		while(lex.peek().getType().equals("[")) {
