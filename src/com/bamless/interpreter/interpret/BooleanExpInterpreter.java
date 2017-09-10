@@ -51,8 +51,8 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 			l = e.getLeft().accept(interpreter.getStringExpInterpreter(), null);
 			r = e.getRight().accept(interpreter.getStringExpInterpreter(), null);
 		} else if(e.getLeft().getType().isArray()){
-			l = interpreter.getMemEnv().retrieve((Lvalue) e.getLeft());
-			r = interpreter.getMemEnv().retrieve((Lvalue) e.getRight());
+			l = e.getLeft().accept(interpreter.getArrayExpInterpreter(), null);
+			r = e.getRight().accept(interpreter.getArrayExpInterpreter(), null);
 		} else {
 			l = e.getLeft().accept(this, null);
 			r = e.getRight().accept(this, null);

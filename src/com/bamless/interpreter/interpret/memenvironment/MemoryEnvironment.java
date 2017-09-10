@@ -2,7 +2,6 @@ package com.bamless.interpreter.interpret.memenvironment;
 
 import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
-import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
@@ -55,7 +54,7 @@ public class MemoryEnvironment {
 		
 		@Override
 		public void visit(ArrayAccess a, Object arg) {
-			Array l = (Array) a.getLvalue().accept(varRetriever, null);
+			Array l = a.getLvalue().accept(interpreter.getArrayExpInterpreter(), null);
 			l.set(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), null).intValue(), arg);
 		}
 	}
@@ -67,15 +66,8 @@ public class MemoryEnvironment {
 		}
 		
 		@Override
-		public Object visit(AssignExpression e, Void arg) {
-			Object o = e.getExpression().accept(this, arg);
-			set((Lvalue) e.getLvalue(), o);
-			return o;
-		}
-		
-		@Override
 		public Object visit(ArrayAccess a, Void arg) {
-			Array array = (Array) a.getLvalue().accept(this, arg);
+			Array array = a.getLvalue().accept(interpreter.getArrayExpInterpreter(), null);
 			return array.get(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), arg).intValue());
 		}
 	}
