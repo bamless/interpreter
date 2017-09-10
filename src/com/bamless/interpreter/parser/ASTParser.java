@@ -263,6 +263,33 @@ public class ASTParser {
 		return e;
 	}
 
+	private Expression assignmentExpr(Expression left) {
+		Token next = lex.next();
+		
+		switch(next.getType()) {
+		case "=":
+			return new AssignExpression(left.getPosition(), left, expression());
+		case "+=":
+			Expression add = new ArithmeticBinExpression(PLUS, left, expression(), left.getPosition());
+			return new AssignExpression(left.getPosition(), left, add);
+		case "-=":
+			Expression min = new ArithmeticBinExpression(MINUS, left, expression(), left.getPosition());
+			return new AssignExpression(left.getPosition(), left, min);
+		case "*=":
+			Expression mul = new ArithmeticBinExpression(MULT, left, expression(), left.getPosition());
+			return new AssignExpression(left.getPosition(), left, mul);
+		case "/=":
+			Expression div = new ArithmeticBinExpression(DIV, left, expression(), left.getPosition());
+			return new AssignExpression(left.getPosition(), left, div);
+		case "%=":
+			Expression mod = new ArithmeticBinExpression(MOD, left, expression(), left.getPosition());
+			return new AssignExpression(left.getPosition(), left, mod);
+		default:
+			error("Expected assignment oprator but instead found \"%s\"", next.getValue());
+			return null;
+		}
+	}
+	
 	private Expression logicalExpr() {
 		Expression left = equalityExpr();
 		
@@ -421,33 +448,6 @@ public class ASTParser {
 			return e;
 		default:
 			error("expected expression before \"%s\"", litTok.getValue());
-			return null;
-		}
-	}
-	
-	private Expression assignmentExpr(Expression left) {
-		Token next = lex.next();
-		
-		switch(next.getType()) {
-		case "=":
-			return new AssignExpression(left.getPosition(), left, expression());
-		case "+=":
-			Expression add = new ArithmeticBinExpression(PLUS, left, expression(), left.getPosition());
-			return new AssignExpression(left.getPosition(), left, add);
-		case "-=":
-			Expression min = new ArithmeticBinExpression(MINUS, left, expression(), left.getPosition());
-			return new AssignExpression(left.getPosition(), left, min);
-		case "*=":
-			Expression mul = new ArithmeticBinExpression(MULT, left, expression(), left.getPosition());
-			return new AssignExpression(left.getPosition(), left, mul);
-		case "/=":
-			Expression div = new ArithmeticBinExpression(DIV, left, expression(), left.getPosition());
-			return new AssignExpression(left.getPosition(), left, div);
-		case "%=":
-			Expression mod = new ArithmeticBinExpression(MOD, left, expression(), left.getPosition());
-			return new AssignExpression(left.getPosition(), left, mod);
-		default:
-			error("Expected assignment oprator but instead found \"%s\"", next.getValue());
 			return null;
 		}
 	}
