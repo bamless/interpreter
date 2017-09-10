@@ -17,6 +17,7 @@ public class Array implements Cloneable {
 			for(int i = 0; i < arr.length; i++)
 					arr[i] = new Array(dimensions, ((ArrayType) t).getInternalType());
 		}
+		dimensions.push(arr.length);
 	}
 	
 	private void init(Type t) {

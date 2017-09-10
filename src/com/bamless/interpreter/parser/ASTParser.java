@@ -118,17 +118,10 @@ public class ASTParser {
 		case "PRINT":
 			return printStmt();
 		//expression statement (an expression followed by a semicolon)
-		case "!":
-		case "INT_CONST":
-		case "FLOAT_CONST":
-		case "STRING_CONST":
-		case "IDENTIFIER":
+		default:
 			Statement s = expression();
 			require(";");
 			return s;
-		default:
-			error("expected statement before \"%s\"", lex.peek().getValue());
-			return null;
 		}
 	}
 	
