@@ -57,17 +57,17 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 	@Override
 	public BigDecimal visit(VarLiteral v, Void arg) {
 		if(v.getType() == Type.INT)
-			return BigDecimal.valueOf(((Integer) interpreter.getMemEnv().retrieve(v)));
+			return BigDecimal.valueOf(interpreter.getMemEnv().<Integer>retrieve(v));
 		else 
-			return BigDecimal.valueOf(((Float) interpreter.getMemEnv().retrieve(v)));
+			return BigDecimal.valueOf(interpreter.getMemEnv().<Integer>retrieve(v));
 	}
 	
 	@Override
 	public BigDecimal visit(ArrayAccess a, Void arg) {
 		if(a.getType() == Type.INT) {
-			return BigDecimal.valueOf(((Integer) interpreter.getMemEnv().retrieve(a)));
+			return BigDecimal.valueOf(interpreter.getMemEnv().<Integer>retrieve(a));
 		}else {
-			return BigDecimal.valueOf(((Float) interpreter.getMemEnv().retrieve(a)));
+			return BigDecimal.valueOf(interpreter.getMemEnv().<Float>retrieve(a));
 		}
 	}
 	

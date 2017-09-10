@@ -16,12 +16,12 @@ public class ArrayExpInterpreter extends VisitorAdapter<Array, Void> {
 	
 	@Override
 	public Array visit(VarLiteral v, Void arg) {
-		return (Array) interpreter.getMemEnv().retrieve(v);
+		return interpreter.getMemEnv().<Array>retrieve(v);
 	}
 	
 	@Override
 	public Array visit(ArrayAccess a, Void arg) {
-		return (Array) interpreter.getMemEnv().retrieve(a);
+		return interpreter.getMemEnv().<Array>retrieve(a);
 	}
 	
 	@Override

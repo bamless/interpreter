@@ -60,12 +60,12 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 	
 	@Override
 	public String visit(VarLiteral v, Void arg) {
-		return (String) interpreter.getMemEnv().retrieve(v);
+		return interpreter.getMemEnv().<String>retrieve(v);
 	}
 	
 	@Override
 	public String visit(ArrayAccess a, Void arg) {
-		return (String) interpreter.getMemEnv().retrieve(a);
+		return interpreter.getMemEnv().<String>retrieve(a);
 	}
 	
 	@Override

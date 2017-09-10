@@ -26,16 +26,17 @@ public class MemoryEnvironment {
 		this.interpreter = interpreter;
 	}
 	
-	public void define(Identifier id, Object val) {
+	public <T> void define(Identifier id, T val) {
 		environmet.define(id.getVal(), val);
 	}
 	
-	public void set(Lvalue var, Object val) {
+	public <T> void set(Lvalue var, T val) {
 		var.accept(varSetter, val);
 	}
 	
-	public Object retrieve(Lvalue var) {
-		return var.accept(varRetriever, null);
+	@SuppressWarnings("unchecked")
+	public <T> T retrieve(Lvalue var) {
+		return (T) var.accept(varRetriever, null);
 	}
 	
 	public void enterScope() {

@@ -90,12 +90,12 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	
 	@Override
 	public Boolean visit(VarLiteral v, Void arg) {
-		return (Boolean) interpreter.getMemEnv().retrieve(v);
+		return interpreter.getMemEnv().<Boolean>retrieve(v);
 	}
 	
 	@Override
 	public Boolean visit(ArrayAccess a, Void arg) {
-		return (Boolean) interpreter.getMemEnv().retrieve(a);
+		return interpreter.getMemEnv().<Boolean>retrieve(a);
 	}
 	
 	@Override
