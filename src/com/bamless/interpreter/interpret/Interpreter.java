@@ -94,7 +94,7 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 			computetDim.add(e.accept(ai, null).intValue());
 		}
 		
-		memEnv.define(a.getId(), new Array(computetDim, Type.internalTypeOf((ArrayType) a.getType())));
+		memEnv.define(a.getId(), new Array(computetDim, ((ArrayType) a.getType()).getInternalType()));
 	}
 	
 	@Override

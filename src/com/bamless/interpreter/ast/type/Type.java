@@ -10,7 +10,6 @@ public abstract class Type {
 	public static final Type STRING = new StringType();
 	
 	private static final HashMap<Type, ArrayType> arrayFromType = new HashMap<>();
-	private static final HashMap<ArrayType, Type> typeFromArray = new HashMap<>();
 	
 	protected Type() {
 	}
@@ -34,13 +33,8 @@ public abstract class Type {
 		if(!arrayFromType.containsKey(t)) {
 			ArrayType at = new ArrayType(t);
 			arrayFromType.put(t, at);
-			typeFromArray.put(at, t);
 		}
 		return arrayFromType.get(t);
-	}
-	
-	public static Type internalTypeOf(ArrayType t) {
-		return typeFromArray.get(t);
 	}
 	
 	/**

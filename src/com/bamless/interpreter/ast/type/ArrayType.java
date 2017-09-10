@@ -1,10 +1,10 @@
 package com.bamless.interpreter.ast.type;
 
 public class ArrayType extends Type {
-	private Type elemType;
+	private Type internal;
 	
-	protected ArrayType(Type elemType) {
-		this.elemType = elemType;
+	protected ArrayType(Type internal) {
+		this.internal = internal;
 	}
 	
 	@Override
@@ -61,11 +61,11 @@ public class ArrayType extends Type {
 
 	@Override
 	public String toString() {
-		return elemType + "[]";
+		return internal + "[]";
 	}
 	
-	public Type getElemType() {
-		return elemType;
+	public Type getInternalType() {
+		return internal;
 	}
 
 }

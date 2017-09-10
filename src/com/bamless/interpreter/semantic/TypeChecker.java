@@ -283,7 +283,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		if(index != Type.INT)
 			typeError(a.getIndex().getPosition(), "array access index must evaluate to int");
 		
-		Type type = Type.internalTypeOf((ArrayType) ltype);
+		Type type = ((ArrayType) ltype).getInternalType();
 		a.setType(type);
 		return type;
 	}
