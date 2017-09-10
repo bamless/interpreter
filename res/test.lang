@@ -1,6 +1,7 @@
 //fibonacci yeee
 
-int n = 33;
+int n = 45;
+print n + "\n";
 int fn[3];
 
 fn[0] = 1;

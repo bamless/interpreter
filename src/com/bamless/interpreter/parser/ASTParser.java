@@ -404,11 +404,16 @@ public class ASTParser {
 	
 	private Expression literal() {
 		Token litTok = lex.next();
-		
 		switch(litTok.getType()) {
 		case "INT_CONST":
-			return new IntegerLiteral(litTok.getPosition(), Integer.parseInt(litTok.getValue()));
+			try {
+				return new IntegerLiteral(litTok.getPosition(), Integer.parseInt(litTok.getValue()));
+			} catch(NumberFormatException ex) {
+				error("int literal out of range");
+			}
 		case "FLOAT_CONST":
+			float f = Float.parseFloat(litTok.getValue());
+			if(Float.isInfinite(f)) error("float literal out of range");
 			return new FloatLiteral(litTok.getPosition(), Float.parseFloat(litTok.getValue()));
 		case "BOOL_CONST":
 			return new BooleanLiteral(litTok.getPosition(), Boolean.parseBoolean(litTok.getValue()));
