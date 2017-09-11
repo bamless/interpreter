@@ -42,8 +42,7 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	
 	@Override
 	public Boolean visit(EqualityExpression e, Void arg) {
-		Object l;
-		Object r;
+		Object l, r;
 		if(e.getLeft().getType() == Type.INT || e.getLeft().getType() == Type.FLOAT) {
 			l = e.getLeft().accept(interpreter.getArithmeticExpInterpreter(), null);
 			r = e.getRight().accept(interpreter.getArithmeticExpInterpreter(), null);
@@ -62,7 +61,7 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 		case EQ:
 			return l.equals(r);
 		case NEQ:
-			return !r.equals(r);
+			return !l.equals(r);
 		default:
 			throw new RuntimeError("fatal error");
 		}
