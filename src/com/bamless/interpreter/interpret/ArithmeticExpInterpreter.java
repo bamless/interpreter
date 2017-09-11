@@ -59,7 +59,7 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 		if(v.getType() == Type.INT)
 			return BigDecimal.valueOf(interpreter.getMemEnv().<Integer>retrieve(v));
 		else 
-			return BigDecimal.valueOf(interpreter.getMemEnv().<Integer>retrieve(v));
+			return BigDecimal.valueOf(interpreter.getMemEnv().<Float>retrieve(v));
 	}
 	
 	@Override
