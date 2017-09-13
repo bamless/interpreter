@@ -1,10 +1,11 @@
-package com.bamless.interpreter.interpret;
+package com.bamless.interpreter.interpret.expinterpreter;
 
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
+import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.interpret.memenvironment.Array;
 
 public class ArrayExpInterpreter extends VisitorAdapter<Array, Void> {

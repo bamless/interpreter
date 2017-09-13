@@ -1,4 +1,4 @@
-package com.bamless.interpreter.interpret;
+package com.bamless.interpreter.interpret.expinterpreter;
 
 import java.math.BigDecimal;
 
@@ -13,6 +13,8 @@ import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
+import com.bamless.interpreter.interpret.Interpreter;
+import com.bamless.interpreter.interpret.RuntimeError;
 
 public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	private Interpreter interpreter;

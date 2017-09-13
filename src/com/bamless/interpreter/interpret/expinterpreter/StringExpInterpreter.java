@@ -1,4 +1,4 @@
-package com.bamless.interpreter.interpret;
+package com.bamless.interpreter.interpret.expinterpreter;
 
 import java.math.BigDecimal;
 
@@ -11,6 +11,8 @@ import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
+import com.bamless.interpreter.interpret.Interpreter;
+import com.bamless.interpreter.interpret.RuntimeError;
 
 public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 	private Interpreter interpreter;

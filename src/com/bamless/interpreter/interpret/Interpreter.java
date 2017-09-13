@@ -15,6 +15,10 @@ import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.type.ArrayType;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
+import com.bamless.interpreter.interpret.expinterpreter.ArithmeticExpInterpreter;
+import com.bamless.interpreter.interpret.expinterpreter.ArrayExpInterpreter;
+import com.bamless.interpreter.interpret.expinterpreter.BooleanExpInterpreter;
+import com.bamless.interpreter.interpret.expinterpreter.StringExpInterpreter;
 import com.bamless.interpreter.interpret.memenvironment.Array;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 

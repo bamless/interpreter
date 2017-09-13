@@ -28,6 +28,9 @@ public class Main {
 		SemanticAnalyzer sa = new SemanticAnalyzer();
 		root.accept(sa, null);		
 		
+		System.out.println("Done");
+		System.out.println("Commencing type checking...");
+		
 		TypeChecker tc = new TypeChecker();
 		root.accept(tc, null);
 		

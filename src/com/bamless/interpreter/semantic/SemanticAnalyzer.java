@@ -15,16 +15,15 @@ import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 
 public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	/**
-	 * Symbol table to keep track of declared variables.
-	 * The boolean associated with the variable's identifier
-	 * denotes if the variable is initialized or not
+	 * Symbol table to keep track of declared variables. The boolean associated with
+	 * the variable's identifier denotes if the variable is initialized or not
 	 */
 	private SymbolTable<Boolean> sym;
-	
+
 	public SemanticAnalyzer() {
 		sym = new SymbolTable<>();
 	}
-	
+
 	@Override
 	public void visit(BlockStatement v, Void arg) {
 		sym.enterScope();
@@ -35,14 +34,14 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 		}
 		sym.exitScope();
 	}
-	
+
 	@Override
 	public void visit(ForStatement v, Void arg) {
 		if(v.getInit() != null && !(v.getInit() instanceof AssignExpression))
 			ErrUtils.warn("Warning %s: computed value is not used", v.getInit().getPosition());
 		if(v.getAct() != null && !(v.getAct() instanceof AssignExpression))
 			ErrUtils.warn("Warning %s: computed value is not used", v.getAct().getPosition());
-		
+
 		if(v.getInit() != null)
 			v.getInit().accept(this, arg);
 		if(v.getCond() != null)
@@ -51,7 +50,7 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 			v.getAct().accept(this, arg);
 		v.getBody().accept(this, arg);
 	}
-	
+
 	@Override
 	public void visit(VarDecl v, Void arg) {
 		try {
@@ -62,51 +61,49 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 		if(v.getInitializer() != null)
 			v.getInitializer().accept(this, arg);
 	}
-	
+
 	@Override
 	public void visit(ArrayDecl a, Void arg) {
 		try {
-			//true because arrays get initialized automagically
+			// true because arrays get initialized automagically
 			sym.define(a.getId().getVal(), true);
 		} catch(IllegalArgumentException e) {
 			semanticError(a.getPosition(), "double declaration of variable %s", a.getId().getVal());
 		}
-		
+
 		for(Expression e : a.getDimensions()) {
 			e.accept(this, arg);
 		}
 	}
-	
+
 	@Override
 	public void visit(AssignExpression e, Void arg) {
 		if(!(e.getLvalue() instanceof Lvalue))
 			semanticError(e.getPosition(), "left hand side of assignement must be an lvalue");
-			
+
 		if(e.getLvalue() instanceof VarLiteral) {
 			VarLiteral v = (VarLiteral) e.getLvalue();
 			try {
 				sym.set(v.getId().getVal(), true);
 			} catch(IllegalArgumentException ex) {
-				semanticError(v.getId().getPosition(), 
-						"variable %s cannot be resolved", v.getId().getVal());
+				semanticError(v.getId().getPosition(), "variable %s cannot be resolved", v.getId().getVal());
 			}
 		}
-		
+
 		e.getLvalue().accept(this, arg);
-		e.getExpression().accept(this, arg);		
+		e.getExpression().accept(this, arg);
 	}
-	
+
 	@Override
 	public void visit(VarLiteral v, Void arg) {
 		Boolean isInit = sym.lookup(v.getId().getVal());
-		if(isInit == null) {
+		if(isInit == null)
 			semanticError(v.getId().getPosition(), "variable %s cannot be resolved", v.getId().getVal());
-		}
-		if(!isInit) {
-			semanticError(v.getId().getPosition(), "the local variable %s may not have been initialized", v.getId().getVal());
-		}
+		if(!isInit)
+			semanticError(v.getId().getPosition(), "the local variable %s may not have been initialized",
+					v.getId().getVal());
 	}
-	
+
 	private void semanticError(Position pos, String format, Object... args) {
 		throw new SemanticException(String.format("Semantic error at " + pos + ": " + format, args));
 	}
