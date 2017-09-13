@@ -1,6 +1,6 @@
 package com.bamless.interpreter.lex;
 
-import com.bamless.interpreter.Position;
+import com.bamless.interpreter.ast.Position;
 
 public class Token {
 	

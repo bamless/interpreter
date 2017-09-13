@@ -1,6 +1,5 @@
 package com.bamless.interpreter.ast;
 
-import com.bamless.interpreter.Position;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;

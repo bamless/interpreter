@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.bamless.interpreter.Position;
+import com.bamless.interpreter.ast.Position;
 
 public class Lexer {
 	private final static Token END = new Token("_END_OF_INPUT_", "end of input", new Position(0, 0));

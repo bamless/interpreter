@@ -1,6 +1,5 @@
 package com.bamless.interpreter.ast;
 
-import com.bamless.interpreter.Position;
 import com.bamless.interpreter.ast.visitor.Visitable;
 
 public abstract class ASTNode implements Visitable {

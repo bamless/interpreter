@@ -1,7 +1,7 @@
 package com.bamless.interpreter.ast.statement;
 
-import com.bamless.interpreter.Position;
 import com.bamless.interpreter.ast.Identifier;
+import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;

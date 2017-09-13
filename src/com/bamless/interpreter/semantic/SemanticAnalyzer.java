@@ -1,7 +1,7 @@
 package com.bamless.interpreter.semantic;
 
 import com.bamless.interpreter.ErrUtils;
-import com.bamless.interpreter.Position;
+import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.Lvalue;

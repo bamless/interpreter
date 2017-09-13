@@ -1,4 +1,4 @@
-package com.bamless.interpreter;
+package com.bamless.interpreter.ast;
 
 public class Position implements Comparable<Position> {
 	public final int line;

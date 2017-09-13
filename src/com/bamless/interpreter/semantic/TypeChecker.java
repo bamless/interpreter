@@ -1,7 +1,7 @@
 package com.bamless.interpreter.semantic;
 
 import com.bamless.interpreter.ErrUtils;
-import com.bamless.interpreter.Position;
+import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
