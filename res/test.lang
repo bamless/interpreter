@@ -2,8 +2,8 @@
 
 int n = 35;
 print n + "\n";
-int fn[3];
 
+int fn[3];
 fn[0] = 1;
 fn[1] = 1;
 

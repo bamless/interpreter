@@ -415,6 +415,14 @@ public class ASTParser {
 			Position pos = require("!").getPosition();
 			return new LogicalNotExpression(unaryExpr(), pos);
 		}
+		if(lex.peek().getType().equals("+")) {
+			require("+");
+			return unaryExpr();
+		}
+		if(lex.peek().getType().equals("-")) {
+			Position pos = require("-").getPosition();
+			return new ArithmeticBinExpression(MULT, new IntegerLiteral(pos, -1), unaryExpr());
+		}
 		if(lex.peek().getType().equals("++")) {
 			Position pos = require("++").getPosition();
 			return new PreIncrementOperation(INCR, unaryExpr(), pos);
