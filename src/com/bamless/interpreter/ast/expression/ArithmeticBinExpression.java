@@ -1,6 +1,5 @@
 package com.bamless.interpreter.ast.expression;
 
-import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
@@ -10,8 +9,8 @@ public class ArithmeticBinExpression extends BinaryExpression {
 	}
 	private ArithmeticBinOperation operation;
 
-	public ArithmeticBinExpression(ArithmeticBinOperation op, Expression left, Expression right, Position pos) {
-		super(left, right, pos);
+	public ArithmeticBinExpression(ArithmeticBinOperation op, Expression left, Expression right) {
+		super(left, right);
 		this.operation = op;
 	}
 

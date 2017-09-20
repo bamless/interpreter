@@ -3,15 +3,12 @@ package com.bamless.interpreter.ast.expression;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
-public class EqualityExpression extends BinaryExpression {
-	public static enum EqualityOperation {
-		EQ, NEQ;
-	}
-	private EqualityOperation operation;
+public class PostIncrementOperation extends PostFixExpression {
+	private IncrementOperator op;
 	
-	public EqualityExpression(EqualityOperation op, Expression left, Expression right) {
-		super(left, right);
-		this.operation = op;
+	public PostIncrementOperation(IncrementOperator op, Expression e) {
+		super(e);
+		this.op = op;
 	}
 
 	@Override
@@ -24,12 +21,14 @@ public class EqualityExpression extends BinaryExpression {
 		v.visit(this, arg);
 	}
 	
-	public EqualityOperation getOperation() {
-		return operation;
+	public IncrementOperator getOperator() {
+		return op;
 	}
 	
 	@Override
 	public String toString() {
-		return "(" + getLeft() +" "+ operation +" "+ getRight() + ")";
+		String opStr = op == IncrementOperator.INCR ? "++" : "--";
+		return getExpression() + opStr;
 	}
+	
 }

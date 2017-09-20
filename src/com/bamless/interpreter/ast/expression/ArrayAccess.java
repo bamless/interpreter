@@ -1,6 +1,5 @@
 package com.bamless.interpreter.ast.expression;
 
-import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
@@ -8,8 +7,8 @@ public class ArrayAccess extends Lvalue {
 	private Expression lvalue;
 	private Expression index;
 
-	public ArrayAccess(Position start, Expression lvalue, Expression index) {
-		super(start);
+	public ArrayAccess(Expression lvalue, Expression index) {
+		super(lvalue.getPosition());
 		this.lvalue = lvalue;
 		this.index = index;
 	}

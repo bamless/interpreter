@@ -10,6 +10,8 @@ import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
+import com.bamless.interpreter.ast.expression.PostIncrementOperation;
+import com.bamless.interpreter.ast.expression.PreIncrementOperation;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
@@ -40,6 +42,8 @@ public interface GenericVisitor<T, A> {
 	T visit(EqualityExpression e, A arg);
 	T visit(RelationalExpression r, A arg);
 	T visit(LogicalNotExpression n, A arg);
+	T visit(PostIncrementOperation p, A arg);
+	T visit(PreIncrementOperation p, A arg);
 	T visit(AssignExpression e, A arg);
 	
 	T visit(FloatLiteral f, A arg);

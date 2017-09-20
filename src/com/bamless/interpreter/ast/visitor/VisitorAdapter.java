@@ -11,6 +11,8 @@ import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
+import com.bamless.interpreter.ast.expression.PostIncrementOperation;
+import com.bamless.interpreter.ast.expression.PreIncrementOperation;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
@@ -29,7 +31,6 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(Visitable v, A arg) {
 		return null;
 	}
-
 
 	@Override
 	public T visit(Program p, A arg) {
@@ -181,6 +182,16 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 		a.getIndex().accept(this, arg);
 		
 		return null;
+	}
+
+	@Override
+	public T visit(PostIncrementOperation p, A arg) {
+		return p.getExpression().accept(this, arg);
+	}
+
+	@Override
+	public T visit(PreIncrementOperation p, A arg) {
+		return p.getExpression().accept(this, arg);
 	}
 
 }

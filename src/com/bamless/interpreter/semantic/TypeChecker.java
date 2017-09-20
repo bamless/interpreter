@@ -13,6 +13,8 @@ import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
+import com.bamless.interpreter.ast.expression.PostIncrementOperation;
+import com.bamless.interpreter.ast.expression.PreIncrementOperation;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
@@ -223,6 +225,32 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 
 		n.setType(Type.BOOLEAN);
 		return Type.BOOLEAN;
+	}
+	
+	@Override
+	public Type visit(PostIncrementOperation p, Void arg) {
+		Type t = p.getExpression().accept(this, null);
+		
+		if(t != Type.INT && t != Type.FLOAT) {
+			undefOperatorError(p.getPosition(), p.getOperator().
+					toString().toLowerCase(), t.toString().toLowerCase());
+		}
+		
+		p.setType(t);
+		return t;
+	}
+
+	@Override
+	public Type visit(PreIncrementOperation p, Void arg) {
+		Type t = p.getExpression().accept(this, null);
+		
+		if(t != Type.INT && t != Type.FLOAT) {
+			undefOperatorError(p.getPosition(), p.getOperator().
+					toString().toLowerCase(), t.toString().toLowerCase());
+		}
+		
+		p.setType(t);
+		return t;
 	}
 
 	@Override

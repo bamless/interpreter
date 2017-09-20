@@ -1,6 +1,5 @@
 package com.bamless.interpreter.ast.expression;
 
-import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
@@ -8,8 +7,8 @@ public class AssignExpression extends Expression {
 	private Expression lvalue;
 	private Expression e;
 	
-	public AssignExpression(Position pos, Expression lvalue, Expression e) {
-		super(pos);
+	public AssignExpression(Expression lvalue, Expression e) {
+		super(lvalue.getPosition());
 		this.lvalue = lvalue;
 		this.e = e;
 	}

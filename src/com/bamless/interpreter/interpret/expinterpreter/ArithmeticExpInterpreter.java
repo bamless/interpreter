@@ -8,6 +8,8 @@ import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.Lvalue;
+import com.bamless.interpreter.ast.expression.PostIncrementOperation;
+import com.bamless.interpreter.ast.expression.PreIncrementOperation;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
@@ -57,6 +59,49 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 	}
 	
 	@Override
+	public BigDecimal visit(PreIncrementOperation p, Void arg) {
+		BigDecimal res = p.getExpression().accept(this, null);
+		
+		switch(p.getOperator()) {
+		case INCR:
+			res = res.add(BigDecimal.valueOf(1));
+			break;
+		case DECR:
+			res = res.subtract(BigDecimal.valueOf(1));
+			break;
+		}
+		
+		if(p.getType() == Type.INT)
+			interpreter.getMemEnv().set((Lvalue) p.getExpression(), res.intValue());
+		else
+			interpreter.getMemEnv().set((Lvalue) p.getExpression(), res.floatValue());
+		
+		return res;
+	}
+	
+	@Override
+	public BigDecimal visit(PostIncrementOperation p, Void arg) {
+		BigDecimal old = p.getExpression().accept(this, null);
+		
+		BigDecimal res = null;
+		switch(p.getOperator()) {
+		case INCR:
+			res = old.add(BigDecimal.valueOf(1));
+			break;
+		case DECR:
+			res = old.subtract(BigDecimal.valueOf(1));
+			break;
+		}
+		
+		if(p.getType() == Type.INT)
+			interpreter.getMemEnv().set((Lvalue) p.getExpression(), res.intValue());
+		else
+			interpreter.getMemEnv().set((Lvalue) p.getExpression(), res.floatValue());
+		
+		return old;
+	}
+	
+	@Override
 	public BigDecimal visit(VarLiteral v, Void arg) {
 		if(v.getType() == Type.INT)
 			return BigDecimal.valueOf(interpreter.getMemEnv().<Integer>retrieve(v));
@@ -66,11 +111,10 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 	
 	@Override
 	public BigDecimal visit(ArrayAccess a, Void arg) {
-		if(a.getType() == Type.INT) {
+		if(a.getType() == Type.INT)
 			return BigDecimal.valueOf(interpreter.getMemEnv().<Integer>retrieve(a));
-		}else {
+		else
 			return BigDecimal.valueOf(interpreter.getMemEnv().<Float>retrieve(a));
-		}
 	}
 	
 	@Override

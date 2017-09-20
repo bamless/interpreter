@@ -11,6 +11,8 @@ import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
+import com.bamless.interpreter.ast.expression.PostIncrementOperation;
+import com.bamless.interpreter.ast.expression.PreIncrementOperation;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
@@ -148,6 +150,16 @@ public class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 	public void visit(ArrayAccess a, A arg) {
 		a.getLvalue().accept(this, arg);
 		a.getIndex().accept(this, arg);
+	}
+	
+	@Override
+	public void visit(PostIncrementOperation p, A arg) {
+		p.getExpression().accept(this, arg);
+	}
+
+	@Override
+	public void visit(PreIncrementOperation p, A arg) {
+		p.getExpression().accept(this, arg);
 	}
 	
 }

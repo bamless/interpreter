@@ -1,15 +1,14 @@
 package com.bamless.interpreter.ast.expression;
 
 import com.bamless.interpreter.ast.Identifier;
-import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class VarLiteral extends Lvalue {
 	private Identifier id;
 	
-	public VarLiteral(Identifier id, Position start) {
-		super(start);
+	public VarLiteral(Identifier id) {
+		super(id.getPosition());
 		this.id = id;
 	}
 

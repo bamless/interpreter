@@ -5,6 +5,8 @@ import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.Lvalue;
+import com.bamless.interpreter.ast.expression.PostIncrementOperation;
+import com.bamless.interpreter.ast.expression.PreIncrementOperation;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
@@ -28,8 +30,9 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	public void visit(BlockStatement v, Void arg) {
 		sym.enterScope();
 		for(Statement s : v.getStmts()) {
-			if(s instanceof Expression && !(s instanceof AssignExpression))
+			if(s instanceof Expression && !hasSideEffect((Expression) s)) {
 				ErrUtils.warn("Warning %s: computed value is not used", s.getPosition());
+			}
 			s.accept(this, null);
 		}
 		sym.exitScope();
@@ -37,10 +40,12 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(ForStatement v, Void arg) {
-		if(v.getInit() != null && !(v.getInit() instanceof AssignExpression))
+		if(v.getInit() != null && !hasSideEffect(v.getInit())) {
 			ErrUtils.warn("Warning %s: computed value is not used", v.getInit().getPosition());
-		if(v.getAct() != null && !(v.getAct() instanceof AssignExpression))
+		}
+		if(v.getAct() != null && !hasSideEffect(v.getAct())) {
 			ErrUtils.warn("Warning %s: computed value is not used", v.getAct().getPosition());
+		}
 
 		if(v.getInit() != null)
 			v.getInit().accept(this, arg);
@@ -93,6 +98,18 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 		e.getLvalue().accept(this, arg);
 		e.getExpression().accept(this, arg);
 	}
+	
+	@Override
+	public void visit(PreIncrementOperation p, Void arg) {
+		if(!(p.getExpression() instanceof Lvalue))
+			semanticError(p.getPosition(), "left hand side of assignement must be an lvalue");
+	}
+	
+	@Override
+	public void visit(PostIncrementOperation p, Void arg) {
+		if(!(p.getExpression() instanceof Lvalue))
+			semanticError(p.getPosition(), "left hand side of assignement must be an lvalue");
+	}
 
 	@Override
 	public void visit(VarLiteral v, Void arg) {
@@ -106,5 +123,13 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 
 	private void semanticError(Position pos, String format, Object... args) {
 		throw new SemanticException(String.format("Semantic error at " + pos + ": " + format, args));
+	}
+	
+	private boolean hasSideEffect(Expression e) {
+		if(e instanceof AssignExpression || e instanceof PostIncrementOperation 
+				|| e instanceof PreIncrementOperation) {
+			return true;
+		}
+		return false;
 	}
 }

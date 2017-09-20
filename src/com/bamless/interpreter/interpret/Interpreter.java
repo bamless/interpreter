@@ -4,6 +4,8 @@ import java.util.LinkedList;
 
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Expression;
+import com.bamless.interpreter.ast.expression.PostIncrementOperation;
+import com.bamless.interpreter.ast.expression.PreIncrementOperation;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
@@ -111,6 +113,16 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 			e.accept(ai, null);
 		if(e.getType().isArray())
 			e.accept(arri, null);
+	}
+	
+	@Override
+	public void visit(PreIncrementOperation p, Void arg) {
+		p.accept(ai, null);
+	}
+	
+	@Override
+	public void visit(PostIncrementOperation p, Void arg) {
+		p.accept(ai, null);
 	}
 
 	public ArithmeticExpInterpreter getArithmeticExpInterpreter() {

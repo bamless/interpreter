@@ -4,10 +4,12 @@ import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
-public class LogicalNotExpression extends UnaryExpression {
-
-	public LogicalNotExpression(Expression e, Position pos) {
+public class PreIncrementOperation extends UnaryExpression {
+	private IncrementOperator op;
+	
+	public PreIncrementOperation(IncrementOperator op, Expression e, Position pos) {
 		super(e, pos);
+		this.op = op;
 	}
 
 	@Override
@@ -19,10 +21,15 @@ public class LogicalNotExpression extends UnaryExpression {
 	public <A> void accept(VoidVisitor<A> v, A arg) {
 		v.visit(this, arg);
 	}
+
+	public IncrementOperator getOperator() {
+		return op;
+	}
 	
 	@Override
 	public String toString() {
-		return "!(" + getExpression() + ")";
+		String opStr = op == IncrementOperator.INCR ? "++" : "--";
+		return opStr + getExpression();
 	}
-
+	
 }

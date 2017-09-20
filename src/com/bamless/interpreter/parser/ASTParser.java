@@ -13,6 +13,8 @@ import static com.bamless.interpreter.ast.expression.RelationalExpression.Relati
 import static com.bamless.interpreter.ast.expression.RelationalExpression.RelationalOperation.GT;
 import static com.bamless.interpreter.ast.expression.RelationalExpression.RelationalOperation.LE;
 import static com.bamless.interpreter.ast.expression.RelationalExpression.RelationalOperation.LT;
+import static com.bamless.interpreter.ast.expression.IncrementOperator.INCR;
+import static com.bamless.interpreter.ast.expression.IncrementOperator.DECR;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,6 +37,8 @@ import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
+import com.bamless.interpreter.ast.expression.PostIncrementOperation;
+import com.bamless.interpreter.ast.expression.PreIncrementOperation;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
@@ -173,7 +177,7 @@ public class ASTParser {
 			Expression initializer = null;
 			if(lex.peek().getType().equals("=")) {
 				require("=");
-				initializer = new AssignExpression(id.getPosition(), new VarLiteral(id, id.getPosition()), expression());
+				initializer = new AssignExpression(new VarLiteral(id), expression());
 			}
 			
 			require(";");
@@ -265,27 +269,27 @@ public class ASTParser {
 			
 			switch(assignOp.getType()) {
 			case "=":
-				left = new AssignExpression(left.getPosition(), left, right);
+				left = new AssignExpression(left, right);
 				break;
 			case "+=":
-				Expression add = new ArithmeticBinExpression(PLUS, left, right, left.getPosition());
-				left = new AssignExpression(left.getPosition(), left, add);
+				Expression add = new ArithmeticBinExpression(PLUS, left, right);
+				left = new AssignExpression(left, add);
 				break;
 			case "-=":
-				Expression min = new ArithmeticBinExpression(MINUS, left, right, left.getPosition());
-				left = new AssignExpression(left.getPosition(), left, min);
+				Expression min = new ArithmeticBinExpression(MINUS, left, right);
+				left = new AssignExpression(left, min);
 				break;
 			case "*=":
-				Expression mul = new ArithmeticBinExpression(MULT, left, right, left.getPosition());
-				left = new AssignExpression(left.getPosition(), left, mul);
+				Expression mul = new ArithmeticBinExpression(MULT, left, right);
+				left = new AssignExpression(left, mul);
 				break;
 			case "/=":
-				Expression div = new ArithmeticBinExpression(DIV, left, right, left.getPosition());
-				left = new AssignExpression(left.getPosition(), left, div);
+				Expression div = new ArithmeticBinExpression(DIV, left, right);
+				left = new AssignExpression(left, div);
 				break;
 			case "%=":
-				Expression mod = new ArithmeticBinExpression(MOD, left, right, left.getPosition());
-				left = new AssignExpression(left.getPosition(), left, mod);
+				Expression mod = new ArithmeticBinExpression(MOD, left, right);
+				left = new AssignExpression(left, mod);
 				break;
 			default:
 				error("Expected assignment oprator but instead found \"%s\"", assignOp.getValue());
@@ -305,10 +309,10 @@ public class ASTParser {
 			
 			switch(op.getType()) {
 			case "OR_OP":
-				left = new LogicalExpression(OR, left, right, left.getPosition());
+				left = new LogicalExpression(OR, left, right);
 				break;
 			case "AND_OP":
-				left = new LogicalExpression(AND, left, right, left.getPosition());
+				left = new LogicalExpression(AND, left, right);
 				break;
 			}
 		}
@@ -325,10 +329,10 @@ public class ASTParser {
 			
 			switch(op.getType()) {
 			case "EQ_OP":
-				left = new EqualityExpression(EQ, left, right, left.getPosition());
+				left = new EqualityExpression(EQ, left, right);
 				break;
 			case "NEQ_OP":
-				left = new EqualityExpression(NEQ, left, right, left.getPosition());
+				left = new EqualityExpression(NEQ, left, right);
 				break;
 			}
 		}
@@ -346,16 +350,16 @@ public class ASTParser {
 			
 			switch(op.getType()) {
 			case "<":
-				left = new RelationalExpression(LT, left, right, left.getPosition());
+				left = new RelationalExpression(LT, left, right);
 				break;
 			case ">":
-				left = new RelationalExpression(GT, left, right, left.getPosition());
+				left = new RelationalExpression(GT, left, right);
 				break;
 			case "LE_OP":
-				left = new RelationalExpression(LE, left, right, left.getPosition());
+				left = new RelationalExpression(LE, left, right);
 				break;
 			case "GE_OP":
-				left = new RelationalExpression(GE, left, right, left.getPosition());
+				left = new RelationalExpression(GE, left, right);
 				break;
 			}
 		}
@@ -372,10 +376,10 @@ public class ASTParser {
 			
 			switch(op.getType()) {
 			case "+":
-				left = new ArithmeticBinExpression(PLUS, left, right, left.getPosition());
+				left = new ArithmeticBinExpression(PLUS, left, right);
 				break;
 			case "-":
-				left = new ArithmeticBinExpression(MINUS, left, right, left.getPosition());
+				left = new ArithmeticBinExpression(MINUS, left, right);
 				break;
 			}
 		}
@@ -393,13 +397,13 @@ public class ASTParser {
 			
 			switch(op.getType()) {
 			case "/":
-				left = new ArithmeticBinExpression(DIV, left, right, left.getPosition());
+				left = new ArithmeticBinExpression(DIV, left, right);
 				break;
 			case "*":
-				left = new ArithmeticBinExpression(MULT, left, right, left.getPosition());
+				left = new ArithmeticBinExpression(MULT, left, right);
 				break;
 			case "%":
-				left = new ArithmeticBinExpression(MOD, left, right, left.getPosition());
+				left = new ArithmeticBinExpression(MOD, left, right);
 				break;
 			}
 		}
@@ -411,20 +415,39 @@ public class ASTParser {
 			Position pos = require("!").getPosition();
 			return new LogicalNotExpression(unaryExpr(), pos);
 		}
+		if(lex.peek().getType().equals("++")) {
+			Position pos = require("++").getPosition();
+			return new PreIncrementOperation(INCR, unaryExpr(), pos);
+		}
+		if(lex.peek().getType().equals("--")) {
+			Position pos = require("--").getPosition();
+			return new PreIncrementOperation(DECR, unaryExpr(), pos);
+		}
 		
 		return postfixExpr();
 	}
 	
 	private Expression postfixExpr() {
-		Expression l = literal();
+		Expression left = literal();
 		
-		while(lex.peek().getType().equals("[")) {
-			require("[");			
-			l = new ArrayAccess(l.getPosition(), l, expression());
-			require("]");
+		Token op;
+		while((op = lex.peek()).getType().equals("[") || op.getType().equals("++") || op.getType().equals("--")) {
+			lex.next();
+			
+			switch(op.getType()) {
+			case "[":
+				left = new ArrayAccess(left, expression());
+				require("]");
+				break;
+			case "++":
+				left = new PostIncrementOperation(INCR, left);
+				break;
+			case "--":
+				left = new PostIncrementOperation(DECR, left);
+			}
 		}
 		
-		return l;
+		return left;
 	}
 	
 	private Expression literal() {
@@ -446,7 +469,7 @@ public class ASTParser {
 			String s = litTok.getValue();
 			return new StringLiteral(litTok.getPosition(), unescapeJavaString(s.substring(1, s.length() - 1)));
 		case "IDENTIFIER":
-			return new VarLiteral(new Identifier(litTok.getPosition(), litTok.getValue()), litTok.getPosition());
+			return new VarLiteral(new Identifier(litTok.getPosition(), litTok.getValue()));
 		case "(":
 			Expression e = expression();
 			require(")");
