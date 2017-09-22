@@ -2,10 +2,17 @@ package com.bamless.interpreter.interpret;
 
 import java.util.LinkedList;
 
+import com.bamless.interpreter.ast.Program;
+import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
+import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
+import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.Expression;
+import com.bamless.interpreter.ast.expression.LogicalExpression;
+import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
 import com.bamless.interpreter.ast.expression.PreIncrementOperation;
+import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
@@ -39,6 +46,11 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 		this.bi = new BooleanExpInterpreter(this);
 		this.si = new StringExpInterpreter(this);
 		this.arri = new ArrayExpInterpreter(this);
+	}
+	
+	@Override
+	public void visit(Program p, Void arg) {
+		p.getBlock().accept(this, arg);
 	}
 	
 	@Override
@@ -103,8 +115,7 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 		memEnv.define(a.getId(), new Array(computetDim, ((ArrayType) a.getType()).getInternalType()));
 	}
 	
-	@Override
-	public void visit(AssignExpression e, Void arg) {
+	private void interpretExpression(Expression e) {
 		if(e.getType() == Type.BOOLEAN)
 			e.accept(bi, null);
 		if(e.getType() == Type.STRING)
@@ -114,17 +125,52 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 		if(e.getType().isArray())
 			e.accept(arri, null);
 	}
+
+	@Override
+	public void visit(AssignExpression e, Void arg) {
+		interpretExpression(e);
+	}
+	
+	@Override
+	public void visit(ArithmeticBinExpression e, Void arg) {
+		interpretExpression(e);
+	}
+	
+	@Override
+	public void visit(ArrayAccess a, Void arg) {
+		interpretExpression(a);
+	}
 	
 	@Override
 	public void visit(PreIncrementOperation p, Void arg) {
-		p.accept(ai, null);
+		interpretExpression(p);
+	}
+
+	@Override
+	public void visit(LogicalExpression l, Void arg) {
+		interpretExpression(l);
+	}
+
+	@Override
+	public void visit(RelationalExpression r, Void arg) {
+		interpretExpression(r);
+	}
+
+	@Override
+	public void visit(EqualityExpression e, Void arg) {
+		interpretExpression(e);
+	}
+
+	@Override
+	public void visit(LogicalNotExpression n, Void arg) {
+		interpretExpression(n);
 	}
 	
 	@Override
 	public void visit(PostIncrementOperation p, Void arg) {
-		p.accept(ai, null);
+		interpretExpression(p);
 	}
-
+	
 	public ArithmeticExpInterpreter getArithmeticExpInterpreter() {
 		return ai;
 	}
@@ -144,5 +190,5 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	public MemoryEnvironment getMemEnv() {
 		return memEnv;
 	}
-	
+
 }

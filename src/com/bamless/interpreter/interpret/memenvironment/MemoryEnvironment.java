@@ -55,7 +55,12 @@ public class MemoryEnvironment {
 		@Override
 		public void visit(ArrayAccess a, Object arg) {
 			Array l = a.getLvalue().accept(interpreter.getArrayExpInterpreter(), null);
-			l.set(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), null).intValue(), arg);
+			
+			try {
+				l.set(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), null).intValue(), arg);
+			} catch(ArrayIndexOutOfBoundsException e) {
+				throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
+			}
 		}
 	}
 	
@@ -68,7 +73,15 @@ public class MemoryEnvironment {
 		@Override
 		public Object visit(ArrayAccess a, Void arg) {
 			Array array = a.getLvalue().accept(interpreter.getArrayExpInterpreter(), null);
-			return array.get(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), arg).intValue());
+			
+			Object o = null;
+			try {
+				o = array.get(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), arg).intValue());
+			} catch(ArrayIndexOutOfBoundsException e) {
+				throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
+			}
+			
+			return o;
 		}
 	}
 
