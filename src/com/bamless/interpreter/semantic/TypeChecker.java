@@ -104,7 +104,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	public Type visit(PrintStatement p, Void arg) {
 		Type e = p.getExpression().accept(this, null);
 		if(e != Type.STRING) {
-			typeError(p.getExpression().getPosition(), "cannot convert %s to string", e.toString().toLowerCase());
+			typeError(p.getExpression().getPosition(), "cannot convert %s to string", e.toString());
 		}
 
 		return null;
@@ -134,7 +134,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	}
 
 	/* ************************* */
-	/*        Expressions        */
+	/* Expressions */
 	/* ************************* */
 
 	@Override
@@ -162,8 +162,8 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		}
 
 		if(res == null) {
-			undefOperatorError(e.getPosition(), e.getOperation().toString().toLowerCase(),
-					left.toString().toLowerCase(), right.toString().toLowerCase());
+			undefOperatorError(e.getPosition(), e.getOperation().toString(), left.toString().toLowerCase(),
+					right.toString().toLowerCase());
 		}
 
 		e.setType(res);
@@ -177,8 +177,8 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		Type res = left.logicalOp(right);
 
 		if(res == null) {
-			undefOperatorError(l.getPosition(), l.getOperation().toString().toLowerCase(),
-					left.toString().toLowerCase(), right.toString().toLowerCase());
+			undefOperatorError(l.getPosition(), l.getOperation().toString(), left.toString().toLowerCase(),
+					right.toString().toLowerCase());
 		}
 
 		l.setType(res);
@@ -192,8 +192,8 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		Type res = left.equalityOp(right);
 
 		if(res == null) {
-			undefOperatorError(e.getPosition(), e.getOperation().toString().toLowerCase(),
-					left.toString().toLowerCase(), right.toString().toLowerCase());
+			undefOperatorError(e.getPosition(), e.getOperation().toString(), left.toString().toLowerCase(),
+					right.toString().toLowerCase());
 		}
 
 		e.setType(res);
@@ -207,8 +207,8 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		Type res = left.relationalOp(right);
 
 		if(res == null) {
-			undefOperatorError(r.getPosition(), r.getOperation().toString().toLowerCase(),
-					left.toString().toLowerCase(), right.toString().toLowerCase());
+			undefOperatorError(r.getPosition(), r.getOperation().toString(), left.toString().toLowerCase(),
+					right.toString().toLowerCase());
 		}
 
 		r.setType(res);
@@ -226,16 +226,15 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 		n.setType(Type.BOOLEAN);
 		return Type.BOOLEAN;
 	}
-	
+
 	@Override
 	public Type visit(PostIncrementOperation p, Void arg) {
 		Type t = p.getExpression().accept(this, null);
-		
+
 		if(t != Type.INT && t != Type.FLOAT) {
-			undefOperatorError(p.getPosition(), p.getOperator().
-					toString().toLowerCase(), t.toString().toLowerCase());
+			undefOperatorError(p.getPosition(), p.getOperator().toString(), t.toString().toLowerCase());
 		}
-		
+
 		p.setType(t);
 		return t;
 	}
@@ -243,12 +242,11 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	@Override
 	public Type visit(PreIncrementOperation p, Void arg) {
 		Type t = p.getExpression().accept(this, null);
-		
+
 		if(t != Type.INT && t != Type.FLOAT) {
-			undefOperatorError(p.getPosition(), p.getOperator().
-					toString().toLowerCase(), t.toString().toLowerCase());
+			undefOperatorError(p.getPosition(), p.getOperator().toString(), t.toString().toLowerCase());
 		}
-		
+
 		p.setType(t);
 		return t;
 	}

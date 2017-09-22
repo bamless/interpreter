@@ -5,7 +5,16 @@ import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class RelationalExpression extends BinaryExpression {
 	public static enum RelationalOperation {
-		LT, GT, LE, GE;
+		LT("<"), GT(">"), LE("<="), GE(">=");
+		
+		private String repr;
+		
+		private RelationalOperation(String repr) {
+			this.repr = repr;
+		}
+		
+		@Override
+		public String toString() { return repr; }
 	}
 	private RelationalOperation operation;
 	

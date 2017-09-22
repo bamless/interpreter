@@ -5,7 +5,14 @@ import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class EqualityExpression extends BinaryExpression {
 	public static enum EqualityOperation {
-		EQ, NEQ;
+		EQ("=="), NEQ("!=");
+		
+		private String repr;
+		
+		private EqualityOperation(String repr) { this.repr = repr; }
+		
+		@Override
+		public String toString() { return repr; }
 	}
 	private EqualityOperation operation;
 	
@@ -30,6 +37,6 @@ public class EqualityExpression extends BinaryExpression {
 	
 	@Override
 	public String toString() {
-		return "(" + getLeft() +" "+ operation +" "+ getRight() + ")";
+		return "(" + getLeft() + " " + operation + " " + getRight() + ")";
 	}
 }

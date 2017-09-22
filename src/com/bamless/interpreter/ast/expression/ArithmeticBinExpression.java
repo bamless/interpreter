@@ -5,7 +5,16 @@ import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class ArithmeticBinExpression extends BinaryExpression {
 	public static enum ArithmeticBinOperation {
-		PLUS, MINUS, MULT, DIV, MOD;
+		PLUS("+"), MINUS("-"), MULT("*"), DIV("/"), MOD("%");
+		
+		private String repr;
+		
+		ArithmeticBinOperation(String repr) {
+			this.repr = repr;
+		}
+		
+		@Override
+		public String toString() { return repr; }
 	}
 	private ArithmeticBinOperation operation;
 

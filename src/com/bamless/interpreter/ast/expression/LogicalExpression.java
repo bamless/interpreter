@@ -5,7 +5,16 @@ import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class LogicalExpression extends BinaryExpression {
 	public static enum BooleanBinOperation {
-		OR, AND;
+		OR("||"), AND("&&");
+		
+		private String repr;
+		
+		private BooleanBinOperation(String repr) {
+			this.repr = repr;
+		}
+		
+		@Override
+		public String toString() { return repr; }
 	}
 	private BooleanBinOperation operation;
 	
