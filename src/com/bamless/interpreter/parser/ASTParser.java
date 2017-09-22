@@ -452,6 +452,7 @@ public class ASTParser {
 				break;
 			case "--":
 				left = new PostIncrementOperation(DECR, left);
+				break;
 			}
 		}
 		
