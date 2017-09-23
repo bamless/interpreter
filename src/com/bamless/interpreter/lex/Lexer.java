@@ -209,8 +209,13 @@ public class Lexer {
 			
 			if(!type.getType().equals("TYPE_NAME"))
 				throw new IllegalArgumentException("Error at " + type.getPosition() + ": " + type.getValue() + " is not a valid token type name.");
-			if(!regx.getType().equals("REGEX"))
-				throw new IllegalArgumentException("Error at " + regx.getPosition() + ": " + regx.getValue() + " is not a valid regex.");
+			
+			if(!regx.getType().equals("REGEX")) {
+				String errStr = regx == Lexer.END ? "Error: expected regex but instead found end of file." :
+					"Error at " + regx.getPosition() + ": " + regx.getValue() + " is not a valid regex.";
+				
+				throw new IllegalArgumentException(errStr);
+			}
 
 			Pattern pattern;
 			try {
