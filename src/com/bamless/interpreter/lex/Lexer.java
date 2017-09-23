@@ -194,7 +194,7 @@ public class Lexer {
 		
 		Lexer tok = new Lexer(new String[] {
 				"REGEX",		"\"(\\\\.|[^\"])*\"",
-				"TYPE_NAME",	"[^\\s]+",
+				"TYPE_NAME",	"[^\\s\"]+",
 		}, true, "//.*");
 		
 		try {
