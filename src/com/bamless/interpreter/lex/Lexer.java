@@ -7,11 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import com.bamless.interpreter.ast.Position;
 
@@ -53,6 +53,7 @@ public class Lexer {
 	public Lexer(InputStream lexFile, boolean skipSpaces, String commentRegx) {
 		this.skipSpaces = skipSpaces;
 		parseLexFile(lexFile);
+		
 		invalid = Pattern.compile(skipSpaces ? "[^\\s]+" : ".+");
 		if(commentRegx != null)
 			this.commentRegx = commentRegx;
@@ -191,40 +192,44 @@ public class Lexer {
 	private void parseLexFile(InputStream lex) {
 		if(lex == null) throw new IllegalArgumentException("The inputstream cannot be null");
 		
-		try(BufferedReader r = new BufferedReader(new InputStreamReader(lex))) {
-			int lineNo = 0;
-			String line = null; 
-			while((line = removeComments(r.readLine())) != null) {
-				lineNo++;
-				if(line.matches("\\s*")) continue;
-				
-				StringBuilder type = new StringBuilder();
-				int i, j;
-				for(i = 0; i < line.length() && line.charAt(i) != '"'; i++) {
-					if(!line.substring(i, i + 1).matches("\\s+"))
-						type.append(line.charAt(i));
-				}
-				
-				StringBuilder regex = new StringBuilder();
-				for(j = i + 1; j < line.length() && line.charAt(j) != '"'; j++) {
-					if(line.charAt(j) == '\\') j += 1;
-					regex.append(line.charAt(j));
-				}
-				
-				if(regex.toString().equals("") || type.toString().equals("") 
-						|| !line.substring(j + 1, line.length()).matches("\\s*")) {
-					throw new LexicalException("Error at line " + lineNo + " of lex file: malformed line.");
-				}
-				typesRegx.put(type.toString(), Pattern.compile(regex.toString()));
+		Lexer tok = new Lexer(new String[] {
+				"REGEX",		"\"(\\\\.|[^\"])*\"",
+				"TYPE_NAME",	"[^\\s]+",
+		}, true, "//.*");
+		
+		try {
+			tok.tokenize(lex);
+		} catch(IOException e) {
+			throw new RuntimeException("Error while reading lex file", e);
+		}
+		
+		while(tok.hasNext()) {
+			Token type = tok.next();
+			Token regx = tok.next();
+			
+			if(!type.getType().equals("TYPE_NAME"))
+				throw new IllegalArgumentException("Error at " + type.getPosition() + ": " + type.getValue() + " is not a valid token type name.");
+			if(!regx.getType().equals("REGEX"))
+				throw new IllegalArgumentException("Error at " + regx.getPosition() + ": " + regx.getValue() + " is not a valid regex.");
+
+			Pattern pattern;
+			try {
+				pattern = Pattern.compile(unescapeRegex(regx.getValue()));
+			} catch(PatternSyntaxException e) {
+				throw new IllegalArgumentException("Error at " + regx.getPosition() + ": " + regx.getValue() + " is not a valid regex.", e);
 			}
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+			
+			typesRegx.put(type.getValue(), pattern);
 		}
 	}
 	
-	private String removeComments(String line) {
-		if(line == null) return null;
-		return line.replaceAll("//.*", "");
+	private String unescapeRegex(String regex) {
+		String unescapedRegx = "";
+		for(int c = 1; c < regex.length() - 1; c++) {
+			if(regex.charAt(c) == '\\') c++;
+			unescapedRegx += regex.charAt(c);
+		}
+		return unescapedRegx;
 	}
 
 }
