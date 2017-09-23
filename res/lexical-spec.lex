@@ -20,7 +20,7 @@ BOOL_CONST      "true|false"
 STRING_CONST    "\"(\\\\.|[^\"])*\""
 
 //id
-IDENTIFIER      "[a-zA-Z][a-zA-Z0-9]*"
+IDENTIFIER      "[_a-zA-Z][_a-zA-Z0-9]*"
 
 //symbols
 (               "\\("
