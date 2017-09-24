@@ -27,8 +27,7 @@ public class PostIncrementOperation extends PostFixExpression {
 	
 	@Override
 	public String toString() {
-		String opStr = op == IncrementOperator.INCR ? "++" : "--";
-		return getExpression() + opStr;
+		return getExpression() + op.toString();
 	}
 	
 }

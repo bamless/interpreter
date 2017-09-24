@@ -28,8 +28,7 @@ public class PreIncrementOperation extends UnaryExpression {
 	
 	@Override
 	public String toString() {
-		String opStr = op == IncrementOperator.INCR ? "++" : "--";
-		return opStr + getExpression();
+		return getExpression() + op.toString();
 	}
 	
 }
