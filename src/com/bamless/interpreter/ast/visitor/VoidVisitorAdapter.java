@@ -118,6 +118,16 @@ public class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 	}
 
 	@Override
+	public void visit(PostIncrementOperation p, A arg) {
+		p.getExpression().accept(this, arg);
+	}
+
+	@Override
+	public void visit(PreIncrementOperation p, A arg) {
+		p.getExpression().accept(this, arg);
+	}
+	
+	@Override
 	public void visit(AssignExpression e, A arg) {
 		e.getLvalue().accept(this, arg);
 		e.getExpression().accept(this, arg);
@@ -150,16 +160,6 @@ public class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 	public void visit(ArrayAccess a, A arg) {
 		a.getLvalue().accept(this, arg);
 		a.getIndex().accept(this, arg);
-	}
-	
-	@Override
-	public void visit(PostIncrementOperation p, A arg) {
-		p.getExpression().accept(this, arg);
-	}
-
-	@Override
-	public void visit(PreIncrementOperation p, A arg) {
-		p.getExpression().accept(this, arg);
 	}
 	
 }

@@ -103,12 +103,16 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	public void visit(PreIncrementOperation p, Void arg) {
 		if(!(p.getExpression() instanceof Lvalue))
 			semanticError(p.getPosition(), "left hand side of assignement must be an lvalue");
+		
+		p.getExpression().accept(this, arg);
 	}
 	
 	@Override
 	public void visit(PostIncrementOperation p, Void arg) {
 		if(!(p.getExpression() instanceof Lvalue))
 			semanticError(p.getPosition(), "left hand side of assignement must be an lvalue");
+		
+		p.getExpression().accept(this, arg);
 	}
 
 	@Override

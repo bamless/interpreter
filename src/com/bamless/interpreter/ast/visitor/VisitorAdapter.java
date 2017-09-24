@@ -139,7 +139,18 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	@Override
 	public T visit(LogicalNotExpression n, A arg) {
 		n.getExpression().accept(this, arg);
-		
+		return null;
+	}
+	
+	@Override
+	public T visit(PostIncrementOperation p, A arg) {
+		p.getExpression().accept(this, arg);
+		return null;
+	}
+
+	@Override
+	public T visit(PreIncrementOperation p, A arg) {
+		p.getExpression().accept(this, arg);
 		return null;
 	}
 
@@ -182,16 +193,6 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 		a.getIndex().accept(this, arg);
 		
 		return null;
-	}
-
-	@Override
-	public T visit(PostIncrementOperation p, A arg) {
-		return p.getExpression().accept(this, arg);
-	}
-
-	@Override
-	public T visit(PreIncrementOperation p, A arg) {
-		return p.getExpression().accept(this, arg);
 	}
 
 }

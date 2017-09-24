@@ -121,10 +121,8 @@ public class ASTParser {
 			return block();
 		case "PRINT":
 			return printStmt();
-		//expression statement (an expression followed by a semicolon)
 		default:
 			Statement s = expression();
-			require(";");
 			return s;
 		}
 	}
@@ -168,8 +166,6 @@ public class ASTParser {
 				require("]");
 			}
 			
-			require(";");
-			
 			return new ArrayDecl(typeTok.getPosition(), t, dim, id);
 		}
 		//Normal declaration
@@ -179,8 +175,6 @@ public class ASTParser {
 				require("=");
 				initializer = new AssignExpression(new VarLiteral(id), expression());
 			}
-			
-			require(";");
 			
 			return new VarDecl(typeTok.getPosition(), t, id, initializer);
 		}
@@ -249,8 +243,6 @@ public class ASTParser {
 		if(parenthesized) require("(");
 		Expression e = expression();
 		if(parenthesized) require(")");
-		
-		require(";");
 		
 		return new PrintStatement(start, e);
 	}
