@@ -28,7 +28,7 @@ public class PreIncrementOperation extends UnaryExpression {
 	
 	@Override
 	public String toString() {
-		return getExpression() + op.toString();
+		return op.toString() + getExpression();
 	}
 	
 }
