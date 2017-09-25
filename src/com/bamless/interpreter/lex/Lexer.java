@@ -27,36 +27,30 @@ public class Lexer {
 	private int pos;
 	private ArrayList<Token> tokens = new ArrayList<>();
 	
+	private Lexer(boolean skipSpaces, String commentsRegx) {
+		this.skipSpaces = skipSpaces;
+		this.commentRegx = commentsRegx;
+		this.invalid = Pattern.compile(skipSpaces ? "[^\\s]+" : ".+");
+	}
+	
 	public Lexer(String[] types, boolean skipSpaces, String commentsRegx) {
+		this(skipSpaces, commentsRegx);
 		if(types.length % 2 != 0) {
 			throw new IllegalArgumentException("Invalid types array. "
 					+ "The array should be composed of pairs TOKEN_TYPE, regex.");
 		}
-		this.skipSpaces = skipSpaces;
-		initRegs(types, commentsRegx);
+		for(int i = 0; i < types.length; i+=2) {
+			typesRegx.put(types[i], Pattern.compile(types[i + 1]));
+		}
 	}
 	
 	public Lexer(String[] types, boolean skipSpaces) {
 		this(types, skipSpaces, null);
 	}
 	
-	private void initRegs(String[] types, String commentRegx) {
-		for(int i = 0; i < types.length; i+=2) {
-			typesRegx.put(types[i], Pattern.compile(types[i + 1]));
-		}
-		invalid = Pattern.compile(skipSpaces ? "[^\\s]+" : ".+");
-		
-		if(commentRegx != null)
-			this.commentRegx = commentRegx;
-	}
-	
 	public Lexer(InputStream lexFile, boolean skipSpaces, String commentRegx) {
-		this.skipSpaces = skipSpaces;
+		this(skipSpaces, commentRegx);
 		parseLexFile(lexFile);
-		
-		invalid = Pattern.compile(skipSpaces ? "[^\\s]+" : ".+");
-		if(commentRegx != null)
-			this.commentRegx = commentRegx;
 	}
 	
 	public Lexer(InputStream lexFile, boolean skipSpaces) {
