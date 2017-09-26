@@ -1,6 +1,7 @@
 package com.bamless.interpreter.interpret.expinterpreter;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
@@ -39,9 +40,9 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 			return l.remainder(r);
 		case DIV:
 			if(e.getLeft().getType() == Type.INT && e.getRight().getType() == Type.INT)
-				return l.divide(r).abs();
+				return l.divide(r, RoundingMode.HALF_EVEN).abs();
 			else
-				return l.divide(r);
+				return l.divide(r, RoundingMode.HALF_EVEN);
 		default:
 			throw new RuntimeError("fatal error");
 		}
