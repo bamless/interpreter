@@ -44,10 +44,17 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	
 	@Override
 	public Boolean visit(EqualityExpression e, Void arg) {
-		Object l, r;
+		Object l = null, r = null;
 		if(e.getLeft().getType() == Type.INT || e.getLeft().getType() == Type.FLOAT) {
-			l = e.getLeft().accept(interpreter.getArithmeticExpInterpreter(), null);
-			r = e.getRight().accept(interpreter.getArithmeticExpInterpreter(), null);
+			BigDecimal bl = e.getLeft().accept(interpreter.getArithmeticExpInterpreter(), null);
+			BigDecimal br = e.getRight().accept(interpreter.getArithmeticExpInterpreter(), null);
+			
+			switch(e.getOperation()) {
+			case EQ:
+				return bl.compareTo(br) == 0;
+			case NEQ:
+				return bl.compareTo(br) != 0;
+			}
 		} else if(e.getLeft().getType() == Type.STRING) {
 			l = e.getLeft().accept(interpreter.getStringExpInterpreter(), null);
 			r = e.getRight().accept(interpreter.getStringExpInterpreter(), null);

@@ -31,8 +31,8 @@ print z[6] + "\n"
 print((z[6] == k[6]) + ", " + (z == k) + "\n")
 
 //exponentiation by squaring
-float base = 10
-float exp = -1
+float base = 3
+float exp = 0
 
 float y = 1
 if(exp < 0) {
