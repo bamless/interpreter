@@ -275,7 +275,8 @@ public class ASTParser {
 	}
 	
 	/**
-	 * Print -> print {(}? expression {)}?
+	 * Print -> print ( expression )
+	 *        | print expression
 	 */
 	private Statement printStmt() {
 		Position start = require("PRINT").getPosition();
