@@ -3,10 +3,8 @@ package com.bamless.interpreter.lex;
 import com.bamless.interpreter.ast.Position;
 
 public class Token {
-	
 	private String type;
 	private String lexeme;
-	
 	/**Starting position in the source file*/
 	private Position pos;
 

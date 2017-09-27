@@ -5,13 +5,13 @@ IF              "if"
 ELSE            "else"
 FOR             "for"
 WHILE           "while"
+PRINT           "print"
 
+//type keywords
 INT             "int"
 FLOAT           "float"
 BOOLEAN         "boolean"
 STRING          "string"
-
-PRINT           "print"
 
 //constants
 INT_CONST       "[0-9]+"
@@ -19,7 +19,7 @@ FLOAT_CONST     "[0-9]+(\\.[0-9]*)?"
 BOOL_CONST      "true|false"
 STRING_CONST    "\"(\\\\.|[^\"])*\""
 
-//id
+//identifier
 IDENTIFIER      "[_a-zA-Z][_a-zA-Z0-9]*"
 
 //symbols

@@ -31,6 +31,10 @@ import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.Visitable;
 
+/**
+ * This class walks the AST and verifies if all the types are used correctly according to the laguage spec.
+ * @author fabrizio
+ */
 public class TypeChecker implements GenericVisitor<Type, Void> {
 	private SymbolTable<Type> st;
 

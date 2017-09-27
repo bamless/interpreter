@@ -15,6 +15,14 @@ import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 
+/**
+ * Semantic analyzer that checks for non declared or uninitialized variables.
+ * It also checks if expression used has statements have side effects, and warns the user if not.
+ * In the case of an assignment operator it checks if the left hand side in an lvalue, and throws an error if not.
+ * 
+ * @author fabrizio
+ *
+ */
 public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	/**
 	 * Symbol table to keep track of declared variables. The boolean associated with

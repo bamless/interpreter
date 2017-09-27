@@ -54,6 +54,17 @@ import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.lex.Lexer;
 import com.bamless.interpreter.lex.Token;
 
+/**
+ * Parser for the ii language. It is implemented as a recursive descent predictive parser,
+ * that recognizes the LL(1) grammar of the language.
+ * 
+ * The grammar rules are reported as javadoc on top of every parser method (in EBNF form).
+ * 
+ * for terminals enclosed by <> see lexical specification
+ * 
+ * @author fabrizio
+ *
+ */
 public class ASTParser {
 	private final static String LEX_FILE = "/lexical-spec.lex";
 	
@@ -89,6 +100,9 @@ public class ASTParser {
 		return root;
 	}
 	
+	/**
+	 * Program -> {vardecl}* {statement}*
+	 */
 	private ASTNode program() {
 		Position start = new Position(0, 0);
 		
@@ -108,6 +122,14 @@ public class ASTParser {
 		return new Program(start, new BlockStatement(statements, start));
 	}
 	
+	/**
+	 * Statement -> if
+	 *            | while
+	 *            | for
+	 *            | block
+	 *            | print
+	 *            | expression
+	 */
 	private Statement statement() {
 		switch(lex.peek().getType()) {
 		//statement
@@ -127,6 +149,9 @@ public class ASTParser {
 		}
 	}
 	
+	/**
+	 * Block -> { {vardecl}* {statement}* }
+	 */
 	private Statement block() {
 		Position start = require("{").getPosition();
 		
@@ -147,6 +172,10 @@ public class ASTParser {
 		return new BlockStatement(statements, start);
 	}
 
+	/**
+	 * Vardecl -> <type-keyword> <identifier> {= expression}?
+	 *          | <type-keyword> <identifier> {[expression]}+
+	 */
 	private Statement varDecl() {	
 		Token typeTok = lex.next();
 		Type t = Type.valueOf(typeTok.getType());
@@ -180,6 +209,9 @@ public class ASTParser {
 		}
 	}
 
+	/**
+	 * If -> if ( expression ) { else statement }?
+	 */
 	private Statement ifStmt() {
 		Position start = require("IF").getPosition();
 		
@@ -198,6 +230,9 @@ public class ASTParser {
 		return new IfStatement(e, thenBody, elseBody, start);
 	}
 	
+	/**
+	 * While -> while ( expression ) statement
+	 */
 	private Statement whileStmt() {
 		Position start = require("WHILE").getPosition();
 		
@@ -209,6 +244,9 @@ public class ASTParser {
 		return new WhileStatement(cond, body, start);
 	}
 	
+	/**
+	 * For -> for ( {expression}? ; {expression}? ; {expression}? ) statement
+	 */
 	private Statement forStmt() {
 		Position start = require("FOR").getPosition();
 		
@@ -236,6 +274,9 @@ public class ASTParser {
 		return new ForStatement(start, init, cond, action, body);
 	}
 	
+	/**
+	 * Print -> print {(}? expression {)}?
+	 */
 	private Statement printStmt() {
 		Position start = require("PRINT").getPosition();
 		boolean parenthesized = lex.peek().getValue().equals("(");
@@ -252,6 +293,10 @@ public class ASTParser {
 	/*        Expressions        */
 	/* ************************* */
 	
+	
+	/**
+	 * Expression -> logicalExp {= logicalExp}?
+	 */
 	private  Expression expression() {
 		Expression left = logicalExpr();
 		
@@ -291,6 +336,9 @@ public class ASTParser {
 		return left;
 	}
 	
+	/**
+	 * LogicalExp -> equalityExp {<logical-operator> equalityExp}*
+	 */
 	private Expression logicalExpr() {
 		Expression left = equalityExpr();
 		
@@ -311,6 +359,9 @@ public class ASTParser {
 		return left;
 	}
 	
+	/**
+	 * EqualityExp -> relationalExp {<equality-operator> relationalExp}*
+	 */
 	private Expression equalityExpr() {
 		Expression left = relationalExpr();
 		
@@ -331,6 +382,9 @@ public class ASTParser {
 		return left;
 	}
 	
+	/**
+	 * RelationalExpr -> additiveExpr {<relational-operator> additiveExpr}*
+	 */
 	private Expression relationalExpr() {
 		Expression left = additiveExpr();
 		
@@ -358,6 +412,9 @@ public class ASTParser {
 		return left;
 	}
 	
+	/**
+	 * AdditiveExpr -> multiplicativeExp {<additive-operator> multiplicativeExp}*
+	 */
 	private Expression additiveExpr() {
 		Expression left = multiplicativeExpression();
 		
@@ -378,6 +435,9 @@ public class ASTParser {
 		return left;
 	}
 	
+	/**
+	 * MultiplicativeExp -> unaryExp {<multiplicative-operator> unaryExp}*
+	 */
 	private Expression multiplicativeExpression() {
 		Expression left = unaryExpr();
 		
@@ -402,6 +462,10 @@ public class ASTParser {
 		return left;
 	}
 
+	/**
+	 * UnaryExp -> <unary-operator> unaryExp
+	 *           | postifixExp
+	 */
 	private Expression unaryExpr() {
 		if(lex.peek().getType().equals("!")) {
 			Position pos = require("!").getPosition();
@@ -427,6 +491,13 @@ public class ASTParser {
 		return postfixExpr();
 	}
 	
+	/**
+	 * PostfixExp -> literal {postfixOp}*
+	 * 
+	 * PostfixOp -> [ expression ]
+	 *            | ++ 
+	 *            | --
+	 */
 	private Expression postfixExpr() {
 		Expression left = literal();
 		
@@ -451,6 +522,14 @@ public class ASTParser {
 		return left;
 	}
 	
+	/**
+	 * Literal -> <int-const>
+	 *          | <float-const>
+	 *          | <string-const>
+	 *          | <bool-const>
+	 *          | <identifier>
+	 *          | ( expression )
+	 */
 	private Expression literal() {
 		Token litTok = lex.next();
 		switch(litTok.getType()) {

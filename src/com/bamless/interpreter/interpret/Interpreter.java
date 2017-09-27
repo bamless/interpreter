@@ -31,6 +31,13 @@ import com.bamless.interpreter.interpret.expinterpreter.StringExpInterpreter;
 import com.bamless.interpreter.interpret.memenvironment.Array;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 
+/**
+ * Interpret the language by directly interpreting the AST. This type of interpretation is slow,
+ * but easy to implement in little time.
+ * 
+ * @author fabrizio
+ *
+ */
 public class Interpreter  extends VoidVisitorAdapter<Void> {
 	private ArithmeticExpInterpreter ai;
 	private BooleanExpInterpreter bi;

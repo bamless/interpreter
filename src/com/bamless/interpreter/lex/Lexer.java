@@ -15,13 +15,24 @@ import java.util.regex.PatternSyntaxException;
 
 import com.bamless.interpreter.ast.Position;
 
+/**
+ * Generic Lexer that accepts a file with definable lexeme regexs.
+ * It allows indefinite peeking in the token stream.
+ * 
+ * @author fabrizio
+ *
+ */
 public class Lexer {
 	public final static Token END = new Token("_END_OF_INPUT_", "end of input", new Position(0, 0));
 	private final static Pattern SPACES = Pattern.compile("\\s+");
 	
+	/**Regex of a comment*/
 	private String commentRegx;
 	private Pattern invalid;
+	
+	/**Hashmap that connects the user-defined token types to the regexs*/
 	private LinkedHashMap<String, Pattern> typesRegx = new LinkedHashMap<>();
+	/**Wheter to skip spaces or not*/
 	private boolean skipSpaces;
 	
 	private int pos;
@@ -33,34 +44,60 @@ public class Lexer {
 		this.invalid = Pattern.compile(skipSpaces ? "[^\\s]+" : ".+");
 	}
 	
+	/**
+	 * Construct a new lexer by taking a string array of the form { TOKEN_TYPE, regex, TOKEN_TYPE, regex...} as input.
+	 * @param skipSpaces wheter to skip spaces or not. If this is false you must provide a token that matches spaces (otherwise Lexical error).
+	 * @param commentsRegx If provided, the lexer will skip the matching comments in the code
+	 */
 	public Lexer(String[] types, boolean skipSpaces, String commentsRegx) {
 		this(skipSpaces, commentsRegx);
 		if(types.length % 2 != 0) {
 			throw new IllegalArgumentException("Invalid types array. "
-					+ "The array should be composed of pairs TOKEN_TYPE, regex.");
+					+ "The array should be composed of pairs TYPE_NAME, REGEX.");
 		}
 		for(int i = 0; i < types.length; i+=2) {
 			typesRegx.put(types[i], Pattern.compile(types[i + 1]));
 		}
 	}
 	
+	/**
+	 * @see Lexer#Lexer(String[], boolean, String)
+	 */
 	public Lexer(String[] types, boolean skipSpaces) {
 		this(types, skipSpaces, null);
 	}
 	
+	/**
+	 * Construct a new lexer by taking lexical rules from a file of the form:
+	 * TYPE_NAME "REGEX"
+	 * TYPE_NAME "REGEX"
+	 * ...
+	 * 
+	 * @param skipSpaces wheter to skip spaces or not. If this is false you must provide a token that matches spaces (otherwise Lexical error).
+	 * @param commentsRegx If provided, the lexer will skip the matching comments in the code
+	 */
 	public Lexer(InputStream lexFile, boolean skipSpaces, String commentRegx) {
 		this(skipSpaces, commentRegx);
 		parseLexFile(lexFile);
 	}
 	
+	/**
+	 * @see Lexer#Lexer(InputStream, boolean, String)
+	 */
 	public Lexer(InputStream lexFile, boolean skipSpaces) {
 		this(lexFile, skipSpaces, null);
 	}
 	
+	/**
+	 * @see Lexer#Lexer(InputStream, boolean, String)
+	 */
 	public Lexer(File lexFile, boolean skipSpaces, String commentRegx) throws FileNotFoundException {
 		this(new FileInputStream(lexFile), skipSpaces, commentRegx);
 	}	
 	
+	/**
+	 * @see Lexer#Lexer(InputStream, boolean, String)
+	 */
 	public Lexer(File lexFile, boolean skipSpaces) throws FileNotFoundException {
 		this(lexFile, skipSpaces, null);
 	}	
