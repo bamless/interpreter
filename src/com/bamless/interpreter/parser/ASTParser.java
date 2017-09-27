@@ -295,7 +295,7 @@ public class ASTParser {
 	
 	
 	/**
-	 * Expression -> logicalExp {= logicalExp}?
+	 * Expression -> logicalExp {<assignment-operator> logicalExp}?
 	 */
 	private  Expression expression() {
 		Expression left = logicalExpr();

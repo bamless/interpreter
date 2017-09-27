@@ -32,7 +32,7 @@ IDENTIFIER      "[_a-zA-Z][_a-zA-Z0-9]*"
 [               "\\["
 ]               "\\]"
 
-//operators
+//assignment operators
 =               "="
 +=              "\\+="
 -=              "-="
@@ -40,6 +40,8 @@ IDENTIFIER      "[_a-zA-Z][_a-zA-Z0-9]*"
 /=              "/="
 %=              "%="
 +               "\\+"
+
+//operators
 -               "-"
 *               "\\*"
 /               "/"
