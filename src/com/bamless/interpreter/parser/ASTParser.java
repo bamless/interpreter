@@ -210,7 +210,7 @@ public class ASTParser {
 	}
 
 	/**
-	 * If -> if ( expression ) { else statement }?
+	 * If -> if ( expression ) statement {else statement}?
 	 */
 	private Statement ifStmt() {
 		Position start = require("IF").getPosition();
