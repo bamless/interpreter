@@ -71,6 +71,8 @@ public class Lexer {
 	
 	public void tokenize(InputStream is) throws IOException {
 		pos = -1;
+		tokens.clear();
+		
 		try(BufferedReader r = new BufferedReader(new InputStreamReader(is))){
 			String line;
 			int lineNo = 0;
@@ -83,6 +85,8 @@ public class Lexer {
 	
 	public void tokenize(String src) {
 		pos = -1;
+		tokens.clear();
+		
 		String[] lines = src.split("\\r?\\n");
 		for(int i = 0; i < lines.length; i++) {
 			tokenize(i + 1, lines[i]);
