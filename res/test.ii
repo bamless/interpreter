@@ -30,13 +30,29 @@ print z[6] + "\n"
 
 print((z[6] == k[6]) + ", " + (z == k) + "\n")
 
-//calculate exp
+//exponentiation by squaring
+float base = 10
+float exp = -1
 
-int n = 2
-int exp = 4
+float y = 1
+if(exp < 0) {
+	base = 1 / base
+	exp = -exp
+}
 
-while(exp-- > 0)
-	n *= n
-	
-print n + "\n"
+if(exp != 0) {
+	while(exp > 1) {
+		if(exp % 2 == 0) {
+			base *= base
+			exp /= 2
+		} else {
+			y *= base
+			base *= base
+			exp = (exp - 1) / 2
+		}
+	}
+	print base * y + "\n"
+} else
+	print 1 + "\n"
+
 

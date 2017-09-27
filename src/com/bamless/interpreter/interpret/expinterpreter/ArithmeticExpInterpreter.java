@@ -40,9 +40,9 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 			return l.remainder(r);
 		case DIV:
 			if(e.getLeft().getType() == Type.INT && e.getRight().getType() == Type.INT)
-				return l.divide(r, RoundingMode.HALF_EVEN).abs();
+				return l.divide(r, 6,RoundingMode.HALF_EVEN).abs();
 			else
-				return l.divide(r, RoundingMode.HALF_EVEN);
+				return l.divide(r, 6, RoundingMode.HALF_EVEN);
 		default:
 			throw new RuntimeError("fatal error");
 		}
