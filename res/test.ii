@@ -29,3 +29,14 @@ print --z[6] + "\n"
 print z[6] + "\n"
 
 print((z[6] == k[6]) + ", " + (z == k) + "\n")
+
+//calculate exp
+
+int n = 2
+int exp = 4
+
+while(exp-- > 0)
+	n *= n
+	
+print n + "\n"
+

@@ -107,6 +107,8 @@ public class Lexer {
 	}
 	
 	public void tokenize(InputStream is) throws IOException {
+		if(is == null) throw new IllegalArgumentException("null input stream");
+		
 		pos = -1;
 		tokens.clear();
 		
