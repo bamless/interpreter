@@ -174,7 +174,7 @@ public class ASTParser {
 
 	/**
 	 * Vardecl -> <type-keyword> <identifier> {= expression}?
-	 *          | <type-keyword> <identifier> {[expression]}+
+	 *          | <type-keyword> <identifier> {[ expression ]}+
 	 */
 	private Statement varDecl() {	
 		Token typeTok = lex.next();
