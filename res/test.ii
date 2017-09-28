@@ -42,5 +42,4 @@ if(exp != 0) {
 	print base * y + "\n"
 } else
 	print 1 + "\n"
-
-
+	
