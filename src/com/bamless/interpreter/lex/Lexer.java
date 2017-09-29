@@ -46,7 +46,7 @@ public class Lexer {
 	
 	/**
 	 * Construct a new lexer by taking a string array of the form { TOKEN_TYPE, regex, TOKEN_TYPE, regex...} as input.
-	 * @param skipSpaces wheter to skip spaces or not. If this is false you must provide a token that matches spaces (otherwise Lexical error).
+	 * @param skipSpaces whether to skip spaces or not. If this is false you must provide a token that matches spaces (otherwise Lexical error).
 	 * @param commentsRegx If provided, the lexer will skip the matching comments in the code
 	 */
 	public Lexer(String[] types, boolean skipSpaces, String commentsRegx) {
