@@ -74,15 +74,16 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 
 	@Override
 	public Type visit(ForStatement f, Void arg) {
+		// propagate visitor to the other 2 expressions and to the body
+		if(f.getInit() != null)
+			f.getInit().accept(this, null);
+		
 		// check condition type
 		Type condition = f.getCond() == null ? Type.BOOLEAN : f.getCond().accept(this, null);
 		if(condition != Type.BOOLEAN) {
 			typeError(f.getCond().getPosition(), "cannot convert %s to boolean", condition.toString().toLowerCase());
 		}
-
-		// propagate visitor to the other 2 expressions and to the body
-		if(f.getInit() != null)
-			f.getInit().accept(this, null);
+		
 		if(f.getAct() != null)
 			f.getAct().accept(this, null);
 
