@@ -139,7 +139,7 @@ public class TypeChecker implements GenericVisitor<Type, Void> {
 	}
 
 	/* ************************* */
-	/* 	 	  Expressions        */
+	/*        Expressions        */
 	/* ************************* */
 
 	@Override
