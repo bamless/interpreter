@@ -7,14 +7,14 @@ import static com.bamless.interpreter.ast.expression.ArithmeticBinExpression.Ari
 import static com.bamless.interpreter.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation.PLUS;
 import static com.bamless.interpreter.ast.expression.EqualityExpression.EqualityOperation.EQ;
 import static com.bamless.interpreter.ast.expression.EqualityExpression.EqualityOperation.NEQ;
+import static com.bamless.interpreter.ast.expression.IncrementOperator.DECR;
+import static com.bamless.interpreter.ast.expression.IncrementOperator.INCR;
 import static com.bamless.interpreter.ast.expression.LogicalExpression.BooleanBinOperation.AND;
 import static com.bamless.interpreter.ast.expression.LogicalExpression.BooleanBinOperation.OR;
 import static com.bamless.interpreter.ast.expression.RelationalExpression.RelationalOperation.GE;
 import static com.bamless.interpreter.ast.expression.RelationalExpression.RelationalOperation.GT;
 import static com.bamless.interpreter.ast.expression.RelationalExpression.RelationalOperation.LE;
 import static com.bamless.interpreter.ast.expression.RelationalExpression.RelationalOperation.LT;
-import static com.bamless.interpreter.ast.expression.IncrementOperator.INCR;
-import static com.bamless.interpreter.ast.expression.IncrementOperator.DECR;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bamless.interpreter.ast.ASTNode;
+import com.bamless.interpreter.ast.FormalArg;
+import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.Program;
@@ -104,22 +106,62 @@ public class ASTParser {
 	 * Program -> {vardecl}* {statement}*
 	 */
 	private ASTNode program() {
-		Position start = new Position(0, 0);
-		
-		List<Statement> statements = new ArrayList<>();
+		List<FuncDecl> decls = new ArrayList<>();
 		while(lex.hasNext()) {
-			Token peek = lex.peek();
+			decls.add(functionDecl());
+		}
+		return new Program(new Position(0, 0), decls);
+	}
+	
+	private FuncDecl functionDecl() {
+		Type retType = type();
+		
+		Token nameTok = lex.next();
+		if(!nameTok.getType().equals("IDENTIFIER"))
+			error("Expected identifier but instead found %s", nameTok.getType());
+		
+		Identifier funcName = new Identifier(nameTok.getPosition(), nameTok.getValue());
+		
+		require("(");
+		
+		List<FormalArg> args = new ArrayList<>();
+		while(!lex.peek().getType().equals(")")) {
+			Type argType = type();
 			
-			//can only declare var 	inside a block
-			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || 
-					peek.getType().equals("FLOAT") || peek.getType().equals("STRING")) {
-				statements.add(varDecl());
-			} else {
-				statements.add(statement());
-			}
+			nameTok = lex.next();
+			if(!nameTok.getType().equals("IDENTIFIER"))
+				error("Invalid argument name %s", nameTok.getValue());
+			
+			Identifier argId = new Identifier(nameTok.getPosition(), nameTok.getValue());
+			args.add(new FormalArg(argId.getPosition(), argType, argId));
+			
+			if(!lex.peek().getType().equals(")"))
+				require(",");
 		}
 		
-		return new Program(start, new BlockStatement(statements, start));
+		require(")");
+		
+		BlockStatement body = block();
+		
+		return new FuncDecl(funcName.getPosition(), retType, funcName, args, body);
+	}
+
+	
+	private Type type() {
+		Type t = null;
+		try {
+			t = Type.valueOf(lex.next().getType());
+		} catch(IllegalArgumentException e) {
+			error("Invalid type");
+		}
+		
+		while(lex.peek().getValue().equals("[")) {
+			require("[");
+			t = Type.arrayType(t);
+			require("]");
+		}
+		
+		return t;
 	}
 	
 	/**
@@ -152,7 +194,7 @@ public class ASTParser {
 	/**
 	 * Block -> { {vardecl}* {statement}* }
 	 */
-	private Statement block() {
+	private BlockStatement block() {
 		Position start = require("{").getPosition();
 		
 		Token peek;

@@ -10,6 +10,7 @@ public class FormalArg extends ASTNode {
 	
 	public FormalArg(Position pos, Type type, Identifier id) {
 		super(pos);
+		this.type = type;
 		this.id = id;
 	}
 
@@ -29,6 +30,11 @@ public class FormalArg extends ASTNode {
 
 	public Identifier getIdentifier() {
 		return id;
+	}
+	
+	@Override
+	public String toString() {
+		return type + " " + id.getVal();
 	}
 	
 }

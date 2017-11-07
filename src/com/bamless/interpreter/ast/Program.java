@@ -1,15 +1,19 @@
 package com.bamless.interpreter.ast;
 
-import com.bamless.interpreter.ast.statement.BlockStatement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class Program extends ASTNode {
-	private BlockStatement stmts;
+	private List<FuncDecl> functions = new ArrayList<>();
 	
-	public Program(Position start, BlockStatement stmts) {
+	public Program(Position start, Collection<FuncDecl> functions) {
 		super(start);
-		this.stmts = stmts;
+		this.functions.addAll(functions);
 	}
 
 	@Override
@@ -22,8 +26,8 @@ public class Program extends ASTNode {
 		v.visit(this, arg);
 	}
 
-	public BlockStatement getBlock() {
-		return stmts;
+	public List<FuncDecl> getFunctions() {
+		return Collections.unmodifiableList(functions);
 	}
 	
 }

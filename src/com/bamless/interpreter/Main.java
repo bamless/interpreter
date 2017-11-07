@@ -23,25 +23,25 @@ public class Main {
 		PrinterVisitor v = new PrinterVisitor(4);
 		root.accept(v, 0);
 		
-		System.out.println("\nCommencing semantic analysis...");
-	
-		SemanticAnalyzer sa = new SemanticAnalyzer();
-		root.accept(sa, null);		
-		
-		System.out.println("Done");
-		System.out.println("Commencing type checking...");
-		
-		TypeChecker tc = new TypeChecker();
-		root.accept(tc, null);
-		
-		System.out.println("Done");
-		
-		System.out.println("Executing program...\n");
-		
-		Interpreter i = new Interpreter();
-		root.accept(i, null);
-		
-		System.out.println("\nDone executing");
+//		System.out.println("\nCommencing semantic analysis...");
+//	
+//		SemanticAnalyzer sa = new SemanticAnalyzer();
+//		root.accept(sa, null);		
+//		
+//		System.out.println("Done");
+//		System.out.println("Commencing type checking...");
+//		
+//		TypeChecker tc = new TypeChecker();
+//		root.accept(tc, null);
+//		
+//		System.out.println("Done");
+//		
+//		System.out.println("Executing program...\n");
+//		
+//		Interpreter i = new Interpreter();
+//		root.accept(i, null);
+//		
+//		System.out.println("\nDone executing");
 	}
 	
 }

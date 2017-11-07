@@ -1,5 +1,6 @@
 package com.bamless.interpreter.ast.visitor;
 
+import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
@@ -52,4 +53,6 @@ public interface VoidVisitor<A> {
 	void visit(StringLiteral s, A arg);
 	void visit(VarLiteral v, A arg);
 	void visit(ArrayAccess a, A arg);
+	
+	void visit(FuncDecl d, A arg);
 }

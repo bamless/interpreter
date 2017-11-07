@@ -1,23 +1,28 @@
 package com.bamless.interpreter.ast;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class FuncDecl extends ASTNode {
-	private Type type;
+	private Type retType;
 	private Identifier id;
-	private List<FormalArg> args = new ArrayList<>();
 	
-	public FuncDecl(Position pos, Type type, Identifier id,  List<FormalArg> args) {
+	private List<FormalArg> args = new ArrayList<>();
+	private BlockStatement body;
+	
+	public FuncDecl(Position pos, Type retType, Identifier id,  Collection<FormalArg> args, BlockStatement body) {
 		super(pos);
-		this.type = type;
+		this.retType = retType;
 		this.id = id;
 		this.args.addAll(args);
+		this.body = body;
 	}
 
 	@Override
@@ -31,7 +36,7 @@ public class FuncDecl extends ASTNode {
 	}
 
 	public Type getType() {
-		return type;
+		return retType;
 	}
 
 	public Identifier getId() {
@@ -40,6 +45,10 @@ public class FuncDecl extends ASTNode {
 	
 	public List<FormalArg> getFormalArgs() {
 		return Collections.unmodifiableList(args);
+	}
+	
+	public BlockStatement getBody() {
+		return body;
 	}
 	
 }

@@ -1,5 +1,7 @@
 package com.bamless.interpreter.ast.visitor;
 
+import com.bamless.interpreter.ast.FormalArg;
+import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
@@ -119,6 +121,18 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 			idDim += "[" + e + "]";
 		}
 		print(indent, a.getType() + " " + idDim);
+	}
+	
+	@Override
+	public void visit(FuncDecl d, Integer indent) {
+		String func = d.getType() + " " + d.getId().getVal() + "(";
+		for(FormalArg f : d.getFormalArgs()) {
+			func += f.toString() + ", ";
+		}
+		func = func.substring(0, func.length() - 2) + ")";
+		
+		print(indent, func);
+		d.getBody().accept(this, indent + 1);
 	}
 	
 	private String indent(int i, String s) {
