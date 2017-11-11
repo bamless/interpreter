@@ -9,6 +9,7 @@ import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
@@ -163,6 +164,13 @@ public class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 	public void visit(ArrayAccess a, A arg) {
 		a.getLvalue().accept(this, arg);
 		a.getIndex().accept(this, arg);
+	}
+	
+	@Override
+	public void visit(FuncCallExpression f, A arg) {
+		for(Expression e : f.getArgs()) {
+			e.accept(this, arg);
+		}
 	}
 	
 	@Override

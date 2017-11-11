@@ -9,6 +9,7 @@ import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
@@ -194,6 +195,15 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(ArrayAccess a, A arg) {
 		a.getLvalue().accept(this, arg);
 		a.getIndex().accept(this, arg);
+		
+		return null;
+	}
+	
+	@Override
+	public T visit(FuncCallExpression f, A arg) {
+		for(Expression e : f.getArgs()) {
+			e.accept(this, arg);
+		}
 		
 		return null;
 	}

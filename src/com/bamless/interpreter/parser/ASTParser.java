@@ -36,6 +36,7 @@ import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
@@ -116,29 +117,22 @@ public class ASTParser {
 	private FuncDecl functionDecl() {
 		Type retType = type();
 		
-		Token nameTok = lex.next();
-		if(!nameTok.getType().equals("IDENTIFIER"))
-			error("Expected identifier but instead found %s", nameTok.getType());
-		
+		Token nameTok = require("IDENTIFIER");
 		Identifier funcName = new Identifier(nameTok.getPosition(), nameTok.getValue());
 		
 		require("(");
-		
 		List<FormalArg> args = new ArrayList<>();
 		while(!lex.peek().getType().equals(")")) {
 			Type argType = type();
 			
-			nameTok = lex.next();
-			if(!nameTok.getType().equals("IDENTIFIER"))
-				error("Invalid argument name %s", nameTok.getValue());
+			nameTok = require("IDENTIFIER");
 			
 			Identifier argId = new Identifier(nameTok.getPosition(), nameTok.getValue());
 			args.add(new FormalArg(argId.getPosition(), argType, argId));
 			
-			if(!lex.peek().getType().equals(")"))
-				require(",");
+			if(lex.peek().getType().equals(","))
+				lex.next();
 		}
-		
 		require(")");
 		
 		BlockStatement body = block();
@@ -336,6 +330,16 @@ public class ASTParser {
 	/*        Expressions        */
 	/* ************************* */
 	
+	
+	private List<Expression> exprList() {
+		List<Expression> exprs = new ArrayList<>();
+		exprs.add(expression());
+		while(lex.peek().getType().equals(",")) {
+			lex.next();
+			exprs.add(expression());
+		}
+		return exprs;
+	}
 	
 	/**
 	 * Expression -> logicalExp {<assignment-operator> logicalExp}?
@@ -592,7 +596,16 @@ public class ASTParser {
 			String s = litTok.getValue();
 			return new StringLiteral(litTok.getPosition(), unescapeJavaString(s.substring(1, s.length() - 1)));
 		case "IDENTIFIER":
-			return new VarLiteral(new Identifier(litTok.getPosition(), litTok.getValue()));
+			if(lex.peek().getType().equals("(")) {
+				require("(");
+				List<Expression> args = null;
+				if(!lex.peek().getValue().equals(")"))
+						args = exprList();
+				require(")");
+				
+				return new FuncCallExpression(new Identifier(litTok.getPosition(), litTok.getValue()), args);
+			} else
+				return new VarLiteral(new Identifier(litTok.getPosition(), litTok.getValue()));
 		case "(":
 			Expression e = expression();
 			require(")");

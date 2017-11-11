@@ -8,6 +8,7 @@ import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
@@ -53,6 +54,7 @@ public interface VoidVisitor<A> {
 	void visit(StringLiteral s, A arg);
 	void visit(VarLiteral v, A arg);
 	void visit(ArrayAccess a, A arg);
+	void visit(FuncCallExpression f, A arg);
 	
 	void visit(FuncDecl d, A arg);
 }

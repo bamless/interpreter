@@ -1,7 +1,5 @@
 package com.bamless.interpreter.ast;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,14 +12,14 @@ public class FuncDecl extends ASTNode {
 	private Type retType;
 	private Identifier id;
 	
-	private List<FormalArg> args = new ArrayList<>();
+	private List<FormalArg> args;
 	private BlockStatement body;
 	
-	public FuncDecl(Position pos, Type retType, Identifier id,  Collection<FormalArg> args, BlockStatement body) {
+	public FuncDecl(Position pos, Type retType, Identifier id,  List<FormalArg> args, BlockStatement body) {
 		super(pos);
 		this.retType = retType;
 		this.id = id;
-		this.args.addAll(args);
+		this.args = args;
 		this.body = body;
 	}
 

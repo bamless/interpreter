@@ -1,9 +1,15 @@
 package com.bamless.interpreter.semantic;
 
+import java.util.HashMap;
+
 import com.bamless.interpreter.ErrUtils;
+import com.bamless.interpreter.ast.FormalArg;
+import com.bamless.interpreter.ast.FuncDecl;
+import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Expression;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
 import com.bamless.interpreter.ast.expression.PreIncrementOperation;
@@ -29,9 +35,11 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	 * the variable's identifier denotes if the variable is initialized or not
 	 */
 	private SymbolTable<Boolean> sym;
+	private HashMap<Identifier, FuncDecl> funcs;
 
-	public SemanticAnalyzer() {
+	public SemanticAnalyzer(HashMap<Identifier, FuncDecl> funcs) {
 		sym = new SymbolTable<>();
+		this.funcs = funcs;
 	}
 
 	@Override
@@ -132,6 +140,25 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 			semanticError(v.getId().getPosition(), "the local variable %s may not have been initialized",
 					v.getId().getVal());
 	}
+	
+	@Override
+	public void visit(FuncCallExpression f, Void arg) {
+		FuncDecl decl = funcs.get(f.getFuncName());
+		if(decl == null) semanticError(f.getPosition(), "Use of undeclared function `%s`.", f.getFuncName());
+	}
+	
+	@Override
+	public void visit(FuncDecl d, Void arg) {
+		sym.enterScope();
+		
+		for(FormalArg a : d.getFormalArgs()) {
+			sym.define(a.getIdentifier().getVal(), true);
+		}
+				
+		d.getBody().accept(this, arg);
+		
+		sym.exitScope();
+	}
 
 	private void semanticError(Position pos, String format, Object... args) {
 		throw new SemanticException(String.format("Semantic error at " + pos + ": " + format, args));
@@ -139,7 +166,7 @@ public class SemanticAnalyzer extends VoidVisitorAdapter<Void> {
 	
 	private boolean hasSideEffect(Expression e) {
 		if(e instanceof AssignExpression || e instanceof PostIncrementOperation 
-				|| e instanceof PreIncrementOperation) {
+				|| e instanceof PreIncrementOperation || e instanceof FuncCallExpression) {
 			return true;
 		}
 		return false;

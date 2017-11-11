@@ -1,6 +1,10 @@
 //fibonacci yeee
 
 int main(int[][][] roba, boolean eheheh) {
+	prova()
+	
+	notExists(eheheh, 24 + 90)
+	
 	int n = 35
 	print "fib(" + n + ")\n"
 	
@@ -43,4 +47,8 @@ int main(int[][][] roba, boolean eheheh) {
 		print base * y + "\n"
 	} else
 		print 1 + "\n"
+}
+
+int prova() {
+
 }

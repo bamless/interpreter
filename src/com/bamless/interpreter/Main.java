@@ -2,13 +2,15 @@ package com.bamless.interpreter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 
 import com.bamless.interpreter.ast.ASTNode;
+import com.bamless.interpreter.ast.FuncDecl;
+import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.visitor.PrinterVisitor;
-import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.parser.ASTParser;
+import com.bamless.interpreter.semantic.FunctionNameRetriever;
 import com.bamless.interpreter.semantic.SemanticAnalyzer;
-import com.bamless.interpreter.semantic.TypeChecker;
 
 public class Main {
 	
@@ -23,10 +25,13 @@ public class Main {
 		PrinterVisitor v = new PrinterVisitor(4);
 		root.accept(v, 0);
 		
-//		System.out.println("\nCommencing semantic analysis...");
-//	
-//		SemanticAnalyzer sa = new SemanticAnalyzer();
-//		root.accept(sa, null);		
+		FunctionNameRetriever f = new FunctionNameRetriever();
+		HashMap<Identifier, FuncDecl> funcs = root.accept(f, null);
+				
+		System.out.println("\nCommencing semantic analysis...");
+	
+		SemanticAnalyzer sa = new SemanticAnalyzer(funcs);
+		root.accept(sa, null);		
 //		
 //		System.out.println("Done");
 //		System.out.println("Commencing type checking...");
