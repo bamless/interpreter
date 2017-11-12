@@ -1,11 +1,11 @@
 package com.bamless.interpreter.semantic;
 
+import java.util.List;
 import java.util.Map;
 
 import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.ast.FormalArg;
 import com.bamless.interpreter.ast.FuncDecl;
-import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Expression;
@@ -24,10 +24,10 @@ import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 
 /**
- * AST walker that checks for non declared or uninitialized variables. It
- * also checks if expression used has statements have side effects, and warns
- * the user if not. In the case of an assignment operator it checks if the left
- * hand side in an lvalue, and throws an error if not.
+ * AST walker that checks for non declared or uninitialized variables. It also
+ * checks if expression used has statements have side effects, and warns the
+ * user if not. In the case of an assignment operator it checks if the left hand
+ * side in an lvalue, and throws an error if not.
  * 
  * @author fabrizio
  *
@@ -55,7 +55,7 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	 * statement.
 	 */
 	private SymbolTable<Boolean> init;
-	private Map<Identifier, FuncDecl> funcs;
+	private Map<String, FuncDecl> funcs;
 
 	public VarDeclChecker() {
 		varDecl = new SymbolTable<>();
@@ -65,18 +65,18 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	@Override
 	public void visit(Program p, Void arg) {
 		this.funcs = p.getFunctions();
-		
-		for(Identifier id : funcs.keySet()) {
+
+		for(String id : funcs.keySet()) {
 			funcs.get(id).accept(this, arg);
 		}
 	}
-	
+
 	@Override
 	public void visit(BlockStatement v, Void arg) {
 		varDecl.enterScope();
 		for(Statement s : v.getStmts()) {
 			if(s instanceof Expression && !hasSideEffect((Expression) s)) {
-				ErrUtils.warn("Warning %s: computed value is not used", s.getPosition());
+				ErrUtils.semanticError(s.getPosition(), "Statement without effect.");
 			}
 			s.accept(this, null);
 		}
@@ -92,11 +92,13 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 			ErrUtils.warn("Warning %s: computed value is not used", v.getAct().getPosition());
 		}
 
-		//the initialization of a for is always executed, so define in current init scope
+		// the initialization of a for is always executed, so define in current init
+		// scope
 		if(v.getInit() != null)
 			v.getInit().accept(this, arg);
 
-		//we're not guaranteed that further initializations will always be executed, so enter init scope
+		// we're not guaranteed that further initializations will always be executed, so
+		// enter init scope
 		init.enterScope();
 
 		if(v.getCond() != null)
@@ -111,6 +113,8 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(IfStatement v, Void arg) {
+		v.getCondition().accept(this, arg);
+		
 		init.enterScope();
 		v.getThenStmt().accept(this, arg);
 		init.exitScope();
@@ -124,6 +128,8 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(WhileStatement v, Void arg) {
+		v.getCondition().accept(this, arg);
+		
 		init.enterScope();
 		v.getBody().accept(this, arg);
 		init.exitScope();
@@ -131,12 +137,13 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(VarDecl v, Void arg) {
-		//we considered declaring a variable with the same name of another variable in an outer scope an error
+		// we considered declaring a variable with the same name of another variable in
+		// an outer scope an error
 		if(varDecl.lookup(v.getId().getVal()) != null)
 			ErrUtils.semanticError(v.getPosition(), "double declaration of variable %s", v.getId().getVal());
 		else
 			varDecl.define(v.getId().getVal(), DECL);
-			
+
 		init.define(v.getId().getVal(), false);
 
 		if(v.getInitializer() != null)
@@ -214,9 +221,21 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(FuncCallExpression f, Void arg) {
-		FuncDecl decl = funcs.get(f.getFuncName());
+		for(Expression e : f.getArgs())
+			e.accept(this, arg);
+		
+		FuncDecl decl = funcs.get(f.getFuncName().getVal());
+		
 		if(decl == null)
 			ErrUtils.semanticError(f.getPosition(), "Use of undeclared function `%s`.", f.getFuncName());
+
+		List<Expression> callArgs = f.getArgs();
+		List<FormalArg> declArgs = decl.getFormalArgs();
+
+		if(callArgs.size() != declArgs.size()) {
+			ErrUtils.semanticError(f.getPosition(), "Function %s requires %d arguments, but instead %d supplied",
+					f.getFuncName(), declArgs.size(), callArgs.size());
+		}
 	}
 
 	@Override
@@ -225,7 +244,8 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 		init.enterScope();
 
 		for(FormalArg a : d.getFormalArgs()) {
-			varDecl.define(a.getIdentifier().getVal(), true);
+			varDecl.define(a.getIdentifier().getVal(), DECL);
+			init.define(a.getIdentifier().getVal(), true);
 		}
 
 		d.getBody().accept(this, arg);

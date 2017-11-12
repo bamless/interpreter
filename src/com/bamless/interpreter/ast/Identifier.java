@@ -8,6 +8,10 @@ public class Identifier {
 		this.position = pos;
 		this.id = id;
 	}
+	
+	public Identifier(String id) {
+		this(new Position(0, 0), id);
+	}
 
 	public String getVal() {
 		return id;

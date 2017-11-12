@@ -6,6 +6,7 @@ import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
@@ -116,6 +117,12 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 		boolean res = e.getExpression().accept(this, null);
 		interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res);
 		return res;
+	}
+	
+	@Override
+	public Boolean visit(FuncCallExpression f, Void arg) {
+		interpreter.callFunction(f);
+		return interpreter.getMemEnv().<Boolean>getReturnRegister();
 	}
 
 }

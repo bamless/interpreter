@@ -2,6 +2,7 @@ package com.bamless.interpreter.interpret.expinterpreter;
 
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
@@ -30,6 +31,12 @@ public class ArrayExpInterpreter extends VisitorAdapter<Array, Void> {
 		Array res = e.getExpression().accept(this, null);
 		interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res);
 		return res;
+	}
+	
+	@Override
+	public Array visit(FuncCallExpression f, Void arg) {
+		interpreter.callFunction(f);
+		return interpreter.getMemEnv().<Array>getReturnRegister();
 	}
 
 }

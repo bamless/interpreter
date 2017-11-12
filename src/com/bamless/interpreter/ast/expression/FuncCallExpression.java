@@ -1,5 +1,6 @@
 package com.bamless.interpreter.ast.expression;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,14 +9,21 @@ import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class FuncCallExpression extends Expression {
+	private static final List<Expression> VOID_ARGS = Collections.unmodifiableList(new ArrayList<Expression>(0));
+	
 	private Identifier funcName;
 	private List<Expression> args;
 	
 	public FuncCallExpression(Identifier funcName, List<Expression> args) {
 		super(funcName.getPosition());
-		this.args = args;
+		this.args = args == null ? VOID_ARGS : args;
 		this.funcName = funcName;
 	}
+	
+	public FuncCallExpression(Identifier funcName) {
+		this(funcName, null);
+	}
+
 
 	@Override
 	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
@@ -39,12 +47,12 @@ public class FuncCallExpression extends Expression {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(funcName.getVal() + "(");
-		if(args != null) {
-			for(int i = 0; i < args.size(); i++) {
-				sb.append(args.get(i));
-				if(i < args.size() - 1) sb.append(", ");
-			}
+		
+		for(int i = 0; i < args.size(); i++) {
+			sb.append(args.get(i));
+			if(i < args.size() - 1) sb.append(", ");
 		}
+		
 		sb.append(")");
 		return sb.toString();
 	}

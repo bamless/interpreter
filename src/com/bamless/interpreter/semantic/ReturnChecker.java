@@ -2,7 +2,6 @@ package com.bamless.interpreter.semantic;
 
 import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.ast.FuncDecl;
-import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
@@ -42,7 +41,7 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 
 	@Override
 	public Boolean visit(Program p, Void arg) {
-		for(Identifier id : p.getFunctions().keySet()) {
+		for(String id : p.getFunctions().keySet()) {
 			p.getFunctions().get(id).accept(this, arg);
 		}
 

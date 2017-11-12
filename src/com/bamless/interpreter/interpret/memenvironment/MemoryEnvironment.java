@@ -1,5 +1,8 @@
 package com.bamless.interpreter.interpret.memenvironment;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.Lvalue;
@@ -10,7 +13,8 @@ import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.semantic.SymbolTable;
 
 public class MemoryEnvironment {
-	private SymbolTable<Object> environmet;
+	private Deque<SymbolTable<Object>> environmet;
+	private Object returnRegister;
 	
 	private VarRetriever varRetriever;
 	private VarSetter varSetter;
@@ -18,7 +22,7 @@ public class MemoryEnvironment {
 	private Interpreter interpreter;
 	
 	public MemoryEnvironment(Interpreter interpreter) {
-		environmet = new SymbolTable<>();
+		environmet = new ArrayDeque<SymbolTable<Object>>();
 		varRetriever = new VarRetriever();
 		varSetter = new VarSetter();
 		
@@ -26,7 +30,7 @@ public class MemoryEnvironment {
 	}
 	
 	public <T> void define(Identifier id, T val) {
-		environmet.define(id.getVal(), val);
+		environmet.peek().define(id.getVal(), val);
 	}
 	
 	public <T> void set(Lvalue var, T val) {
@@ -38,18 +42,35 @@ public class MemoryEnvironment {
 		return (T) var.accept(varRetriever, null);
 	}
 	
+	public void pushStackFrame() {
+		environmet.push(new SymbolTable<>());
+	}
+	
+	public void popStackFrame() {
+		environmet.pop();
+	}
+	
 	public void enterScope() {
-		environmet.enterScope();
+		environmet.peek().enterScope();
 	}
 	
 	public void exitScope() {
-		environmet.exitScope();
+		environmet.peek().exitScope();
+	}
+	
+	public void setReturnRegister(Object ret) {
+		returnRegister = ret;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getReturnRegister() {
+		return (T) returnRegister;
 	}
 	
 	private class VarSetter extends VoidVisitorAdapter<Object> {
 		@Override
 		public void visit(VarLiteral v, Object val) {
-			environmet.set(v.getId().getVal(), val);
+			environmet.peek().set(v.getId().getVal(), val);
 		}
 		
 		@Override
@@ -67,7 +88,7 @@ public class MemoryEnvironment {
 	private class VarRetriever extends VisitorAdapter<Object, Void> {
 		@Override
 		public Object visit(VarLiteral v, Void arg) {
-			return environmet.lookup(v.getId().getVal());
+			return environmet.peek().lookup(v.getId().getVal());
 		}
 		
 		@Override

@@ -1,7 +1,6 @@
 package com.bamless.interpreter.ast.visitor;
 
 import com.bamless.interpreter.ast.FuncDecl;
-import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
@@ -37,7 +36,7 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	
 	@Override
 	public void visit(Program p, Integer arg) {
-		for(Identifier id : p.getFunctions().keySet()) {
+		for(String id : p.getFunctions().keySet()) {
 			p.getFunctions().get(id).accept(this, 0);
 			System.out.print("\n");
 		}
@@ -141,12 +140,12 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	@Override
 	public void visit(FuncDecl d, Integer indent) {
 		String func = d.getType() + " " + d.getId().getVal() + "(";
-		if(d.getFormalArgs() != null) {
-			for(int i = 0; i < d.getFormalArgs().size(); i++) {
-				func += d.getFormalArgs().get(i);
-				if(i < d.getFormalArgs().size() - 1) func += ", ";
-			}
+		
+		for(int i = 0; i < d.getFormalArgs().size(); i++) {
+			func += d.getFormalArgs().get(i);
+			if(i < d.getFormalArgs().size() - 1) func += ", ";
 		}
+		
 		func += ")";
 		print(indent, func);
 		d.getBody().accept(this, indent + 1);

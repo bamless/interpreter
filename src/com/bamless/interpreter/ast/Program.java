@@ -9,13 +9,13 @@ import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class Program extends ASTNode {
-	private Map<Identifier, FuncDecl> functions;
+	private Map<String, FuncDecl> functions;
 	
 	public Program(Position start, Collection<FuncDecl> functions) {
 		super(start);
 		this.functions = new LinkedHashMap<>();
 		for(FuncDecl d : functions) {
-			this.functions.put(d.getId(), d);
+			this.functions.put(d.getId().getVal(), d);
 		}
 	}
 
@@ -29,7 +29,7 @@ public class Program extends ASTNode {
 		v.visit(this, arg);
 	}
 
-	public Map<Identifier, FuncDecl> getFunctions() {
+	public Map<String, FuncDecl> getFunctions() {
 		return Collections.unmodifiableMap(functions);
 	}
 	

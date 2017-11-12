@@ -1,11 +1,11 @@
 package com.bamless.interpreter.semantic;
 
+import java.util.List;
 import java.util.Map;
 
 import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.ast.FormalArg;
 import com.bamless.interpreter.ast.FuncDecl;
-import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
@@ -46,7 +46,7 @@ import com.bamless.interpreter.ast.visitor.Visitable;
  */
 public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	private SymbolTable<Type> st;
-	private Map<Identifier, FuncDecl> funcs;
+	private Map<String, FuncDecl> funcs;
 
 	public TypeChecker() {
 		this.st = new SymbolTable<>();
@@ -54,8 +54,8 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 
 	public Type visit(Program p, FuncDecl currentFunc) {
 		this.funcs = p.getFunctions();
-		
-		for(Identifier id : funcs.keySet()) {
+
+		for(String id : funcs.keySet()) {
 			funcs.get(id).accept(this, null);
 		}
 
@@ -178,7 +178,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 			typeError(r.getPosition(), "Return type mismatch, cannot convert from %s to %s",
 					exp.toString().toLowerCase(), currentFunc.getType().toString().toLowerCase());
 		}
-		
+
 		if(currentFunc.getType() == Type.INT && exp == Type.FLOAT) {
 			ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
 					r.getExpression().getPosition());
@@ -326,7 +326,32 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 
 	@Override
 	public Type visit(FuncCallExpression f, FuncDecl currentFunc) {
-		return funcs.get(f.getFuncName()).getType();
+		for(Expression e : f.getArgs()) {
+			e.accept(this, currentFunc);
+		}
+
+		List<Expression> callArgs = f.getArgs();
+		List<FormalArg> declArgs = funcs.get(f.getFuncName().getVal()).getFormalArgs();
+
+		for(int i = 0; i < callArgs.size(); i++) {
+			Type callType = callArgs.get(i).getType();
+			Type declType = declArgs.get(i).getType();
+
+			if(!callType.canAssign(declType)) {
+				typeError(callArgs.get(i).getPosition(),
+						"type mismatch, cannot convert %s to %s on %s argument of function call `%s`",
+						callType.toString().toLowerCase(), declType.toString().toLowerCase(), cardinal(i + 1),
+						f.getFuncName());
+			}
+
+			if(declType == Type.INT && callType == Type.FLOAT) {
+				ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
+						callArgs.get(i).getPosition());
+			}
+		}
+
+		f.setType(funcs.get(f.getFuncName().getVal()).getType());
+		return f.getType();
 	}
 
 	@Override
@@ -385,6 +410,19 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 				+ (types.length > 1 ? "s" : "") + " " + String.join(", ", types));
 	}
 
+	private String cardinal(int i) {
+		switch(i) {
+		case 1:
+			return i + "st";
+		case 2:
+			return i + "nd";
+		case 3: 
+			return i + "rd";
+		default:
+			return i + "th";
+		}
+	}
+	
 	@Override
 	public Type visit(Visitable v, FuncDecl currentFunc) {
 		return null;

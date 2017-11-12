@@ -1,7 +1,6 @@
 package com.bamless.interpreter.ast.visitor;
 
 import com.bamless.interpreter.ast.FuncDecl;
-import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
@@ -38,7 +37,7 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 
 	@Override
 	public T visit(Program p, A arg) {
-		for(Identifier id : p.getFunctions().keySet()) {
+		for(String id : p.getFunctions().keySet()) {
 			p.getFunctions().get(id).accept(this, arg);
 		}
 		
