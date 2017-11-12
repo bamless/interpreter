@@ -178,6 +178,11 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 			typeError(r.getPosition(), "Return type mismatch, cannot convert from %s to %s",
 					exp.toString().toLowerCase(), currentFunc.getType().toString().toLowerCase());
 		}
+		
+		if(currentFunc.getType() == Type.INT && exp == Type.FLOAT) {
+			ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
+					r.getExpression().getPosition());
+		}
 
 		return null;
 	}

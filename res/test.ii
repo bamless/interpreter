@@ -44,7 +44,7 @@ int main(int[][][] roba, boolean eheheh) {
 	} else
 		print 1 + "\n"
 
-	return 1
+	return exp
 }
 
 void prova() {
@@ -57,5 +57,4 @@ void prova() {
 
 	int z = x + 4
 	
-	return 1000000
 }
