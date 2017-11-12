@@ -22,6 +22,7 @@ import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
+import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 
@@ -47,6 +48,7 @@ public interface GenericVisitor<T, A> {
 	T visit(PostIncrementOperation p, A arg);
 	T visit(PreIncrementOperation p, A arg);
 	T visit(AssignExpression e, A arg);
+	T visit(ReturnStatement r, A arg);
 	
 	T visit(FloatLiteral f, A arg);
 	T visit(IntegerLiteral i, A arg);

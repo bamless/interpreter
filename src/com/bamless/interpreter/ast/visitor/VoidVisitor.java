@@ -22,6 +22,7 @@ import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
+import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 
@@ -35,6 +36,7 @@ public interface VoidVisitor<A> {
 	void visit(ForStatement f, A arg);
 	void visit(BlockStatement b, A arg);
 	void visit(PrintStatement p, A arg);
+	void visit(ReturnStatement r, A arg);
 	
 	void visit(VarDecl v, A arg);
 	void visit(ArrayDecl a, A arg);

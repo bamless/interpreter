@@ -1,11 +1,7 @@
 //fibonacci yeee
 
 int main(int[][][] roba, boolean eheheh) {
-	prova()
-	
-	notExists(eheheh, 24 + 90)
-	
-	int n = 35
+	int n = 6
 	print "fib(" + n + ")\n"
 	
 	int fn[3]
@@ -47,8 +43,19 @@ int main(int[][][] roba, boolean eheheh) {
 		print base * y + "\n"
 	} else
 		print 1 + "\n"
+
+	return 1
 }
 
 int prova() {
-
+	int x = 0
+	boolean y = false
+	if(y) {
+		x = 3
+	} else if(!y)
+		return 3000
+		
+	int z = x + 4
+	
+	return 2
 }

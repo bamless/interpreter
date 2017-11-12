@@ -50,6 +50,7 @@ import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
+import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
@@ -179,6 +180,8 @@ public class ASTParser {
 			return block();
 		case "PRINT":
 			return printStmt();
+		case "RETURN":
+			return returnStmt();
 		default:
 			Statement s = expression();
 			return s;
@@ -323,6 +326,11 @@ public class ASTParser {
 		if(parenthesized) require(")");
 		
 		return new PrintStatement(start, e);
+	}
+	
+	private Statement returnStmt() {
+		Position start = require("RETURN").getPosition();
+		return new ReturnStatement(start, expression());
 	}
 	
 	

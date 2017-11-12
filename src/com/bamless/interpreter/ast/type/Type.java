@@ -8,6 +8,7 @@ public abstract class Type {
 	public static final Type FLOAT = new FloatType();
 	public static final Type BOOLEAN = new BooleanType();
 	public static final Type STRING = new StringType();
+	public static final Type VOID = new VoidType();
 	
 	private static final HashMap<Type, ArrayType> arrayFromType = new HashMap<>();
 	
@@ -24,6 +25,8 @@ public abstract class Type {
 			return BOOLEAN;
 		case "STRING":
 			return STRING;
+		case "VOID":
+			return VOID;
 		}
 		
 		throw new IllegalArgumentException("Invalid type name");

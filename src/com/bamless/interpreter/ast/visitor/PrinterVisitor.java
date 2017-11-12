@@ -1,6 +1,5 @@
 package com.bamless.interpreter.ast.visitor;
 
-import com.bamless.interpreter.ast.FormalArg;
 import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.Expression;
@@ -9,6 +8,7 @@ import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
+import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
@@ -113,6 +113,11 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	@Override
 	public void visit(PrintStatement p, Integer indent) {
 		print(indent, "PRINT " + p.getExpression());
+	}
+	
+	@Override
+	public void visit(ReturnStatement r, Integer indent) {
+		print(indent, "RETURN " + r.getExpression());
 	}
 	
 	@Override

@@ -23,6 +23,7 @@ import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
+import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
@@ -87,6 +88,13 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	@Override
 	public T visit(PrintStatement p, A arg) {
 		p.getExpression().accept(this, arg);
+		
+		return null;
+	}
+	
+	@Override
+	public T visit(ReturnStatement r, A arg) {
+		r.getExpression().accept(this, arg);
 		
 		return null;
 	}
