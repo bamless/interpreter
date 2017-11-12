@@ -1,5 +1,6 @@
 package com.bamless.interpreter.ast.visitor;
 
+import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
@@ -8,6 +9,7 @@ import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
@@ -21,6 +23,7 @@ import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
+import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
@@ -34,7 +37,9 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 
 	@Override
 	public T visit(Program p, A arg) {
-		p.getBlock().accept(this, arg);
+		for(String id : p.getFunctions().keySet()) {
+			p.getFunctions().get(id).accept(this, arg);
+		}
 		
 		return null;
 	}
@@ -83,6 +88,14 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	@Override
 	public T visit(PrintStatement p, A arg) {
 		p.getExpression().accept(this, arg);
+		
+		return null;
+	}
+	
+	@Override
+	public T visit(ReturnStatement r, A arg) {
+		if(r.getExpression() != null)
+			r.getExpression().accept(this, arg);
 		
 		return null;
 	}
@@ -192,6 +205,22 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 		a.getLvalue().accept(this, arg);
 		a.getIndex().accept(this, arg);
 		
+		return null;
+	}
+	
+	@Override
+	public T visit(FuncCallExpression f, A arg) {
+		for(Expression e : f.getArgs()) {
+			e.accept(this, arg);
+		}
+		
+		return null;
+	}
+
+	@Override
+	public T visit(FuncDecl d, A arg) {
+		d.getBody().accept(this, arg);
+
 		return null;
 	}
 

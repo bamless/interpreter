@@ -1,5 +1,6 @@
 package com.bamless.interpreter.ast.visitor;
 
+import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
@@ -7,6 +8,7 @@ import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
@@ -20,6 +22,7 @@ import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
+import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 
@@ -45,6 +48,7 @@ public interface GenericVisitor<T, A> {
 	T visit(PostIncrementOperation p, A arg);
 	T visit(PreIncrementOperation p, A arg);
 	T visit(AssignExpression e, A arg);
+	T visit(ReturnStatement r, A arg);
 	
 	T visit(FloatLiteral f, A arg);
 	T visit(IntegerLiteral i, A arg);
@@ -52,4 +56,7 @@ public interface GenericVisitor<T, A> {
 	T visit(StringLiteral s, A arg);
 	T visit(VarLiteral v, A arg);
 	T visit(ArrayAccess a, A arg);
+	T visit(FuncCallExpression f, A arg);
+	
+	T visit(FuncDecl d, A arg);
 }

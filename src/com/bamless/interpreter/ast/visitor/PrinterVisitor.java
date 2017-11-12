@@ -1,11 +1,14 @@
 package com.bamless.interpreter.ast.visitor;
 
+import com.bamless.interpreter.ast.FuncDecl;
+import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
+import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
@@ -29,6 +32,14 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	@Override
 	public void visit(Visitable v, Integer arg) {
 		print(arg, "UNKNWN");
+	}
+	
+	@Override
+	public void visit(Program p, Integer arg) {
+		for(String id : p.getFunctions().keySet()) {
+			p.getFunctions().get(id).accept(this, 0);
+			System.out.print("\n");
+		}
 	}
 	
 	@Override
@@ -105,6 +116,11 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	}
 	
 	@Override
+	public void visit(ReturnStatement r, Integer indent) {
+		print(indent, "RETURN " + (r.getExpression() == null ? "" : r.getExpression().toString()));
+	}
+	
+	@Override
 	public void visit(VarDecl decl, Integer indent) {
 		if(decl.getInitializer() != null)
 			print(indent, decl.getType() + " " + decl.getInitializer());
@@ -119,6 +135,20 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 			idDim += "[" + e + "]";
 		}
 		print(indent, a.getType() + " " + idDim);
+	}
+	
+	@Override
+	public void visit(FuncDecl d, Integer indent) {
+		String func = d.getType() + " " + d.getId().getVal() + "(";
+		
+		for(int i = 0; i < d.getFormalArgs().size(); i++) {
+			func += d.getFormalArgs().get(i);
+			if(i < d.getFormalArgs().size() - 1) func += ", ";
+		}
+		
+		func += ")";
+		print(indent, func);
+		d.getBody().accept(this, indent + 1);
 	}
 	
 	private String indent(int i, String s) {

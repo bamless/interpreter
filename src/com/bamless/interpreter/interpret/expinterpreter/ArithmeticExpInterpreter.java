@@ -7,6 +7,7 @@ import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
@@ -57,6 +58,19 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 			interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res.floatValue());
 		
 		return res;
+	}
+	
+	@Override
+	public BigDecimal visit(FuncCallExpression f, Void arg) {
+		interpreter.callFunction(f);
+
+		BigDecimal ret;
+		if(f.getType() == Type.INT)
+			ret = BigDecimal.valueOf(interpreter.getMemEnv().<Integer>getReturnRegister());
+		else
+			ret = BigDecimal.valueOf(interpreter.getMemEnv().<Float>getReturnRegister());
+		
+		return ret;
 	}
 	
 	@Override

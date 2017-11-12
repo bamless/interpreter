@@ -6,12 +6,14 @@ ELSE            "else"
 FOR             "for"
 WHILE           "while"
 PRINT           "print"
+RETURN          "return"
 
 //type keywords
 INT             "int"
 FLOAT           "float"
 BOOLEAN         "boolean"
 STRING          "string"
+VOID            "void"
 
 //constants
 INT_CONST       "[0-9]+"

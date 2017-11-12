@@ -6,6 +6,7 @@ import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
@@ -81,5 +82,12 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 		interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res);
 		return res;
 	}
+	
+	@Override
+	public String visit(FuncCallExpression f, Void arg) {
+		interpreter.callFunction(f);
+		return interpreter.getMemEnv().<String>getReturnRegister();
+	}
+
 	
 }

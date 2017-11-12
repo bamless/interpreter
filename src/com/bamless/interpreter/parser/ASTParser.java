@@ -7,14 +7,14 @@ import static com.bamless.interpreter.ast.expression.ArithmeticBinExpression.Ari
 import static com.bamless.interpreter.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation.PLUS;
 import static com.bamless.interpreter.ast.expression.EqualityExpression.EqualityOperation.EQ;
 import static com.bamless.interpreter.ast.expression.EqualityExpression.EqualityOperation.NEQ;
+import static com.bamless.interpreter.ast.expression.IncrementOperator.DECR;
+import static com.bamless.interpreter.ast.expression.IncrementOperator.INCR;
 import static com.bamless.interpreter.ast.expression.LogicalExpression.BooleanBinOperation.AND;
 import static com.bamless.interpreter.ast.expression.LogicalExpression.BooleanBinOperation.OR;
 import static com.bamless.interpreter.ast.expression.RelationalExpression.RelationalOperation.GE;
 import static com.bamless.interpreter.ast.expression.RelationalExpression.RelationalOperation.GT;
 import static com.bamless.interpreter.ast.expression.RelationalExpression.RelationalOperation.LE;
 import static com.bamless.interpreter.ast.expression.RelationalExpression.RelationalOperation.LT;
-import static com.bamless.interpreter.ast.expression.IncrementOperator.INCR;
-import static com.bamless.interpreter.ast.expression.IncrementOperator.DECR;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bamless.interpreter.ast.ASTNode;
+import com.bamless.interpreter.ast.FormalArg;
+import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.Program;
@@ -34,6 +36,7 @@ import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
@@ -47,6 +50,7 @@ import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
+import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
@@ -104,22 +108,55 @@ public class ASTParser {
 	 * Program -> {vardecl}* {statement}*
 	 */
 	private ASTNode program() {
-		Position start = new Position(0, 0);
-		
-		List<Statement> statements = new ArrayList<>();
+		List<FuncDecl> decls = new ArrayList<>();
 		while(lex.hasNext()) {
-			Token peek = lex.peek();
+			decls.add(functionDecl());
+		}
+		return new Program(new Position(0, 0), decls);
+	}
+	
+	private FuncDecl functionDecl() {
+		Type retType = type();
+		
+		Token nameTok = require("IDENTIFIER");
+		Identifier funcName = new Identifier(nameTok.getPosition(), nameTok.getValue());
+		
+		require("(");
+		List<FormalArg> args = new ArrayList<>();
+		while(!lex.peek().getType().equals(")")) {
+			Type argType = type();
 			
-			//can only declare var 	inside a block
-			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || 
-					peek.getType().equals("FLOAT") || peek.getType().equals("STRING")) {
-				statements.add(varDecl());
-			} else {
-				statements.add(statement());
-			}
+			nameTok = require("IDENTIFIER");
+			
+			Identifier argId = new Identifier(nameTok.getPosition(), nameTok.getValue());
+			args.add(new FormalArg(argId.getPosition(), argType, argId));
+			
+			if(lex.peek().getType().equals(","))
+				lex.next();
+		}
+		require(")");
+		
+		BlockStatement body = block();
+		
+		return new FuncDecl(funcName.getPosition(), retType, funcName, args, body);
+	}
+
+	
+	private Type type() {
+		Type t = null;
+		try {
+			t = Type.valueOf(lex.next().getType());
+		} catch(IllegalArgumentException e) {
+			error("Invalid type");
 		}
 		
-		return new Program(start, new BlockStatement(statements, start));
+		while(lex.peek().getValue().equals("[")) {
+			require("[");
+			t = Type.arrayType(t);
+			require("]");
+		}
+		
+		return t;
 	}
 	
 	/**
@@ -143,6 +180,8 @@ public class ASTParser {
 			return block();
 		case "PRINT":
 			return printStmt();
+		case "RETURN":
+			return returnStmt();
 		default:
 			Statement s = expression();
 			return s;
@@ -152,7 +191,7 @@ public class ASTParser {
 	/**
 	 * Block -> { {vardecl}* {statement}* }
 	 */
-	private Statement block() {
+	private BlockStatement block() {
 		Position start = require("{").getPosition();
 		
 		Token peek;
@@ -291,11 +330,33 @@ public class ASTParser {
 		return new PrintStatement(start, e);
 	}
 	
+	private Statement returnStmt() {
+		Position start = require("RETURN").getPosition();
+		Expression e = null;
+		
+		if(lex.peek().getValue().equals(";"))
+			lex.next();
+		else
+			e = expression();
+		
+		return new ReturnStatement(start, e);
+	}
+	
 	
 	/* ************************* */
 	/*        Expressions        */
 	/* ************************* */
 	
+	
+	private List<Expression> exprList() {
+		List<Expression> exprs = new ArrayList<>();
+		exprs.add(expression());
+		while(lex.peek().getType().equals(",")) {
+			lex.next();
+			exprs.add(expression());
+		}
+		return exprs;
+	}
 	
 	/**
 	 * Expression -> logicalExp {<assignment-operator> logicalExp}?
@@ -552,7 +613,16 @@ public class ASTParser {
 			String s = litTok.getValue();
 			return new StringLiteral(litTok.getPosition(), unescapeJavaString(s.substring(1, s.length() - 1)));
 		case "IDENTIFIER":
-			return new VarLiteral(new Identifier(litTok.getPosition(), litTok.getValue()));
+			if(lex.peek().getType().equals("(")) {
+				require("(");
+				List<Expression> args = null;
+				if(!lex.peek().getValue().equals(")"))
+						args = exprList();
+				require(")");
+				
+				return new FuncCallExpression(new Identifier(litTok.getPosition(), litTok.getValue()), args);
+			} else
+				return new VarLiteral(new Identifier(litTok.getPosition(), litTok.getValue()));
 		case "(":
 			Expression e = expression();
 			require(")");

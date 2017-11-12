@@ -1,23 +1,24 @@
 package com.bamless.interpreter.interpret;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
+import com.bamless.interpreter.ast.FuncDecl;
+import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Program;
-import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
-import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
-import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.Expression;
-import com.bamless.interpreter.ast.expression.LogicalExpression;
-import com.bamless.interpreter.ast.expression.LogicalNotExpression;
+import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
 import com.bamless.interpreter.ast.expression.PreIncrementOperation;
-import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
+import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
@@ -39,12 +40,18 @@ import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
  *
  */
 public class Interpreter  extends VoidVisitorAdapter<Void> {
+	private static final String MAIN_FUNC = "main";
+	
 	private ArithmeticExpInterpreter ai;
 	private BooleanExpInterpreter bi;
 	private StringExpInterpreter si;
 	private ArrayExpInterpreter arri;
 	
+	private Map<String, FuncDecl> functions;
+	
 	private MemoryEnvironment memEnv;
+	
+	private boolean returning;
 	
 	public Interpreter() {
 		this.memEnv = new MemoryEnvironment(this);
@@ -57,7 +64,10 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	
 	@Override
 	public void visit(Program p, Void arg) {
-		p.getBlock().accept(this, arg);
+		functions = p.getFunctions();
+		
+		FuncCallExpression main = new FuncCallExpression(new Identifier(MAIN_FUNC));
+		callFunction(main);
 	}
 	
 	@Override
@@ -65,6 +75,7 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 		memEnv.enterScope();
 		for(Statement s : v.getStmts()) {
 			s.accept(this, null);
+			if(returning) break;
 		}
 		memEnv.exitScope();
 	}
@@ -83,6 +94,7 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	public void visit(WhileStatement v, Void arg) {
 		while(v.getCondition().accept(bi, null)) {
 			v.getBody().accept(this, null);
+			if(returning) break;
 		}
 	}
 	
@@ -94,6 +106,7 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 		Expression cond = v.getCond();
 		while(cond == null || cond.accept(bi, null)) {
 			v.getBody().accept(this, null);
+			if(returning) break;
 			
 			if(v.getAct() != null)
 				v.getAct().accept(this, null);
@@ -122,60 +135,86 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 		memEnv.define(a.getId(), new Array(computetDim, ((ArrayType) a.getType()).getInternalType()));
 	}
 	
-	private void interpretExpression(Expression e) {
-		if(e.getType() == Type.BOOLEAN)
-			e.accept(bi, null);
-		if(e.getType() == Type.STRING)
-			e.accept(si, null);
-		if(e.getType() == Type.INT || e.getType() == Type.FLOAT)
-			e.accept(ai, null);
-		if(e.getType().isArray())
-			e.accept(arri, null);
+	@Override
+	public void visit(ReturnStatement r, Void arg) {
+		if(r.getExpression() != null)
+			memEnv.setReturnRegister(interpretExpression(r.getExpression()));
+		returning = true;
 	}
+	
+	/* ************************* */
+	/*        Expressions        */
+	/* ************************* */
+	
+	private Object interpretExpression(Expression e) {
+		if(e.getType() == Type.BOOLEAN) {
+			boolean b = e.accept(bi, null);
+			return b;
+		} else if(e.getType() == Type.STRING) {
+			String s = e.accept(si, null);
+			return s;
+		} else if(e.getType() == Type.INT || e.getType() == Type.FLOAT) {
+			BigDecimal n = e.accept(ai, null);
+			
+			if(e.getType() == Type.INT)
+				return n.intValue();
+			else
+				return n.floatValue();
+		} else if(e.getType().isArray())
+			return e.accept(arri, null);
 
+		
+		throw new RuntimeError("Fatal error.");
+	}
+	
 	@Override
 	public void visit(AssignExpression e, Void arg) {
 		interpretExpression(e);
 	}
 	
 	@Override
-	public void visit(ArithmeticBinExpression e, Void arg) {
-		interpretExpression(e);
-	}
-	
-	@Override
-	public void visit(ArrayAccess a, Void arg) {
-		interpretExpression(a);
-	}
-	
-	@Override
 	public void visit(PreIncrementOperation p, Void arg) {
 		interpretExpression(p);
-	}
-
-	@Override
-	public void visit(LogicalExpression l, Void arg) {
-		interpretExpression(l);
-	}
-
-	@Override
-	public void visit(RelationalExpression r, Void arg) {
-		interpretExpression(r);
-	}
-
-	@Override
-	public void visit(EqualityExpression e, Void arg) {
-		interpretExpression(e);
-	}
-
-	@Override
-	public void visit(LogicalNotExpression n, Void arg) {
-		interpretExpression(n);
 	}
 	
 	@Override
 	public void visit(PostIncrementOperation p, Void arg) {
 		interpretExpression(p);
+	}
+	
+	@Override
+	public void visit(FuncCallExpression f, Void arg) {
+		callFunction(f);
+	}
+	
+	public void callFunction(FuncCallExpression funcCall) {
+		FuncDecl func = functions.get(funcCall.getFuncName().getVal());
+		List<Expression> args = funcCall.getArgs();
+		
+		//compute function argument expressions
+		Object[] computedArgs = new Object[args.size()];
+		for(int i = 0; i < func.getFormalArgs().size(); i++) {
+			computedArgs[i] = interpretExpression(args.get(i));
+		}
+		
+		//push a new stack frame
+		memEnv.pushStackFrame();
+		memEnv.enterScope();
+		
+		//set arguments on the newly pushed stackframe
+		for(int i = 0; i < func.getFormalArgs().size(); i++) {
+			memEnv.define(func.getFormalArgs().get(i).getIdentifier(), computedArgs[i]);
+		}
+		
+		//call the function
+		func.getBody().accept(this, null);
+		
+		//clear the stack frames
+		memEnv.exitScope();
+		memEnv.popStackFrame();
+		
+		//return
+		returning = false;
 	}
 	
 	public ArithmeticExpInterpreter getArithmeticExpInterpreter() {

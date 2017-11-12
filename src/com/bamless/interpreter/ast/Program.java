@@ -1,15 +1,22 @@
 package com.bamless.interpreter.ast;
 
-import com.bamless.interpreter.ast.statement.BlockStatement;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class Program extends ASTNode {
-	private BlockStatement stmts;
+	private Map<String, FuncDecl> functions;
 	
-	public Program(Position start, BlockStatement stmts) {
+	public Program(Position start, Collection<FuncDecl> functions) {
 		super(start);
-		this.stmts = stmts;
+		this.functions = new LinkedHashMap<>();
+		for(FuncDecl d : functions) {
+			this.functions.put(d.getId().getVal(), d);
+		}
 	}
 
 	@Override
@@ -22,8 +29,8 @@ public class Program extends ASTNode {
 		v.visit(this, arg);
 	}
 
-	public BlockStatement getBlock() {
-		return stmts;
+	public Map<String, FuncDecl> getFunctions() {
+		return Collections.unmodifiableMap(functions);
 	}
 	
 }
