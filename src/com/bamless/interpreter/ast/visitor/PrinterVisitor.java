@@ -1,6 +1,7 @@
 package com.bamless.interpreter.ast.visitor;
 
 import com.bamless.interpreter.ast.FuncDecl;
+import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
@@ -36,8 +37,8 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	
 	@Override
 	public void visit(Program p, Integer arg) {
-		for(FuncDecl d : p.getFunctions()) {
-			d.accept(this, 0);
+		for(Identifier id : p.getFunctions().keySet()) {
+			p.getFunctions().get(id).accept(this, 0);
 			System.out.print("\n");
 		}
 	}
@@ -117,7 +118,7 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	
 	@Override
 	public void visit(ReturnStatement r, Integer indent) {
-		print(indent, "RETURN " + r.getExpression());
+		print(indent, "RETURN " + (r.getExpression() == null ? "" : r.getExpression().toString()));
 	}
 	
 	@Override

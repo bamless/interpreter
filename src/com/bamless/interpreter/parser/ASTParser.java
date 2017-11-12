@@ -330,7 +330,14 @@ public class ASTParser {
 	
 	private Statement returnStmt() {
 		Position start = require("RETURN").getPosition();
-		return new ReturnStatement(start, expression());
+		Expression e = null;
+		
+		if(lex.peek().getValue().equals(";"))
+			lex.next();
+		else
+			e = expression();
+		
+		return new ReturnStatement(start, e);
 	}
 	
 	

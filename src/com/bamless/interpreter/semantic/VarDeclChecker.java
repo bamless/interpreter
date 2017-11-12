@@ -1,11 +1,12 @@
 package com.bamless.interpreter.semantic;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.ast.FormalArg;
 import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.Identifier;
+import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
@@ -54,26 +55,31 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	 * statement.
 	 */
 	private SymbolTable<Boolean> init;
+	private Map<Identifier, FuncDecl> funcs;
 
-	private HashMap<Identifier, FuncDecl> funcs;
-
-	public VarDeclChecker(HashMap<Identifier, FuncDecl> funcs) {
+	public VarDeclChecker() {
 		varDecl = new SymbolTable<>();
 		init = new SymbolTable<>();
-		this.funcs = funcs;
 	}
 
 	@Override
+	public void visit(Program p, Void arg) {
+		this.funcs = p.getFunctions();
+		
+		for(Identifier id : funcs.keySet()) {
+			funcs.get(id).accept(this, arg);
+		}
+	}
+	
+	@Override
 	public void visit(BlockStatement v, Void arg) {
 		varDecl.enterScope();
-		init.enterScope();
 		for(Statement s : v.getStmts()) {
 			if(s instanceof Expression && !hasSideEffect((Expression) s)) {
 				ErrUtils.warn("Warning %s: computed value is not used", s.getPosition());
 			}
 			s.accept(this, null);
 		}
-		init.exitScope();
 		varDecl.exitScope();
 	}
 

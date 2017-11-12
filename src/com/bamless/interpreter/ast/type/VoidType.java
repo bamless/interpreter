@@ -44,7 +44,7 @@ public class VoidType extends Type {
 
 	@Override
 	public boolean canAssign(Type other) {
-		return false;
+		return other == Type.VOID;
 	}
 
 	@Override

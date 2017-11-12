@@ -1,6 +1,6 @@
 package com.bamless.interpreter.semantic;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.ast.FormalArg;
@@ -46,16 +46,17 @@ import com.bamless.interpreter.ast.visitor.Visitable;
  */
 public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	private SymbolTable<Type> st;
-	private HashMap<Identifier, FuncDecl> funcs;
+	private Map<Identifier, FuncDecl> funcs;
 
-	public TypeChecker(HashMap<Identifier, FuncDecl> funcs) {
+	public TypeChecker() {
 		this.st = new SymbolTable<>();
-		this.funcs = funcs;
 	}
 
 	public Type visit(Program p, FuncDecl currentFunc) {
-		for(FuncDecl d : p.getFunctions()) {
-			d.accept(this, null);
+		this.funcs = p.getFunctions();
+		
+		for(Identifier id : funcs.keySet()) {
+			funcs.get(id).accept(this, null);
 		}
 
 		return null;
@@ -170,7 +171,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 
 	@Override
 	public Type visit(ReturnStatement r, FuncDecl currentFunc) {
-		Type exp = r.getExpression().accept(this, currentFunc);
+		Type exp = r.getExpression() == null ? Type.VOID : r.getExpression().accept(this, currentFunc);
 		boolean ret = currentFunc.getType().canAssign(exp);
 
 		if(!ret) {

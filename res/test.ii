@@ -47,15 +47,15 @@ int main(int[][][] roba, boolean eheheh) {
 	return 1
 }
 
-int prova() {
+void prova() {
 	int x = 0
 	boolean y = false
 	if(y) {
 		x = 3
 	} else if(!y)
-		return 3000
-		
+		return;
+
 	int z = x + 4
 	
-	return 2
+	return 1000000
 }

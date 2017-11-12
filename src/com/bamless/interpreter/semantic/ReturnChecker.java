@@ -2,6 +2,7 @@ package com.bamless.interpreter.semantic;
 
 import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.ast.FuncDecl;
+import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
@@ -41,9 +42,8 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 
 	@Override
 	public Boolean visit(Program p, Void arg) {
-		for(FuncDecl d : p.getFunctions()) {
-			if(d.getType() != Type.VOID)
-				d.accept(this, arg);
+		for(Identifier id : p.getFunctions().keySet()) {
+			p.getFunctions().get(id).accept(this, arg);
 		}
 
 		return null;
@@ -52,7 +52,7 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 	@Override
 	public Boolean visit(FuncDecl d, Void arg) {
 		boolean ret = d.getBody().accept(this, arg);
-		if(!ret) {
+		if(!ret && d.getType() != Type.VOID) {
 			ErrUtils.semanticError(d.getPosition(), "Function `%s` declares return type of %s, but does not return.",
 					d.getId(), d.getType().toString().toLowerCase());
 		}

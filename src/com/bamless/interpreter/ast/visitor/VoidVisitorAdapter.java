@@ -1,6 +1,7 @@
 package com.bamless.interpreter.ast.visitor;
 
 import com.bamless.interpreter.ast.FuncDecl;
+import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
@@ -37,8 +38,8 @@ public class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 
 	@Override
 	public void visit(Program p, A arg) {
-		for(FuncDecl f : p.getFunctions()) {
-			f.accept(this, arg);
+		for(Identifier id : p.getFunctions().keySet()) {
+			p.getFunctions().get(id).accept(this, arg);
 		}
 	}
 	
@@ -82,7 +83,8 @@ public class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 	
 	@Override
 	public void visit(ReturnStatement r, A arg) {
-		r.getExpression().accept(this, arg);
+		if(r.getExpression() != null)
+			r.getExpression().accept(this, arg);
 	}
 
 	@Override
