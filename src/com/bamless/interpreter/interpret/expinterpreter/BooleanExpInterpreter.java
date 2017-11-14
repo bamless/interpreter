@@ -122,7 +122,7 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	@Override
 	public Boolean visit(FuncCallExpression f, Void arg) {
 		interpreter.callFunction(f);
-		return interpreter.getMemEnv().<Boolean>getReturnRegister();
+		return (Boolean) interpreter.getMemEnv().getReturnRegister();
 	}
 
 }

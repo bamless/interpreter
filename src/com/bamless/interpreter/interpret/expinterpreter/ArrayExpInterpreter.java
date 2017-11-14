@@ -36,7 +36,7 @@ public class ArrayExpInterpreter extends VisitorAdapter<Array, Void> {
 	@Override
 	public Array visit(FuncCallExpression f, Void arg) {
 		interpreter.callFunction(f);
-		return interpreter.getMemEnv().<Array>getReturnRegister();
+		return (Array) interpreter.getMemEnv().getReturnRegister();
 	}
 
 }

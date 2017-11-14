@@ -62,9 +62,8 @@ public class MemoryEnvironment {
 		returnRegister = ret;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T> T getReturnRegister() {
-		return (T) returnRegister;
+	public Object getReturnRegister() {
+		return returnRegister;
 	}
 	
 	private class VarSetter extends VoidVisitorAdapter<Object> {

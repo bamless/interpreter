@@ -64,11 +64,13 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 	public BigDecimal visit(FuncCallExpression f, Void arg) {
 		interpreter.callFunction(f);
 
+		Object retObj = interpreter.getMemEnv().getReturnRegister();
+		
 		BigDecimal ret;
-		if(f.getType() == Type.INT)
-			ret = BigDecimal.valueOf(interpreter.getMemEnv().<Integer>getReturnRegister());
+		if(retObj instanceof Integer)
+			ret = BigDecimal.valueOf((int) interpreter.getMemEnv().getReturnRegister());
 		else
-			ret = BigDecimal.valueOf(interpreter.getMemEnv().<Float>getReturnRegister());
+			ret = BigDecimal.valueOf((float) interpreter.getMemEnv().getReturnRegister());
 		
 		return ret;
 	}

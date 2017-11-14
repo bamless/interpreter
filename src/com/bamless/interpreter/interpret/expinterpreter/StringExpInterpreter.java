@@ -86,7 +86,7 @@ public class StringExpInterpreter extends VisitorAdapter<String, Void> {
 	@Override
 	public String visit(FuncCallExpression f, Void arg) {
 		interpreter.callFunction(f);
-		return interpreter.getMemEnv().<String>getReturnRegister();
+		return (String) interpreter.getMemEnv().getReturnRegister();
 	}
 
 	

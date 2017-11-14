@@ -147,20 +147,18 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	/* ************************* */
 	
 	private Object interpretExpression(Expression e) {
-		if(e.getType() == Type.BOOLEAN) {
-			boolean b = e.accept(bi, null);
-			return b;
-		} else if(e.getType() == Type.STRING) {
-			String s = e.accept(si, null);
-			return s;
-		} else if(e.getType() == Type.INT || e.getType() == Type.FLOAT) {
+		if(e.getType() == Type.INT || e.getType() == Type.FLOAT) {
 			BigDecimal n = e.accept(ai, null);
 			
 			if(e.getType() == Type.INT)
 				return n.intValue();
 			else
 				return n.floatValue();
-		} else if(e.getType().isArray())
+		} else if(e.getType() == Type.BOOLEAN)
+			return e.accept(bi, null);
+		else if(e.getType() == Type.STRING)
+			return e.accept(si, null);
+		else if(e.getType().isArray())
 			return e.accept(arri, null);
 
 		
