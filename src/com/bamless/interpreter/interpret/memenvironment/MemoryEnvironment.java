@@ -2,6 +2,7 @@ package com.bamless.interpreter.interpret.memenvironment;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashMap;
 
 import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
@@ -10,98 +11,103 @@ import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 import com.bamless.interpreter.interpret.Interpreter;
-import com.bamless.interpreter.semantic.SymbolTable;
 
 public class MemoryEnvironment {
-	private Deque<SymbolTable<Object>> environmet;
-	private Object returnRegister;
-	
-	private VarRetriever varRetriever;
-	private VarSetter varSetter;
+	private Deque<Frame> environmet;
 	
 	private Interpreter interpreter;
 	
 	public MemoryEnvironment(Interpreter interpreter) {
-		environmet = new ArrayDeque<SymbolTable<Object>>();
-		varRetriever = new VarRetriever();
-		varSetter = new VarSetter();
+		environmet = new ArrayDeque<Frame>();
 		
 		this.interpreter = interpreter;
 	}
 	
-	public <T> void define(Identifier id, T val) {
-		environmet.peek().define(id.getVal(), val);
-	}
-	
-	public <T> void set(Lvalue var, T val) {
-		var.accept(varSetter, val);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <T> T retrieve(Lvalue var) {
-		return (T) var.accept(varRetriever, null);
-	}
-	
 	public void pushStackFrame() {
-		environmet.push(new SymbolTable<>());
+		environmet.push(new Frame());
 	}
 	
 	public void popStackFrame() {
 		environmet.pop();
 	}
 	
-	public void enterScope() {
-		environmet.peek().enterScope();
+	public Frame getCurrentFrame() {
+		return environmet.peek();
 	}
 	
-	public void exitScope() {
-		environmet.peek().exitScope();
-	}
-	
-	public void setReturnRegister(Object ret) {
-		returnRegister = ret;
-	}
-	
-	public Object getReturnRegister() {
-		return returnRegister;
-	}
-	
-	private class VarSetter extends VoidVisitorAdapter<Object> {
-		@Override
-		public void visit(VarLiteral v, Object val) {
-			environmet.peek().set(v.getId().getVal(), val);
+	public class Frame {
+		private VarSetter setter;
+		private VarRetriever retriever;
+		
+		private HashMap<String, Object> mem;
+		private Object returnRegister;
+		
+		public Frame() {
+			mem = new HashMap<>();
+			setter = new VarSetter();
+			retriever = new VarRetriever();
 		}
 		
-		@Override
-		public void visit(ArrayAccess a, Object arg) {
-			Array l = a.getLvalue().accept(interpreter.getArrayExpInterpreter(), null);
-			
-			try {
-				l.set(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), null).intValue(), arg);
-			} catch(ArrayIndexOutOfBoundsException e) {
-				throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
-			}
-		}
-	}
-	
-	private class VarRetriever extends VisitorAdapter<Object, Void> {
-		@Override
-		public Object visit(VarLiteral v, Void arg) {
-			return environmet.peek().lookup(v.getId().getVal());
+		public <T> void define(Identifier id, T val) {
+			if(mem.get(id.getVal()) != null)
+				throw new IllegalArgumentException("Identifier " + id + " is already defined");
+			mem.put(id.getVal(), val);
 		}
 		
-		@Override
-		public Object visit(ArrayAccess a, Void arg) {
-			Array array = a.getLvalue().accept(interpreter.getArrayExpInterpreter(), null);
-			
-			Object o = null;
-			try {
-				o = array.get(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), arg).intValue());
-			} catch(ArrayIndexOutOfBoundsException e) {
-				throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
+		public <T> void set(Lvalue var, T val) {
+			var.accept(setter, val);
+		}
+		
+		@SuppressWarnings("unchecked")
+		public <T> T retrieve(Lvalue var) {
+			return (T) var.accept(retriever, null);
+		}
+		
+		public <T> void setReturnRegister(T val) {
+			returnRegister = val;
+		}
+		
+		public Object getReturnRegister() {
+			return returnRegister;
+		}
+		
+		private class VarSetter extends VoidVisitorAdapter<Object> {
+			@Override
+			public void visit(VarLiteral v, Object val) {
+				mem.put(v.getId().getVal(), val);
 			}
 			
-			return o;
+			@Override
+			public void visit(ArrayAccess a, Object arg) {
+				Array l = a.getLvalue().accept(interpreter.getArrayExpInterpreter(), getCurrentFrame());
+				
+				try {
+					l.set(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), getCurrentFrame()).intValue(), arg);
+				} catch(ArrayIndexOutOfBoundsException e) {
+					throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
+				}
+			}
+		}
+		
+		private class VarRetriever extends VisitorAdapter<Object, Void> {
+			@Override
+			public Object visit(VarLiteral v, Void arg) {
+				return mem.get(v.getId().getVal());
+			}
+			
+			@Override
+			public Object visit(ArrayAccess a, Void arg) {
+				Array array = a.getLvalue().accept(interpreter.getArrayExpInterpreter(), getCurrentFrame());
+				
+				Object o = null;
+				try {
+					o = array.get(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), getCurrentFrame()).intValue());
+				} catch(ArrayIndexOutOfBoundsException e) {
+					throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
+				}
+				
+				return o;
+			}
 		}
 	}
 

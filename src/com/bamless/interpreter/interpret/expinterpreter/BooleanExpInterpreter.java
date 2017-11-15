@@ -16,8 +16,9 @@ import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
 import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.interpret.RuntimeError;
+import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
 
-public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
+public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Frame> {
 	private Interpreter interpreter;
 	
 	public BooleanExpInterpreter(Interpreter interpreter) {
@@ -25,9 +26,9 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	}
 
 	@Override
-	public Boolean visit(RelationalExpression r, Void arg) {
-		BigDecimal left  = r.getLeft().accept(interpreter.getArithmeticExpInterpreter(), null);
-		BigDecimal right = r.getRight().accept(interpreter.getArithmeticExpInterpreter(), null);
+	public Boolean visit(RelationalExpression r, Frame frame) {
+		BigDecimal left  = r.getLeft().accept(interpreter.getArithmeticExpInterpreter(), frame);
+		BigDecimal right = r.getRight().accept(interpreter.getArithmeticExpInterpreter(), frame);
 		
 		switch(r.getOperation()) {
 		case LT:
@@ -44,11 +45,11 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	}
 	
 	@Override
-	public Boolean visit(EqualityExpression e, Void arg) {
+	public Boolean visit(EqualityExpression e, Frame frame) {
 		Object l = null, r = null;
 		if(e.getLeft().getType() == Type.INT || e.getLeft().getType() == Type.FLOAT) {
-			BigDecimal bl = e.getLeft().accept(interpreter.getArithmeticExpInterpreter(), null);
-			BigDecimal br = e.getRight().accept(interpreter.getArithmeticExpInterpreter(), null);
+			BigDecimal bl = e.getLeft().accept(interpreter.getArithmeticExpInterpreter(), frame);
+			BigDecimal br = e.getRight().accept(interpreter.getArithmeticExpInterpreter(), frame);
 			
 			switch(e.getOperation()) {
 			case EQ:
@@ -57,14 +58,14 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 				return bl.compareTo(br) != 0;
 			}
 		} else if(e.getLeft().getType() == Type.STRING) {
-			l = e.getLeft().accept(interpreter.getStringExpInterpreter(), null);
-			r = e.getRight().accept(interpreter.getStringExpInterpreter(), null);
+			l = e.getLeft().accept(interpreter.getStringExpInterpreter(), frame);
+			r = e.getRight().accept(interpreter.getStringExpInterpreter(), frame);
 		} else if(e.getLeft().getType().isArray()){
-			l = e.getLeft().accept(interpreter.getArrayExpInterpreter(), null);
-			r = e.getRight().accept(interpreter.getArrayExpInterpreter(), null);
+			l = e.getLeft().accept(interpreter.getArrayExpInterpreter(), frame);
+			r = e.getRight().accept(interpreter.getArrayExpInterpreter(), frame);
 		} else {
-			l = e.getLeft().accept(this, null);
-			r = e.getRight().accept(this, null);
+			l = e.getLeft().accept(this, frame);
+			r = e.getRight().accept(this, frame);
 		}
 		
 		switch(e.getOperation()) {
@@ -78,9 +79,9 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	}
 	
 	@Override
-	public Boolean visit(LogicalExpression l, Void arg) {
-		boolean left  = l.getLeft().accept(this, null);
-		boolean right = l.getRight().accept(this, null);
+	public Boolean visit(LogicalExpression l, Frame frame) {
+		boolean left  = l.getLeft().accept(this, frame);
+		boolean right = l.getRight().accept(this, frame);
 		
 		switch(l.getOperation()) {
 		case AND:
@@ -93,36 +94,36 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Void> {
 	}
 	
 	@Override
-	public Boolean visit(LogicalNotExpression n, Void arg) {
-		return !n.getExpression().accept(this, null);
+	public Boolean visit(LogicalNotExpression n, Frame frame) {
+		return !n.getExpression().accept(this, frame);
 	}
 	
 	@Override
-	public Boolean visit(VarLiteral v, Void arg) {
-		return interpreter.getMemEnv().<Boolean>retrieve(v);
+	public Boolean visit(VarLiteral v, Frame frame) {
+		return frame.<Boolean>retrieve(v);
 	}
 	
 	@Override
-	public Boolean visit(ArrayAccess a, Void arg) {
-		return interpreter.getMemEnv().<Boolean>retrieve(a);
+	public Boolean visit(ArrayAccess a, Frame frame) {
+		return frame.<Boolean>retrieve(a);
 	}
 	
 	@Override
-	public Boolean visit(BooleanLiteral b, Void arg) {
+	public Boolean visit(BooleanLiteral b, Frame frame) {
 		return b.getValue();
 	}
 	
 	@Override
-	public Boolean visit(AssignExpression e, Void arg) {
-		boolean res = e.getExpression().accept(this, null);
-		interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res);
+	public Boolean visit(AssignExpression e, Frame frame) {
+		boolean res = e.getExpression().accept(this, frame);
+		frame.set((Lvalue) e.getLvalue(), res);
 		return res;
 	}
 	
 	@Override
-	public Boolean visit(FuncCallExpression f, Void arg) {
+	public Boolean visit(FuncCallExpression f, Frame frame) {
 		interpreter.callFunction(f);
-		return (Boolean) interpreter.getMemEnv().getReturnRegister();
+		return (Boolean) frame.getReturnRegister();
 	}
 
 }

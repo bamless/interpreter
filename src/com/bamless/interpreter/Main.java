@@ -15,7 +15,7 @@ public class Main {
 		System.out.println("Commencing parsing...");
 		
 		ASTParser p = new ASTParser();
-		ASTNode root = p.parse(ClassLoader.class.getResourceAsStream("/test.ii"));
+		ASTNode root = p.parse(ClassLoader.class.getResourceAsStream("/test.c+-"));
 		
 		System.out.println("Parsing done, printing AST:");
 		

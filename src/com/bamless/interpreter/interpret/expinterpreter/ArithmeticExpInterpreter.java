@@ -17,8 +17,9 @@ import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
 import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.interpret.RuntimeError;
+import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
 
-public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
+public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Frame> {
 	private Interpreter interpreter;
 
 	public ArithmeticExpInterpreter(Interpreter interpreter) {
@@ -26,9 +27,9 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 	}
 	
 	@Override
-	public BigDecimal visit(ArithmeticBinExpression e, Void arg) {
-		BigDecimal l = e.getLeft().accept(this, null);
-		BigDecimal r = e.getRight().accept(this, null);
+	public BigDecimal visit(ArithmeticBinExpression e, Frame frame) {
+		BigDecimal l = e.getLeft().accept(this, frame);
+		BigDecimal r = e.getRight().accept(this, frame);
 		
 		switch(e.getOperation()) {
 		case PLUS:
@@ -50,34 +51,34 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 	}
 	
 	@Override
-	public BigDecimal visit(AssignExpression e, Void arg) {
-		BigDecimal res = e.getExpression().accept(this, null);
+	public BigDecimal visit(AssignExpression e, Frame frame) {
+		BigDecimal res = e.getExpression().accept(this, frame);
 		if(e.getType() == Type.INT)
-			interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res.intValue());
+			frame.set((Lvalue) e.getLvalue(), res.intValue());
 		else
-			interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res.floatValue());
+			frame.set((Lvalue) e.getLvalue(), res.floatValue());
 		
 		return res;
 	}
 	
 	@Override
-	public BigDecimal visit(FuncCallExpression f, Void arg) {
+	public BigDecimal visit(FuncCallExpression f, Frame frame) {
 		interpreter.callFunction(f);
 
-		Object retObj = interpreter.getMemEnv().getReturnRegister();
+		Object retObj = frame.getReturnRegister();
 		
 		BigDecimal ret;
 		if(retObj instanceof Integer)
-			ret = BigDecimal.valueOf((int) interpreter.getMemEnv().getReturnRegister());
+			ret = BigDecimal.valueOf((int) retObj);
 		else
-			ret = BigDecimal.valueOf((float) interpreter.getMemEnv().getReturnRegister());
+			ret = BigDecimal.valueOf((float) retObj);
 		
 		return ret;
 	}
 	
 	@Override
-	public BigDecimal visit(PreIncrementOperation p, Void arg) {
-		BigDecimal res = p.getExpression().accept(this, null);
+	public BigDecimal visit(PreIncrementOperation p, Frame frame) {
+		BigDecimal res = p.getExpression().accept(this, frame);
 		
 		switch(p.getOperator()) {
 		case INCR:
@@ -89,16 +90,16 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 		}
 		
 		if(p.getType() == Type.INT)
-			interpreter.getMemEnv().set((Lvalue) p.getExpression(), res.intValue());
+			frame.set((Lvalue) p.getExpression(), res.intValue());
 		else
-			interpreter.getMemEnv().set((Lvalue) p.getExpression(), res.floatValue());
+			frame.set((Lvalue) p.getExpression(), res.floatValue());
 		
 		return res;
 	}
 	
 	@Override
-	public BigDecimal visit(PostIncrementOperation p, Void arg) {
-		BigDecimal old = p.getExpression().accept(this, null);
+	public BigDecimal visit(PostIncrementOperation p, Frame frame) {
+		BigDecimal old = p.getExpression().accept(this, frame);
 		
 		BigDecimal res = null;
 		switch(p.getOperator()) {
@@ -111,36 +112,36 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Void> {
 		}
 		
 		if(p.getType() == Type.INT)
-			interpreter.getMemEnv().set((Lvalue) p.getExpression(), res.intValue());
+			frame.set((Lvalue) p.getExpression(), res.intValue());
 		else
-			interpreter.getMemEnv().set((Lvalue) p.getExpression(), res.floatValue());
+			frame.set((Lvalue) p.getExpression(), res.floatValue());
 		
 		return old;
 	}
 	
 	@Override
-	public BigDecimal visit(VarLiteral v, Void arg) {
+	public BigDecimal visit(VarLiteral v, Frame frame) {
 		if(v.getType() == Type.INT)
-			return BigDecimal.valueOf(interpreter.getMemEnv().<Integer>retrieve(v));
+			return BigDecimal.valueOf(frame.<Integer>retrieve(v));
 		else 
-			return BigDecimal.valueOf(interpreter.getMemEnv().<Float>retrieve(v));
+			return BigDecimal.valueOf(frame.<Float>retrieve(v));
 	}
 	
 	@Override
-	public BigDecimal visit(ArrayAccess a, Void arg) {
+	public BigDecimal visit(ArrayAccess a, Frame frame) {
 		if(a.getType() == Type.INT)
-			return BigDecimal.valueOf(interpreter.getMemEnv().<Integer>retrieve(a));
+			return BigDecimal.valueOf(frame.<Integer>retrieve(a));
 		else
-			return BigDecimal.valueOf(interpreter.getMemEnv().<Float>retrieve(a));
+			return BigDecimal.valueOf(frame.<Float>retrieve(a));
 	}
 	
 	@Override
-	public BigDecimal visit(FloatLiteral f, Void arg) {
+	public BigDecimal visit(FloatLiteral f, Frame frame) {
 		return BigDecimal.valueOf(f.getValue());
 	}
 	
 	@Override
-	public BigDecimal visit(IntegerLiteral i, Void arg) {
+	public BigDecimal visit(IntegerLiteral i, Frame frame) {
 		return BigDecimal.valueOf(i.getValue());
 	}
 

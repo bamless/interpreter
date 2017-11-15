@@ -31,6 +31,7 @@ import com.bamless.interpreter.interpret.expinterpreter.BooleanExpInterpreter;
 import com.bamless.interpreter.interpret.expinterpreter.StringExpInterpreter;
 import com.bamless.interpreter.interpret.memenvironment.Array;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
+import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
 
 /**
  * Interpret the language by directly interpreting the AST. This type of interpretation is slow,
@@ -39,7 +40,7 @@ import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
  * @author fabrizio
  *
  */
-public class Interpreter  extends VoidVisitorAdapter<Void> {
+public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	private static final String MAIN_FUNC = "main";
 	
 	private ArithmeticExpInterpreter ai;
@@ -63,7 +64,7 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	}
 	
 	@Override
-	public void visit(Program p, Void arg) {
+	public void visit(Program p, Frame frame) {
 		functions = p.getFunctions();
 		
 		FuncCallExpression main = new FuncCallExpression(new Identifier(MAIN_FUNC));
@@ -71,74 +72,72 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	}
 	
 	@Override
-	public void visit(BlockStatement v, Void arg) {
-		memEnv.enterScope();
+	public void visit(BlockStatement v, Frame frame) {
 		for(Statement s : v.getStmts()) {
-			s.accept(this, null);
+			s.accept(this, frame);
 			if(returning) break;
 		}
-		memEnv.exitScope();
 	}
 	
 	@Override
-	public void visit(IfStatement v, Void arg) {
-		if(v.getCondition().accept(bi, null)) {
-			v.getThenStmt().accept(this, null);
+	public void visit(IfStatement v, Frame frame) {
+		if(v.getCondition().accept(bi, frame)) {
+			v.getThenStmt().accept(this, frame);
 		} else {
 			if(v.getElseStmt() != null)
-				v.getElseStmt().accept(this, null);
+				v.getElseStmt().accept(this, frame);
 		}
 	}
 	
 	@Override
-	public void visit(WhileStatement v, Void arg) {
-		while(v.getCondition().accept(bi, null)) {
-			v.getBody().accept(this, null);
+	public void visit(WhileStatement v, Frame frame) {
+		while(v.getCondition().accept(bi, frame)) {
+			v.getBody().accept(this, frame);
 			if(returning) break;
 		}
 	}
 	
 	@Override
-	public void visit(ForStatement v, Void arg) {
+	public void visit(ForStatement v, Frame frame) {
 		if(v.getInit() != null)
-			v.getInit().accept(this, null);
+			v.getInit().accept(this, frame);
 		
 		Expression cond = v.getCond();
-		while(cond == null || cond.accept(bi, null)) {
-			v.getBody().accept(this, null);
+		while(cond == null || cond.accept(bi, frame)) {
+			v.getBody().accept(this, frame);
 			if(returning) break;
 			
 			if(v.getAct() != null)
-				v.getAct().accept(this, null);
+				v.getAct().accept(this, frame);
 		}
 	}
 	
 	@Override
-	public void visit(PrintStatement p, Void arg) {
-		System.out.print(p.getExpression().accept(si, null));
+	public void visit(PrintStatement p, Frame frame) {
+		System.out.print(p.getExpression().accept(si, frame));
 	}
 
 	@Override
-	public void visit(VarDecl v, Void arg) {
-		memEnv.define(v.getId(), null);
+	public void visit(VarDecl v, Frame frame) {
+		frame.define(v.getId(), frame);
 		if(v.getInitializer() != null)
-			v.getInitializer().accept(this, null);
+			v.getInitializer().accept(this, frame);
 	}
 	
 	@Override
-	public void visit(ArrayDecl a, Void arg) {
+	public void visit(ArrayDecl a, Frame frame) {
 		LinkedList<Integer> computetDim = new LinkedList<>();
 		for(Expression e : a.getDimensions()) {
 			computetDim.add(e.accept(ai, null).intValue());
 		}
 		
-		memEnv.define(a.getId(), new Array(computetDim, ((ArrayType) a.getType()).getInternalType()));
+		frame.define(a.getId(), new Array(computetDim, ((ArrayType) a.getType()).getInternalType()));
 	}
 	
 	@Override
-	public void visit(ReturnStatement r, Void arg) {
+	public void visit(ReturnStatement r, Frame frame) {
 		if(r.getExpression() != null)
-			memEnv.setReturnRegister(interpretExpression(r.getExpression()));
+			frame.setReturnRegister(interpretExpression(r.getExpression(), frame));
 		returning = true;
 	}
 	
@@ -146,70 +145,72 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 	/*        Expressions        */
 	/* ************************* */
 	
-	private Object interpretExpression(Expression e) {
+	private Object interpretExpression(Expression e, Frame frame) {
 		if(e.getType() == Type.INT || e.getType() == Type.FLOAT) {
-			BigDecimal n = e.accept(ai, null);
+			BigDecimal n = e.accept(ai, frame);
 			
 			if(e.getType() == Type.INT)
 				return n.intValue();
 			else
 				return n.floatValue();
 		} else if(e.getType() == Type.BOOLEAN)
-			return e.accept(bi, null);
+			return e.accept(bi, frame);
 		else if(e.getType() == Type.STRING)
-			return e.accept(si, null);
+			return e.accept(si, frame);
 		else if(e.getType().isArray())
-			return e.accept(arri, null);
+			return e.accept(arri, frame);
 
 		
 		throw new RuntimeError("Fatal error.");
 	}
 	
 	@Override
-	public void visit(AssignExpression e, Void arg) {
-		interpretExpression(e);
+	public void visit(AssignExpression e, Frame frame) {
+		interpretExpression(e, frame);
 	}
 	
 	@Override
-	public void visit(PreIncrementOperation p, Void arg) {
-		interpretExpression(p);
+	public void visit(PreIncrementOperation p, Frame frame) {
+		interpretExpression(p, frame);
 	}
 	
 	@Override
-	public void visit(PostIncrementOperation p, Void arg) {
-		interpretExpression(p);
+	public void visit(PostIncrementOperation p, Frame frame) {
+		interpretExpression(p, frame);
 	}
 	
 	@Override
-	public void visit(FuncCallExpression f, Void arg) {
+	public void visit(FuncCallExpression f, Frame frame) {
 		callFunction(f);
 	}
 	
 	public void callFunction(FuncCallExpression funcCall) {
 		FuncDecl func = functions.get(funcCall.getFuncName().getVal());
-		List<Expression> args = funcCall.getArgs();
+		List<Expression> frames = funcCall.getArgs();
 		
-		//compute function argument expressions
-		Object[] computedArgs = new Object[args.size()];
+		//compute function frameument expressions
+		Object[] computedArgs = new Object[frames.size()];
 		for(int i = 0; i < func.getFormalArgs().size(); i++) {
-			computedArgs[i] = interpretExpression(args.get(i));
+			computedArgs[i] = interpretExpression(frames.get(i), memEnv.getCurrentFrame());
 		}
 		
 		//push a new stack frame
 		memEnv.pushStackFrame();
-		memEnv.enterScope();
 		
 		//set arguments on the newly pushed stackframe
 		for(int i = 0; i < func.getFormalArgs().size(); i++) {
-			memEnv.define(func.getFormalArgs().get(i).getIdentifier(), computedArgs[i]);
+			memEnv.getCurrentFrame().define(func.getFormalArgs().get(i).getIdentifier(), computedArgs[i]);
 		}
 		
 		//call the function
-		func.getBody().accept(this, null);
+		func.getBody().accept(this, memEnv.getCurrentFrame());
+		Object ret = memEnv.getCurrentFrame().getReturnRegister();
 		
 		//clear the stack frames
-		memEnv.exitScope();
 		memEnv.popStackFrame();
+		
+		if(memEnv.getCurrentFrame() != null)
+			memEnv.getCurrentFrame().setReturnRegister(ret);
 		
 		//return
 		returning = false;
@@ -229,10 +230,6 @@ public class Interpreter  extends VoidVisitorAdapter<Void> {
 
 	public ArrayExpInterpreter getArrayExpInterpreter() {
 		return arri;
-	}
-
-	public MemoryEnvironment getMemEnv() {
-		return memEnv;
 	}
 
 }

@@ -59,7 +59,7 @@ import com.bamless.interpreter.lex.Lexer;
 import com.bamless.interpreter.lex.Token;
 
 /**
- * Parser for the ii language. It is implemented as a recursive descent predictive parser,
+ * Parser for the c+- language. It is implemented as a recursive descent predictive parser,
  * that recognizes the LL(1) grammar of the language.
  * 
  * The grammar rules are reported as javadoc on top of every parser method (in EBNF form).

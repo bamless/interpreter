@@ -1,7 +1,6 @@
 //fibonacci yeee
 
 void main() {
-
 	int fib = 10
 	
 	print "fibonacci:\n"
@@ -14,10 +13,14 @@ void main() {
 	
 	float base = 3
 	float exp = 2
-
+	
 	print "exp(" + base + ", " + exp + ") = "
 
 	print exp(base, exp) + "\n"
+}
+
+void test(boolean[] x) {
+	x[4] = true
 }
 
 //recursive fibonacci, because now we can!

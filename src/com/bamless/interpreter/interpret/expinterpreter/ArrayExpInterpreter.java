@@ -8,8 +8,9 @@ import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.visitor.VisitorAdapter;
 import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.interpret.memenvironment.Array;
+import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
 
-public class ArrayExpInterpreter extends VisitorAdapter<Array, Void> {
+public class ArrayExpInterpreter extends VisitorAdapter<Array, Frame> {
 	private Interpreter interpreter;
 	
 	public ArrayExpInterpreter(Interpreter interpreter) {
@@ -17,26 +18,26 @@ public class ArrayExpInterpreter extends VisitorAdapter<Array, Void> {
 	}
 	
 	@Override
-	public Array visit(VarLiteral v, Void arg) {
-		return interpreter.getMemEnv().<Array>retrieve(v);
+	public Array visit(VarLiteral v, Frame frame) {
+		return frame.<Array>retrieve(v);
 	}
 	
 	@Override
-	public Array visit(ArrayAccess a, Void arg) {
-		return interpreter.getMemEnv().<Array>retrieve(a);
+	public Array visit(ArrayAccess a, Frame frame) {
+		return frame.<Array>retrieve(a);
 	}
 	
 	@Override
-	public Array visit(AssignExpression e, Void arg) {
-		Array res = e.getExpression().accept(this, null);
-		interpreter.getMemEnv().set((Lvalue) e.getLvalue(), res);
+	public Array visit(AssignExpression e, Frame frame) {
+		Array res = e.getExpression().accept(this, frame);
+		frame.set((Lvalue) e.getLvalue(), res);
 		return res;
 	}
 	
 	@Override
-	public Array visit(FuncCallExpression f, Void arg) {
+	public Array visit(FuncCallExpression f, Frame frame) {
 		interpreter.callFunction(f);
-		return (Array) interpreter.getMemEnv().getReturnRegister();
+		return (Array) frame.getReturnRegister();
 	}
 
 }
