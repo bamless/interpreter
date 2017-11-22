@@ -1,10 +1,13 @@
 //fibonacci yeee
 
 void main() {
-	int fib = 10
+	int fib = 20
 	
 	print "fibonacci:\n"
 	
+	print "fibdp(" + fib + ") = "
+	print fibdp(fib) + "\n"
+
 	print "fib(" + fib + ") = "
 	print fib(fib) + "\n"
 	
@@ -37,6 +40,21 @@ int fib(int n) {
 		return n
 		
 	return fib(n - 1) + fib(n - 2)
+}
+
+int fibdp(int n) {
+	int n1 = 0
+	int n2 = 1
+	
+	int fib = 0
+	
+	int i
+	for(i = 0; i < n; i++) {
+		n1 = n2
+		n2 = fib
+		fib = n1 + n2
+	}
+	return fib
 }
 
 //exponentiation by squaring

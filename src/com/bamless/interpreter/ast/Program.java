@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
@@ -15,6 +16,8 @@ public class Program extends ASTNode {
 		super(start);
 		this.functions = new LinkedHashMap<>();
 		for(FuncDecl d : functions) {
+			if(this.functions.get(d.getId().getVal()) != null)
+				ErrUtils.semanticError(d.getPosition(), "double declaration od function `%s`", d.getId());
 			this.functions.put(d.getId().getVal(), d);
 		}
 	}
