@@ -33,14 +33,14 @@ public class LoopBreakingChecker extends VoidVisitorAdapter<Statement> {
 	@Override
 	public void visit(BreakStatement b, Statement arg) {
 		if(arg == null) {
-			ErrUtils.semanticError(b.getPosition(), "Break statement can only be used inside a loop");
+			ErrUtils.semanticError(b.getPosition(), "break statement can only be used inside a loop");
 		}
 	}
 
 	@Override
 	public void visit(ContinueStatement c, Statement arg) {
 		if(arg == null) {
-			ErrUtils.semanticError(c.getPosition(), "Break statement can only be used inside a loop");
+			ErrUtils.semanticError(c.getPosition(), "continue statement can only be used inside a loop");
 		}
 	}
 

@@ -22,7 +22,6 @@ void main() {
 		if(k == 5) break
 		print k + "\n"
 	}
-	
 
 	float i = (int) 3.54
 	print i + "\n"
