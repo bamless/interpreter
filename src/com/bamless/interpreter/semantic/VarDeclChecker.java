@@ -141,8 +141,8 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 		// an outer scope an error
 		if(varDecl.lookup(v.getId().getVal()) != null)
 			ErrUtils.semanticError(v.getPosition(), "double declaration of variable %s", v.getId().getVal());
-		else
-			varDecl.define(v.getId().getVal(), DECL);
+		
+		varDecl.define(v.getId().getVal(), DECL);
 
 		init.define(v.getId().getVal(), false);
 
@@ -255,10 +255,7 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	}
 
 	private boolean hasSideEffect(Expression e) {
-		if(e instanceof AssignExpression || e instanceof PostIncrementOperation || e instanceof PreIncrementOperation
-				|| e instanceof FuncCallExpression) {
-			return true;
-		}
-		return false;
+		return (e instanceof AssignExpression || e instanceof PostIncrementOperation || e instanceof PreIncrementOperation
+				|| e instanceof FuncCallExpression);
 	}
 }
