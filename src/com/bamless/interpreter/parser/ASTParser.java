@@ -78,7 +78,7 @@ public class ASTParser {
 	private Lexer lex;
 	
 	public ASTParser() {
-		lex = new Lexer(ClassLoader.class.getResourceAsStream(LEX_FILE), true, "//.+");
+		lex = new Lexer(ClassLoader.class.getResourceAsStream(LEX_FILE), true, "//.*");
 	}
 	
 	public ASTNode parse(File f) throws FileNotFoundException, IOException {
