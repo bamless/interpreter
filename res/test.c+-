@@ -15,6 +15,7 @@ void main() {
 	float exp = 2
 	
 	print "exp(" + base + ", " + exp + ") = "
+	print exp(base, exp) + "\n"
 }
 
 void test(boolean[] x) {
