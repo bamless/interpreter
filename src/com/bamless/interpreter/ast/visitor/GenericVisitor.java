@@ -20,6 +20,8 @@ import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
+import com.bamless.interpreter.ast.statement.BreakStatement;
+import com.bamless.interpreter.ast.statement.ContinueStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
@@ -38,6 +40,8 @@ public interface GenericVisitor<T, A> {
 	T visit(ForStatement f, A arg);
 	T visit(PrintStatement p, A arg);
 	T visit(ReturnStatement r, A arg);
+	T visit(BreakStatement b, A arg);
+	T visit(ContinueStatement c, A arg);
 	
 	T visit(VarDecl v, A arg);
 	T visit(ArrayDecl a, A arg);

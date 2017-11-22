@@ -48,6 +48,8 @@ import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
+import com.bamless.interpreter.ast.statement.BreakStatement;
+import com.bamless.interpreter.ast.statement.ContinueStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
@@ -183,6 +185,10 @@ public class ASTParser {
 			return printStmt();
 		case "RETURN":
 			return returnStmt();
+		case "CONTINUE":
+			return new ContinueStatement(lex.next().getPosition());
+		case "BREAK":
+			return new BreakStatement(lex.next().getPosition());
 		default:
 			Statement s = expression();
 			return s;

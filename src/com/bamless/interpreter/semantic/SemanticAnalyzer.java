@@ -11,11 +11,13 @@ public class SemanticAnalyzer {
 	private VarDeclChecker vc; 
 	private ReturnChecker rc;
 	private TypeChecker tc;
+	private LoopBreakingChecker lc;
 	
 	public SemanticAnalyzer() {
 		rc = new ReturnChecker();
 		vc = new VarDeclChecker();
 		tc = new TypeChecker();
+		lc = new LoopBreakingChecker();
 	}
 
 	public void analyze(ASTNode root) {
@@ -25,6 +27,8 @@ public class SemanticAnalyzer {
 		root.accept(rc, null);
 		//type checking
 		root.accept(tc, null);
+		//check that breaks and continues have a surrounding loop
+		root.accept(lc, null);
 	}
 	
 }

@@ -27,6 +27,8 @@ import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
+import com.bamless.interpreter.ast.statement.BreakStatement;
+import com.bamless.interpreter.ast.statement.ContinueStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
@@ -437,6 +439,16 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 
 	@Override
 	public Type visit(Visitable v, FuncDecl currentFunc) {
+		return null;
+	}
+
+	@Override
+	public Type visit(BreakStatement b, FuncDecl arg) {
+		return null;
+	}
+
+	@Override
+	public Type visit(ContinueStatement c, FuncDecl arg) {
 		return null;
 	}
 

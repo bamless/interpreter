@@ -21,6 +21,8 @@ import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
+import com.bamless.interpreter.ast.statement.BreakStatement;
+import com.bamless.interpreter.ast.statement.ContinueStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
@@ -85,6 +87,14 @@ public class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 	public void visit(ReturnStatement r, A arg) {
 		if(r.getExpression() != null)
 			r.getExpression().accept(this, arg);
+	}
+	
+	@Override
+	public void visit(BreakStatement b, A arg) {
+	}
+	
+	@Override
+	public void visit(ContinueStatement c, A arg) {
 	}
 
 	@Override

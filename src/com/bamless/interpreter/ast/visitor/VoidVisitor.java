@@ -20,6 +20,8 @@ import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
+import com.bamless.interpreter.ast.statement.BreakStatement;
+import com.bamless.interpreter.ast.statement.ContinueStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
@@ -38,6 +40,8 @@ public interface VoidVisitor<A> {
 	void visit(BlockStatement b, A arg);
 	void visit(PrintStatement p, A arg);
 	void visit(ReturnStatement r, A arg);
+	void visit(BreakStatement b, A arg);
+	void visit(ContinueStatement c, A arg);
 	
 	void visit(VarDecl v, A arg);
 	void visit(ArrayDecl a, A arg);
@@ -51,6 +55,7 @@ public interface VoidVisitor<A> {
 	void visit(PreIncrementOperation p, A arg);
 	void visit(AssignExpression e, A arg);
 	void visit(CastExpression c, A arg);
+	
 	
 	void visit(FloatLiteral f, A arg);
 	void visit(IntegerLiteral i, A arg);

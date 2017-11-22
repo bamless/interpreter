@@ -15,6 +15,8 @@ import com.bamless.interpreter.ast.expression.PostIncrementOperation;
 import com.bamless.interpreter.ast.expression.PreIncrementOperation;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
+import com.bamless.interpreter.ast.statement.BreakStatement;
+import com.bamless.interpreter.ast.statement.ContinueStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
@@ -91,10 +93,28 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	
 	@Override
 	public void visit(WhileStatement v, Frame frame) {
-		while(v.getCondition().accept(bi, frame)) {
-			v.getBody().accept(this, frame);
-			if(returning) break;
+		try {
+			while(v.getCondition().accept(bi, frame)) {
+				try {
+					v.getBody().accept(this, frame);
+				} catch(ContinueException c) {
+					//continue the cicle
+				}
+				if(returning) break;
+			}
+		} catch(BreakException b) {
+			//break out of cicle
 		}
+	}
+	
+	@Override
+	public void visit(BreakStatement b, Frame arg) {
+		throw new BreakException();
+	}
+	
+	@Override
+	public void visit(ContinueStatement c, Frame arg) {
+		throw new ContinueException();
 	}
 	
 	@Override
@@ -103,12 +123,19 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 			v.getInit().accept(this, frame);
 		
 		Expression cond = v.getCond();
-		while(cond == null || cond.accept(bi, frame)) {
-			v.getBody().accept(this, frame);
-			if(returning) break;
-			
-			if(v.getAct() != null)
-				v.getAct().accept(this, frame);
+		try {
+			while(cond == null || cond.accept(bi, frame)) {
+				try {
+					v.getBody().accept(this, frame);
+				} catch(ContinueException c) {
+				}
+	
+				if(returning) break;
+				
+				if(v.getAct() != null)
+					v.getAct().accept(this, frame);
+			}
+		} catch(BreakException b) {
 		}
 	}
 	

@@ -7,6 +7,8 @@ FOR             "for"
 WHILE           "while"
 PRINT           "print"
 RETURN          "return"
+CONTINUE        "continue"
+BREAK           "break"
 
 //type keywords
 INT             "int"

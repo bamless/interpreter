@@ -16,7 +16,14 @@ void main() {
 	
 	print "exp(" + base + ", " + exp + ") = "
 	print exp(base, exp) + "\n"
+
+	int k
+	for(k = 0; k < 20; k++) {
+		if(k == 5) break
+		print k + "\n"
+	}
 	
+
 	float i = (int) 3.54
 	print i + "\n"
 }

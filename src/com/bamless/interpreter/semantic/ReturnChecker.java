@@ -21,6 +21,8 @@ import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
+import com.bamless.interpreter.ast.statement.BreakStatement;
+import com.bamless.interpreter.ast.statement.ContinueStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
@@ -202,6 +204,16 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 
 	@Override
 	public Boolean visit(CastExpression c, Void arg) {
+		return false;
+	}
+
+	@Override
+	public Boolean visit(BreakStatement b, Void arg) {
+		return false;
+	}
+
+	@Override
+	public Boolean visit(ContinueStatement c, Void arg) {
 		return false;
 	}
 

@@ -5,6 +5,8 @@ import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.statement.ArrayDecl;
 import com.bamless.interpreter.ast.statement.BlockStatement;
+import com.bamless.interpreter.ast.statement.BreakStatement;
+import com.bamless.interpreter.ast.statement.ContinueStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.PrintStatement;
@@ -126,6 +128,16 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 			print(indent, decl.getType() + " " + decl.getInitializer());
 		else
 			print(indent, decl.getType() + " " + decl.getId().getVal());
+	}
+	
+	@Override
+	public void visit(ContinueStatement c, Integer arg) {
+		print(arg, "CONTINUE");
+	}
+	
+	@Override
+	public void visit(BreakStatement b, Integer arg) {
+		print(arg, "BREAK");
 	}
 	
 	@Override
