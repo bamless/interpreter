@@ -12,6 +12,7 @@ import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
+import com.bamless.interpreter.ast.expression.CastExpression;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
@@ -55,7 +56,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	public Type visit(Program p, FuncDecl currentFunc) {
 		this.funcs = p.getFunctions();
 
-		for(String id : funcs.keySet()) {
+		for (String id : funcs.keySet()) {
 			funcs.get(id).accept(this, null);
 		}
 
@@ -66,7 +67,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	public Type visit(FuncDecl d, FuncDecl currentFunc) {
 		st.enterScope();
 
-		for(FormalArg a : d.getFormalArgs()) {
+		for (FormalArg a : d.getFormalArgs()) {
 			st.define(a.getIdentifier().getVal(), a.getType());
 		}
 
@@ -80,7 +81,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	@Override
 	public Type visit(BlockStatement b, FuncDecl currentFunc) {
 		st.enterScope();
-		for(Statement stmt : b.getStmts()) {
+		for (Statement stmt : b.getStmts()) {
 			stmt.accept(this, currentFunc);
 		}
 		st.exitScope();
@@ -91,13 +92,13 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	@Override
 	public Type visit(IfStatement i, FuncDecl currentFunc) {
 		Type condition = i.getCondition().accept(this, currentFunc);
-		if(condition != Type.BOOLEAN) {
+		if (condition != Type.BOOLEAN) {
 			typeError(i.getCondition().getPosition(), "cannot convert %s to boolean",
 					condition.toString().toLowerCase());
 		}
 
 		i.getThenStmt().accept(this, currentFunc);
-		if(i.getElseStmt() != null)
+		if (i.getElseStmt() != null)
 			i.getElseStmt().accept(this, currentFunc);
 
 		return null;
@@ -106,16 +107,16 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	@Override
 	public Type visit(ForStatement f, FuncDecl currentFunc) {
 		// propagate visitor to the other 2 expressions and to the body
-		if(f.getInit() != null)
+		if (f.getInit() != null)
 			f.getInit().accept(this, currentFunc);
 
 		// check condition type
 		Type condition = f.getCond() == null ? Type.BOOLEAN : f.getCond().accept(this, currentFunc);
-		if(condition != Type.BOOLEAN) {
+		if (condition != Type.BOOLEAN) {
 			typeError(f.getCond().getPosition(), "cannot convert %s to boolean", condition.toString().toLowerCase());
 		}
 
-		if(f.getAct() != null)
+		if (f.getAct() != null)
 			f.getAct().accept(this, currentFunc);
 
 		f.getBody().accept(this, currentFunc);
@@ -127,7 +128,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	public Type visit(WhileStatement w, FuncDecl currentFunc) {
 		Type condition = w.getCondition().accept(this, currentFunc);
 
-		if(condition != Type.BOOLEAN) {
+		if (condition != Type.BOOLEAN) {
 			typeError(w.getCondition().getPosition(), "cannot convert %s to boolean",
 					condition.toString().toLowerCase());
 		}
@@ -139,7 +140,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	@Override
 	public Type visit(PrintStatement p, FuncDecl currentFunc) {
 		Type e = p.getExpression().accept(this, currentFunc);
-		if(e != Type.STRING) {
+		if (e != Type.STRING) {
 			typeError(p.getExpression().getPosition(), "cannot convert %s to string", e.toString());
 		}
 
@@ -150,7 +151,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	public Type visit(VarDecl v, FuncDecl currentFunc) {
 		st.define(v.getId().getVal(), v.getType());
 
-		if(v.getInitializer() != null)
+		if (v.getInitializer() != null)
 			v.getInitializer().accept(this, currentFunc);
 
 		return null;
@@ -160,9 +161,9 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	public Type visit(ArrayDecl a, FuncDecl currentFunc) {
 		st.define(a.getId().getVal(), a.getType());
 
-		for(Expression e : a.getDimensions()) {
+		for (Expression e : a.getDimensions()) {
 			Type ind = e.accept(this, currentFunc);
-			if(ind != Type.INT)
+			if (ind != Type.INT)
 				typeError(e.getPosition(), "cannot convert from %s to int", ind.toString().toLowerCase());
 		}
 
@@ -174,12 +175,12 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		Type exp = r.getExpression() == null ? Type.VOID : r.getExpression().accept(this, currentFunc);
 		boolean ret = currentFunc.getType().canAssign(exp);
 
-		if(!ret) {
+		if (!ret) {
 			typeError(r.getPosition(), "Return type mismatch, cannot convert from %s to %s",
 					exp.toString().toLowerCase(), currentFunc.getType().toString().toLowerCase());
 		}
 
-		if(currentFunc.getType() == Type.INT && exp == Type.FLOAT) {
+		if (currentFunc.getType() == Type.INT && exp == Type.FLOAT) {
 			ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
 					r.getExpression().getPosition());
 		}
@@ -188,7 +189,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	}
 
 	/* ************************* */
-	/*        Expressions        */
+	/* Expressions */
 	/* ************************* */
 
 	@Override
@@ -197,7 +198,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		Type right = e.getRight().accept(this, currentFunc);
 
 		Type res = null;
-		switch(e.getOperation()) {
+		switch (e.getOperation()) {
 		case DIV:
 			res = left.div(right);
 			break;
@@ -215,7 +216,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 			break;
 		}
 
-		if(res == null) {
+		if (res == null) {
 			undefOperatorError(e.getPosition(), e.getOperation().toString(), left.toString().toLowerCase(),
 					right.toString().toLowerCase());
 		}
@@ -230,7 +231,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		Type right = l.getRight().accept(this, currentFunc);
 		Type res = left.logicalOp(right);
 
-		if(res == null) {
+		if (res == null) {
 			undefOperatorError(l.getPosition(), l.getOperation().toString(), left.toString().toLowerCase(),
 					right.toString().toLowerCase());
 		}
@@ -245,7 +246,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		Type right = e.getRight().accept(this, currentFunc);
 		Type res = left.equalityOp(right);
 
-		if(res == null) {
+		if (res == null) {
 			undefOperatorError(e.getPosition(), e.getOperation().toString(), left.toString().toLowerCase(),
 					right.toString().toLowerCase());
 		}
@@ -260,7 +261,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		Type right = r.getRight().accept(this, currentFunc);
 		Type res = left.relationalOp(right);
 
-		if(res == null) {
+		if (res == null) {
 			undefOperatorError(r.getPosition(), r.getOperation().toString(), left.toString().toLowerCase(),
 					right.toString().toLowerCase());
 		}
@@ -273,7 +274,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	public Type visit(LogicalNotExpression n, FuncDecl currentFunc) {
 		Type t = n.getExpression().accept(this, currentFunc);
 
-		if(t != Type.BOOLEAN) {
+		if (t != Type.BOOLEAN) {
 			undefOperatorError(n.getPosition(), "!", t.toString().toLowerCase());
 		}
 
@@ -285,7 +286,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	public Type visit(PostIncrementOperation p, FuncDecl currentFunc) {
 		Type t = p.getExpression().accept(this, currentFunc);
 
-		if(t != Type.INT && t != Type.FLOAT) {
+		if (t != Type.INT && t != Type.FLOAT) {
 			undefOperatorError(p.getPosition(), p.getOperator().toString(), t.toString().toLowerCase());
 		}
 
@@ -297,7 +298,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	public Type visit(PreIncrementOperation p, FuncDecl currentFunc) {
 		Type t = p.getExpression().accept(this, currentFunc);
 
-		if(t != Type.INT && t != Type.FLOAT) {
+		if (t != Type.INT && t != Type.FLOAT) {
 			undefOperatorError(p.getPosition(), p.getOperator().toString(), t.toString().toLowerCase());
 		}
 
@@ -310,12 +311,12 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		Type lval = e.getLvalue().accept(this, currentFunc);
 		Type expr = e.getExpression().accept(this, currentFunc);
 
-		if(!lval.canAssign(expr)) {
+		if (!lval.canAssign(expr)) {
 			typeError(e.getPosition(), "type mismatch, cannot assign %s to %s", expr.toString().toLowerCase(),
 					lval.toString().toLowerCase());
 		}
 
-		if(lval == Type.INT && expr == Type.FLOAT) {
+		if (lval == Type.INT && expr == Type.FLOAT) {
 			ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
 					e.getExpression().getPosition());
 		}
@@ -326,25 +327,25 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 
 	@Override
 	public Type visit(FuncCallExpression f, FuncDecl currentFunc) {
-		for(Expression e : f.getArgs()) {
+		for (Expression e : f.getArgs()) {
 			e.accept(this, currentFunc);
 		}
 
 		List<Expression> callArgs = f.getArgs();
 		List<FormalArg> declArgs = funcs.get(f.getFuncName().getVal()).getFormalArgs();
 
-		for(int i = 0; i < callArgs.size(); i++) {
+		for (int i = 0; i < callArgs.size(); i++) {
 			Type callType = callArgs.get(i).getType();
 			Type declType = declArgs.get(i).getType();
 
-			if(!callType.canAssign(declType)) {
+			if (!callType.canAssign(declType)) {
 				typeError(callArgs.get(i).getPosition(),
 						"type mismatch, cannot convert %s to %s on %s argument of function call `%s`",
 						callType.toString().toLowerCase(), declType.toString().toLowerCase(), cardinal(i + 1),
 						f.getFuncName());
 			}
 
-			if(declType == Type.INT && callType == Type.FLOAT) {
+			if (declType == Type.INT && callType == Type.FLOAT) {
 				ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
 						callArgs.get(i).getPosition());
 			}
@@ -352,6 +353,17 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 
 		f.setType(funcs.get(f.getFuncName().getVal()).getType());
 		return f.getType();
+	}
+
+	@Override
+	public Type visit(CastExpression c, FuncDecl arg) {
+		Type exprType = c.getExpression().accept(this, arg);
+		if (!c.getType().canAssign(exprType)) {
+			typeError(c.getPosition(), "Cannot cast from %s to %s", exprType.toString().toLowerCase(),
+					c.getType().toString().toLowerCase());
+		}
+
+		return c.getType();
 	}
 
 	@Override
@@ -386,14 +398,14 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	public Type visit(ArrayAccess a, FuncDecl currentFunc) {
 		Type ltype = a.getLvalue().accept(this, currentFunc);
 
-		if(!ltype.isArray()) {
+		if (!ltype.isArray()) {
 			typeError(a.getPosition(),
 					"The type of the expression must be an array type," + " but instead resolved to %s",
 					ltype.toString().toLowerCase());
 		}
 
 		Type index = a.getIndex().accept(this, currentFunc);
-		if(index != Type.INT)
+		if (index != Type.INT)
 			typeError(a.getIndex().getPosition(), "array access index must evaluate to int");
 
 		Type type = ((ArrayType) ltype).getInternalType();
@@ -411,18 +423,18 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	}
 
 	private String cardinal(int i) {
-		switch(i) {
+		switch (i) {
 		case 1:
 			return i + "st";
 		case 2:
 			return i + "nd";
-		case 3: 
+		case 3:
 			return i + "rd";
 		default:
 			return i + "th";
 		}
 	}
-	
+
 	@Override
 	public Type visit(Visitable v, FuncDecl currentFunc) {
 		return null;

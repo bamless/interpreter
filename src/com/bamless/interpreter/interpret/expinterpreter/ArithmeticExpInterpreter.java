@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
+import com.bamless.interpreter.ast.expression.CastExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
@@ -117,6 +118,14 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Frame> 
 			frame.set((Lvalue) p.getExpression(), res.floatValue());
 		
 		return old;
+	}
+	
+	@Override
+	public BigDecimal visit(CastExpression c, Frame arg) {
+		BigDecimal ret = c.getExpression().accept(this, arg);
+		if(c.getType() == Type.INT)   ret = BigDecimal.valueOf(ret.intValue());
+		if(c.getType() == Type.FLOAT) ret = BigDecimal.valueOf(ret.floatValue()); 
+		return ret;
 	}
 	
 	@Override

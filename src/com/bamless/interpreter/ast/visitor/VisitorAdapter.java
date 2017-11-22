@@ -6,6 +6,7 @@ import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
+import com.bamless.interpreter.ast.expression.CastExpression;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
@@ -171,6 +172,13 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(AssignExpression e, A arg) {
 		e.getLvalue().accept(this, arg);
 		e.getExpression().accept(this, arg);
+		
+		return null;
+	}
+	
+	@Override
+	public T visit(CastExpression c, A arg) {
+		c.getExpression().accept(this, arg);
 		
 		return null;
 	}

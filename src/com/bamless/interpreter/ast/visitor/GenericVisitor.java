@@ -6,6 +6,7 @@ import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
+import com.bamless.interpreter.ast.expression.CastExpression;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
@@ -36,6 +37,7 @@ public interface GenericVisitor<T, A> {
 	T visit(BlockStatement b, A arg);
 	T visit(ForStatement f, A arg);
 	T visit(PrintStatement p, A arg);
+	T visit(ReturnStatement r, A arg);
 	
 	T visit(VarDecl v, A arg);
 	T visit(ArrayDecl a, A arg);
@@ -48,7 +50,7 @@ public interface GenericVisitor<T, A> {
 	T visit(PostIncrementOperation p, A arg);
 	T visit(PreIncrementOperation p, A arg);
 	T visit(AssignExpression e, A arg);
-	T visit(ReturnStatement r, A arg);
+	T visit(CastExpression c, A arg);
 	
 	T visit(FloatLiteral f, A arg);
 	T visit(IntegerLiteral i, A arg);

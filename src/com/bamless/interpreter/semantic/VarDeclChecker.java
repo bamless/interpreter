@@ -22,6 +22,7 @@ import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
+import com.bamless.interpreter.interpret.Interpreter;
 
 /**
  * AST walker that checks for non declared or uninitialized variables. It also
@@ -66,7 +67,10 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	public void visit(Program p, Void arg) {
 		this.funcs = p.getFunctions();
 
-		for(String id : funcs.keySet()) {
+		if (funcs.get(Interpreter.MAIN_FUNC) == null)
+			ErrUtils.semanticError(p.getPosition(), "Could not find main function");
+
+		for (String id : funcs.keySet()) {
 			funcs.get(id).accept(this, arg);
 		}
 	}
@@ -74,8 +78,8 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	@Override
 	public void visit(BlockStatement v, Void arg) {
 		varDecl.enterScope();
-		for(Statement s : v.getStmts()) {
-			if(s instanceof Expression && !hasSideEffect((Expression) s)) {
+		for (Statement s : v.getStmts()) {
+			if (s instanceof Expression && !hasSideEffect((Expression) s)) {
 				ErrUtils.semanticError(s.getPosition(), "Statement without effect.");
 			}
 			s.accept(this, null);
@@ -85,25 +89,25 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(ForStatement v, Void arg) {
-		if(v.getInit() != null && !hasSideEffect(v.getInit())) {
+		if (v.getInit() != null && !hasSideEffect(v.getInit())) {
 			ErrUtils.warn("Warning %s: computed value is not used", v.getInit().getPosition());
 		}
-		if(v.getAct() != null && !hasSideEffect(v.getAct())) {
+		if (v.getAct() != null && !hasSideEffect(v.getAct())) {
 			ErrUtils.warn("Warning %s: computed value is not used", v.getAct().getPosition());
 		}
 
 		// the initialization of a for is always executed, so define in current init
 		// scope
-		if(v.getInit() != null)
+		if (v.getInit() != null)
 			v.getInit().accept(this, arg);
 
 		// we're not guaranteed that further initializations will always be executed, so
 		// enter init scope
 		init.enterScope();
 
-		if(v.getCond() != null)
+		if (v.getCond() != null)
 			v.getCond().accept(this, arg);
-		if(v.getAct() != null)
+		if (v.getAct() != null)
 			v.getAct().accept(this, arg);
 
 		v.getBody().accept(this, arg);
@@ -114,12 +118,12 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	@Override
 	public void visit(IfStatement v, Void arg) {
 		v.getCondition().accept(this, arg);
-		
+
 		init.enterScope();
 		v.getThenStmt().accept(this, arg);
 		init.exitScope();
 
-		if(v.getElseStmt() != null) {
+		if (v.getElseStmt() != null) {
 			init.enterScope();
 			v.getElseStmt().accept(this, arg);
 			init.exitScope();
@@ -129,7 +133,7 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	@Override
 	public void visit(WhileStatement v, Void arg) {
 		v.getCondition().accept(this, arg);
-		
+
 		init.enterScope();
 		v.getBody().accept(this, arg);
 		init.exitScope();
@@ -139,14 +143,14 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	public void visit(VarDecl v, Void arg) {
 		// we considered declaring a variable with the same name of another variable in
 		// an outer scope an error
-		if(varDecl.lookup(v.getId().getVal()) != null)
+		if (varDecl.lookup(v.getId().getVal()) != null)
 			ErrUtils.semanticError(v.getPosition(), "double declaration of variable %s", v.getId().getVal());
-		
+
 		varDecl.define(v.getId().getVal(), DECL);
 
 		init.define(v.getId().getVal(), false);
 
-		if(v.getInitializer() != null)
+		if (v.getInitializer() != null)
 			v.getInitializer().accept(this, arg);
 	}
 
@@ -154,33 +158,33 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	public void visit(ArrayDecl a, Void arg) {
 		try {
 			varDecl.define(a.getId().getVal(), DECL);
-		} catch(IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			ErrUtils.semanticError(a.getPosition(), "double declaration of variable %s", a.getId().getVal());
 		}
 		// true because arrays get initialized automagically
 		init.define(a.getId().getVal(), true);
 
-		for(Expression e : a.getDimensions()) {
+		for (Expression e : a.getDimensions()) {
 			e.accept(this, arg);
 		}
 	}
 
 	@Override
 	public void visit(AssignExpression e, Void arg) {
-		if(!(e.getLvalue() instanceof Lvalue))
+		if (!(e.getLvalue() instanceof Lvalue))
 			ErrUtils.semanticError(e.getPosition(), "left hand side of assignement must be an lvalue");
 
-		if(e.getLvalue() instanceof VarLiteral) {
+		if (e.getLvalue() instanceof VarLiteral) {
 			VarLiteral v = (VarLiteral) e.getLvalue();
 
-			if(varDecl.lookup(v.getId().getVal()) == null) {
+			if (varDecl.lookup(v.getId().getVal()) == null) {
 				ErrUtils.semanticError(v.getId().getPosition(), "variable %s cannot be resolved", v.getId().getVal());
 			}
 
 			e.getExpression().accept(this, arg);
 
 			// if not defined in current init scope define it
-			if(init.probe(v.getId().getVal()) == null)
+			if (init.probe(v.getId().getVal()) == null)
 				init.define(v.getId().getVal(), true);
 			// else set the current scope entry to true
 			else
@@ -195,7 +199,7 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(PreIncrementOperation p, Void arg) {
-		if(!(p.getExpression() instanceof Lvalue))
+		if (!(p.getExpression() instanceof Lvalue))
 			ErrUtils.semanticError(p.getPosition(), "left hand side of assignement must be an lvalue");
 
 		p.getExpression().accept(this, arg);
@@ -203,7 +207,7 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(PostIncrementOperation p, Void arg) {
-		if(!(p.getExpression() instanceof Lvalue))
+		if (!(p.getExpression() instanceof Lvalue))
 			ErrUtils.semanticError(p.getPosition(), "left hand side of assignement must be an lvalue");
 
 		p.getExpression().accept(this, arg);
@@ -211,28 +215,28 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(VarLiteral v, Void arg) {
-		if(varDecl.lookup(v.getId().getVal()) == null)
+		if (varDecl.lookup(v.getId().getVal()) == null)
 			ErrUtils.semanticError(v.getPosition(), "variable %s cannot be resolved", v.getId().getVal());
 
-		if(!init.lookup(v.getId().getVal()))
+		if (!init.lookup(v.getId().getVal()))
 			ErrUtils.semanticError(v.getId().getPosition(), "the local variable %s may not have been initialized",
 					v.getId().getVal());
 	}
 
 	@Override
 	public void visit(FuncCallExpression f, Void arg) {
-		for(Expression e : f.getArgs())
+		for (Expression e : f.getArgs())
 			e.accept(this, arg);
-		
+
 		FuncDecl decl = funcs.get(f.getFuncName().getVal());
-		
-		if(decl == null)
+
+		if (decl == null)
 			ErrUtils.semanticError(f.getPosition(), "Use of undeclared function `%s`.", f.getFuncName());
 
 		List<Expression> callArgs = f.getArgs();
 		List<FormalArg> declArgs = decl.getFormalArgs();
 
-		if(callArgs.size() != declArgs.size()) {
+		if (callArgs.size() != declArgs.size()) {
 			ErrUtils.semanticError(f.getPosition(), "Function %s requires %d arguments, but instead %d supplied",
 					f.getFuncName(), declArgs.size(), callArgs.size());
 		}
@@ -243,7 +247,7 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 		varDecl.enterScope();
 		init.enterScope();
 
-		for(FormalArg a : d.getFormalArgs()) {
+		for (FormalArg a : d.getFormalArgs()) {
 			varDecl.define(a.getIdentifier().getVal(), DECL);
 			init.define(a.getIdentifier().getVal(), true);
 		}
@@ -255,7 +259,7 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	}
 
 	private boolean hasSideEffect(Expression e) {
-		return (e instanceof AssignExpression || e instanceof PostIncrementOperation || e instanceof PreIncrementOperation
-				|| e instanceof FuncCallExpression);
+		return (e instanceof AssignExpression || e instanceof PostIncrementOperation
+				|| e instanceof PreIncrementOperation || e instanceof FuncCallExpression);
 	}
 }

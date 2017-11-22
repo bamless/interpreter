@@ -33,6 +33,7 @@ import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
+import com.bamless.interpreter.ast.expression.CastExpression;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
@@ -532,24 +533,32 @@ public class ASTParser {
 	 */
 	private Expression unaryExpr() {
 		if(lex.peek().getType().equals("!")) {
-			Position pos = require("!").getPosition();
+			Position pos = lex.next().getPosition();
 			return new LogicalNotExpression(unaryExpr(), pos);
 		}
 		if(lex.peek().getType().equals("+")) {
-			require("+");
+			lex.next();
 			return unaryExpr();
 		}
 		if(lex.peek().getType().equals("-")) {
-			Position pos = require("-").getPosition();
+			Position pos = lex.next().getPosition();
 			return new ArithmeticBinExpression(MULT, new IntegerLiteral(pos, -1), unaryExpr());
 		}
 		if(lex.peek().getType().equals("++")) {
-			Position pos = require("++").getPosition();
+			Position pos = lex.next().getPosition();
 			return new PreIncrementOperation(INCR, unaryExpr(), pos);
 		}
 		if(lex.peek().getType().equals("--")) {
-			Position pos = require("--").getPosition();
+			Position pos = lex.next().getPosition();
 			return new PreIncrementOperation(DECR, unaryExpr(), pos);
+		}
+		if(lex.peek().getType().equals("(") && (lex.peek(2).getType().equals("INT") || lex.peek(2).getType().equals("BOOLEAN") || 
+				lex.peek(2).getType().equals("FLOAT") || lex.peek(2).getType().equals("STRING"))) {
+			Position pos = lex.next().getPosition();
+			Type cast = type();
+			require(")");
+
+			return new CastExpression(cast, unaryExpr(), pos);
 		}
 		
 		return postfixExpr();

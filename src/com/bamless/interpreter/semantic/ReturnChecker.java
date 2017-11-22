@@ -7,6 +7,7 @@ import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
+import com.bamless.interpreter.ast.expression.CastExpression;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
@@ -196,6 +197,11 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 
 	@Override
 	public Boolean visit(FuncCallExpression f, Void arg) {
+		return false;
+	}
+
+	@Override
+	public Boolean visit(CastExpression c, Void arg) {
 		return false;
 	}
 

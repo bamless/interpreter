@@ -6,6 +6,7 @@ import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
+import com.bamless.interpreter.ast.expression.CastExpression;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
@@ -49,6 +50,7 @@ public interface VoidVisitor<A> {
 	void visit(PostIncrementOperation p, A arg);
 	void visit(PreIncrementOperation p, A arg);
 	void visit(AssignExpression e, A arg);
+	void visit(CastExpression c, A arg);
 	
 	void visit(FloatLiteral f, A arg);
 	void visit(IntegerLiteral i, A arg);

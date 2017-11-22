@@ -41,7 +41,7 @@ import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
  *
  */
 public class Interpreter  extends VoidVisitorAdapter<Frame> {
-	private static final String MAIN_FUNC = "main";
+	public static final String MAIN_FUNC = "main";
 	
 	private ArithmeticExpInterpreter ai;
 	private BooleanExpInterpreter bi;
