@@ -28,6 +28,8 @@ void main() {
 
 	float i = (int) 3.54
 	print i + "\n"
+	
+	print (float) 3 / 2 + "\n"
 }
 
 void test(boolean[] x) {

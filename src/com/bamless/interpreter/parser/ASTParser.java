@@ -323,16 +323,12 @@ public class ASTParser {
 	}
 	
 	/**
-	 * Print -> print ( expression )
-	 *        | print expression
+	 * Print -> print expression
 	 */
 	private Statement printStmt() {
 		Position start = require("PRINT").getPosition();
-		boolean parenthesized = lex.peek().getValue().equals("(");
 		
-		if(parenthesized) require("(");
 		Expression e = expression();
-		if(parenthesized) require(")");
 		
 		return new PrintStatement(start, e);
 	}
@@ -566,7 +562,7 @@ public class ASTParser {
 
 			return new CastExpression(cast, unaryExpr(), pos);
 		}
-		
+
 		return postfixExpr();
 	}
 	

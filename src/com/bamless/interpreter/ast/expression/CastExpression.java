@@ -24,7 +24,7 @@ public class CastExpression extends UnaryExpression {
 
 	@Override
 	public String toString() {
-		return "(" + getType() + ") " + getExpression();
+		return "(" + getType() + ") " + "(" + getExpression() + ")";
 	}
 	
 }
