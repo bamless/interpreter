@@ -1,5 +1,3 @@
-//fibonacci yeee
-
 void main() {
 	int fib = 20
 	
@@ -11,7 +9,6 @@ void main() {
 	print "fib(" + fib + ") = "
 	print fib(fib) + "\n"
 	
-	//exponentiation by squaring
 	print "\nexponentiation by squaring:\n"
 	
 	float base = 3
@@ -20,43 +17,43 @@ void main() {
 	print "exp(" + base + ", " + exp + ") = "
 	print exp(base, exp) + "\n"
 
+	print "\n"
+
+	//other tests for break, continue and typoe casting
 	int k
 	for(k = 0; k < 20; k++) {
 		if(k == 5) break
 		print k + "\n"
 	}
-
-	float i = (int) 3.54
-	print i + "\n"
 	
+	print "\n"
+
+	print (int) 3.54 + "\n"
 	print (float) 3 / 2 + "\n"
 }
 
-void test(boolean[] x) {
-	x[4] = true
-}
-//
 //recursive fibonacci, because now we can!
 int fib(int n) {
+	if(n < 0) return 0
+	
 	if(n == 0 || n == 1)
 		return n
 		
 	return fib(n - 1) + fib(n - 2)
 }
 
+//fibonacci with no recursion
 int fibdp(int n) {
-	int n1 = 0
-	int n2 = 1
+	if(n <= 0) return 0
 	
-	int fib = 0
+	int fib[3]
+	fib[0] = 1 fib[1] = 1
 	
 	int i
-	for(i = 0; i < n; i++) {
-		n1 = n2
-		n2 = fib
-		fib = n1 + n2
+	for(i = 2; i < n; i++) {
+		fib[i % 3] = fib[(i - 1) % 3] + fib[(i - 2) % 3]
 	}
-	return fib
+	return fib[(i - 1) % 3]
 }
 
 //exponentiation by squaring
