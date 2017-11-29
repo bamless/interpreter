@@ -45,9 +45,7 @@ public class StringExpInterpreter extends VisitorAdapter<String, Frame> {
 			String r = rightType == Type.FLOAT ? res.floatValue() + "" : res.intValue() + "";
 			
 			return l + r;
-		}
-		
-		if(leftType == Type.BOOLEAN) {
+		} else if(leftType == Type.BOOLEAN) {
 			String l = e.getLeft().accept(interpreter.getBoolExpInterpreter(), frame).toString();
 			String r = e.getRight().accept(this, frame);
 			
