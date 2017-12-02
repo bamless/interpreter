@@ -26,5 +26,9 @@ public class ReturnStatement extends Statement {
 	public Expression getExpression() {
 		return expression;
 	}
+	
+	public void setExpression(Expression e) {
+		this.expression = e;
+	}
 
 }

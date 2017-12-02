@@ -40,7 +40,7 @@ public class FuncCallExpression extends Expression {
 	}
 	
 	public List<Expression> getArgs() {
-		return Collections.unmodifiableList(args);
+		return args;
 	}
 
 	@Override

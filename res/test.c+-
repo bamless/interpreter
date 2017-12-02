@@ -12,8 +12,8 @@ void main() {
 	println ""
 	println "exponentiation by squaring:"
 	
-	float base = 3
-	float exp = 2
+	int base = 3
+	int exp = 0
 	
 	print "exp(" + base + ", " + exp + ") = "
 	println exp(base, exp)

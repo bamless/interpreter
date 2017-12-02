@@ -17,13 +17,15 @@ public class Main {
 		ASTParser p = new ASTParser();
 		ASTNode root = p.parse(ClassLoader.class.getResourceAsStream("/test.c+-"));
 		
-		System.out.println("Parsing done, printing AST:");
-		
-		PrinterVisitor v = new PrinterVisitor(4);
-		root.accept(v, 0);
+		System.out.println("Parsing done, commencing semantic analysis...");
 		
 		SemanticAnalyzer semantic = new SemanticAnalyzer();
 		semantic.analyze(root);
+		
+		System.out.println("Semantic analysis done, printing AST:");
+		
+		PrinterVisitor v = new PrinterVisitor(4);
+		root.accept(v, 0);
 		
 		System.out.println("Executing program...\n");
 		

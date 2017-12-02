@@ -184,12 +184,18 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 			ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
 					r.getExpression().getPosition());
 		}
+		
+		//types are compatible, apply type coercion if needed
+		if(exp != currentFunc.getType()) {
+			Expression e = r.getExpression();
+			r.setExpression(new CastExpression(currentFunc.getType(), e, e.getPosition()));
+		}
 
 		return null;
 	}
 
 	/* ************************* */
-	/* Expressions */
+	/*        Expressions        */
 	/* ************************* */
 
 	@Override
@@ -348,6 +354,12 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 			if (declType == Type.INT && callType == Type.FLOAT) {
 				ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
 						callArgs.get(i).getPosition());
+			}
+			
+			//types are compatible, apply type coercion if needed
+			if(callType != declType) {
+				Expression e = callArgs.get(i);
+				callArgs.set(i, new CastExpression(declType, e, e.getPosition()));
 			}
 		}
 
