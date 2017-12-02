@@ -80,14 +80,11 @@ public class BooleanExpInterpreter extends VisitorAdapter<Boolean, Frame> {
 	
 	@Override
 	public Boolean visit(LogicalExpression l, Frame frame) {
-		boolean left  = l.getLeft().accept(this, frame);
-		boolean right = l.getRight().accept(this, frame);
-		
 		switch(l.getOperation()) {
 		case AND:
-			return left && right;
+			return l.getLeft().accept(this, frame) && l.getRight().accept(this, frame);
 		case OR:
-			return left || right;
+			return l.getLeft().accept(this, frame) || l.getRight().accept(this, frame);
 		default:
 			throw new RuntimeError("fatal error");
 		}
