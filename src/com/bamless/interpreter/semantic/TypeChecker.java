@@ -18,6 +18,7 @@ import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
+import com.bamless.interpreter.ast.expression.LengthFuncExpression;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
@@ -141,10 +142,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 
 	@Override
 	public Type visit(PrintStatement p, FuncDecl currentFunc) {
-		Type e = p.getExpression().accept(this, currentFunc);
-		if (e != Type.STRING) {
-			typeError(p.getExpression().getPosition(), "cannot convert %s to string", e.toString());
-		}
+		p.getExpression().accept(this, currentFunc);
 
 		return null;
 	}
@@ -366,6 +364,17 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		}
 
 		return c.getType();
+	}
+
+	@Override
+	public Type visit(LengthFuncExpression l, FuncDecl arg) {
+		Type argType = l.getArg().accept(this, arg);
+		if (!(argType == Type.STRING || argType.isArray())) {
+			ErrUtils.semanticError(l.getArg().getPosition(),
+					"len() function expects argument of type string or array, but instead %s found",
+					argType.toString().toLowerCase());
+		}
+		return l.getType();
 	}
 
 	@Override

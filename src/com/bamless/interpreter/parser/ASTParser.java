@@ -39,6 +39,7 @@ import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
+import com.bamless.interpreter.ast.expression.LengthFuncExpression;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
@@ -65,9 +66,13 @@ import com.bamless.interpreter.lex.Token;
  * Parser for the c+- language. It is implemented as a recursive descent predictive parser,
  * that recognizes the LL(1) grammar of the language.
  * 
- * The grammar rules are reported as javadoc on top of every parser method (in EBNF form).
+ * Actually the grammar is not strictly LL(1) because some productions (for simplicity of method implementation)
+ * are not left factored, and a peek distance greater than 1 is used to choose the appropriate production (for
+ * an example see the cast expression in the unaryExpression method)
  * 
- * for terminals enclosed by <> see lexical specification
+ * The grammar rules are reported as javadoc on top of every parser method (in EBNF form).
+ * Non terminals always begin with a capital letter.
+ * for terminals enclosed by <> see lexical specification.
  * 
  * @author fabrizio
  *
@@ -108,7 +113,7 @@ public class ASTParser {
 	}
 	
 	/**
-	 * Program -> {vardecl}* {statement}*
+	 * Program -> {FunctionDecl}+
 	 */
 	private ASTNode program() {
 		List<FuncDecl> decls = new ArrayList<>();
@@ -118,6 +123,9 @@ public class ASTParser {
 		return new Program(new Position(0, 0), decls);
 	}
 	
+	/**
+	 * FunctionDecl -> Type <identifier> ( {{Type <identifier> ,}* {Type <identifier>}}* )
+	 */
 	private FuncDecl functionDecl() {
 		Type retType = type();
 		
@@ -145,6 +153,12 @@ public class ASTParser {
 	}
 
 	
+	/**
+	 * Type -> int     {[]}*
+	 *       | float   {[]}*
+	 *       | boolean {[]}*
+	 *       | string  {[]}*
+	 */
 	private Type type() {
 		Type t = null;
 		try {
@@ -163,12 +177,15 @@ public class ASTParser {
 	}
 	
 	/**
-	 * Statement -> if
-	 *            | while
-	 *            | for
-	 *            | block
-	 *            | print
-	 *            | expression
+	 * Statement -> If
+	 *            | While
+	 *            | For
+	 *            | Block
+	 *            | Print
+	 *            | Return
+	 *            | continue
+	 *            | break
+	 *            | Expression
 	 */
 	private Statement statement() {
 		switch(lex.peek().getType()) {
@@ -182,7 +199,9 @@ public class ASTParser {
 		case "{":
 			return block();
 		case "PRINT":
-			return printStmt();
+			return printStmt(false);
+		case "PRINTLN":
+			return printStmt(true);
 		case "RETURN":
 			return returnStmt();
 		case "CONTINUE":
@@ -196,7 +215,7 @@ public class ASTParser {
 	}
 	
 	/**
-	 * Block -> { {vardecl}* {statement}* }
+	 * Block -> { {{Vardecl}* {Statement}*}* }
 	 */
 	private BlockStatement block() {
 		Position start = require("{").getPosition();
@@ -219,10 +238,10 @@ public class ASTParser {
 	}
 
 	/**
-	 * Vardecl -> <type-keyword> <identifier> {initializer}?
+	 * Vardecl -> <type-keyword> <identifier> {Initializer}?
 	 *          
-	 * Initializer -> = expression
-	 * 				| {[ expression ]}+
+	 * Initializer -> = Expression
+	 * 				| {[ Expression ]}+
 	 */
 	private Statement varDecl() {	
 		Token typeTok = lex.next();
@@ -258,7 +277,7 @@ public class ASTParser {
 	}
 
 	/**
-	 * If -> if ( expression ) statement {else statement}?
+	 * If -> if ( Expression ) Statement {else Statement}?
 	 */
 	private Statement ifStmt() {
 		Position start = require("IF").getPosition();
@@ -279,7 +298,7 @@ public class ASTParser {
 	}
 	
 	/**
-	 * While -> while ( expression ) statement
+	 * While -> While ( Expression ) Statement
 	 */
 	private Statement whileStmt() {
 		Position start = require("WHILE").getPosition();
@@ -293,7 +312,7 @@ public class ASTParser {
 	}
 	
 	/**
-	 * For -> for ( {expression}? ; {expression}? ; {expression}? ) statement
+	 * For -> for ( {Expression}? ; {Expression}? ; {Expression}? ) Statement
 	 */
 	private Statement forStmt() {
 		Position start = require("FOR").getPosition();
@@ -323,16 +342,21 @@ public class ASTParser {
 	}
 	
 	/**
-	 * Print -> print expression
+	 * Print -> print Expression
+	 *        | println Expression
 	 */
-	private Statement printStmt() {
-		Position start = require("PRINT").getPosition();
+	private Statement printStmt(boolean isNewLine) {
+		Position start = lex.next().getPosition();
 		
 		Expression e = expression();
 		
-		return new PrintStatement(start, e);
+		return new PrintStatement(start, e, isNewLine);
 	}
 	
+	/**
+	 *  ReturnStmt -> return Expression
+	 *              | return ;
+	 */
 	private Statement returnStmt() {
 		Position start = require("RETURN").getPosition();
 		Expression e = null;
@@ -350,7 +374,9 @@ public class ASTParser {
 	/*        Expressions        */
 	/* ************************* */
 	
-	
+	/**
+	 *  ExprList -> {{Expression ,}* {Expression}}*
+	 */
 	private List<Expression> exprList() {
 		List<Expression> exprs = new ArrayList<>();
 		exprs.add(expression());
@@ -362,7 +388,7 @@ public class ASTParser {
 	}
 	
 	/**
-	 * Expression -> logicalExp {<assignment-operator> logicalExp}?
+	 * Expression -> LogicalExp {<assignment-operator> LogicalExp}?
 	 */
 	private  Expression expression() {
 		Expression left = logicalExpr();
@@ -404,7 +430,7 @@ public class ASTParser {
 	}
 	
 	/**
-	 * LogicalExp -> equalityExp {<logical-operator> equalityExp}*
+	 * LogicalExp -> EqualityExp {<logical-operator> EqualityExp}*
 	 */
 	private Expression logicalExpr() {
 		Expression left = equalityExpr();
@@ -427,7 +453,7 @@ public class ASTParser {
 	}
 	
 	/**
-	 * EqualityExp -> relationalExp {<equality-operator> relationalExp}*
+	 * EqualityExp -> RelationalExp {<equality-operator> RelationalExp}*
 	 */
 	private Expression equalityExpr() {
 		Expression left = relationalExpr();
@@ -450,7 +476,7 @@ public class ASTParser {
 	}
 	
 	/**
-	 * RelationalExpr -> additiveExpr {<relational-operator> additiveExpr}*
+	 * RelationalExpr -> AdditiveExpr {<relational-operator> AdditiveExpr}*
 	 */
 	private Expression relationalExpr() {
 		Expression left = additiveExpr();
@@ -480,7 +506,7 @@ public class ASTParser {
 	}
 	
 	/**
-	 * AdditiveExpr -> multiplicativeExp {<additive-operator> multiplicativeExp}*
+	 * AdditiveExpr -> MultiplicativeExp {<additive-operator> MultiplicativeExp}*
 	 */
 	private Expression additiveExpr() {
 		Expression left = multiplicativeExpression();
@@ -503,7 +529,7 @@ public class ASTParser {
 	}
 	
 	/**
-	 * MultiplicativeExp -> unaryExp {<multiplicative-operator> unaryExp}*
+	 * MultiplicativeExp -> UnaryExp {<multiplicative-operator> UnaryExp}*
 	 */
 	private Expression multiplicativeExpression() {
 		Expression left = unaryExpr();
@@ -530,8 +556,9 @@ public class ASTParser {
 	}
 
 	/**
-	 * UnaryExp -> <unary-operator> unaryExp
-	 *           | postifixExp
+	 * UnaryExp -> <unary-operator> UnaryExp
+	 *           | ( Type ) UnaryExpr
+	 *           | PostifixExp
 	 */
 	private Expression unaryExpr() {
 		if(lex.peek().getType().equals("!")) {
@@ -567,9 +594,9 @@ public class ASTParser {
 	}
 	
 	/**
-	 * PostfixExp -> literal {postfixOp}*
+	 * PostfixExp -> Literal {PostfixOp}*
 	 * 
-	 * PostfixOp -> [ expression ]
+	 * PostfixOp -> [ Expression ]
 	 *            | ++ 
 	 *            | --
 	 */
@@ -603,7 +630,11 @@ public class ASTParser {
 	 *          | <string-const>
 	 *          | <bool-const>
 	 *          | <identifier>
-	 *          | ( expression )
+	 *          | len( Expression )
+	 *          | FuncCall
+	 *          | ( Expression )
+	 *          
+	 * FuncCall -> <identifier> ( ExprList )
 	 */
 	private Expression literal() {
 		Token litTok = lex.next();
@@ -632,8 +663,12 @@ public class ASTParser {
 				require(")");
 				
 				return new FuncCallExpression(new Identifier(litTok.getPosition(), litTok.getValue()), args);
-			} else
-				return new VarLiteral(new Identifier(litTok.getPosition(), litTok.getValue()));
+			}
+			return new VarLiteral(new Identifier(litTok.getPosition(), litTok.getValue()));
+		case "LEN":
+			Expression arg = expression();
+			require(")");
+			return new LengthFuncExpression(litTok.getPosition(), arg);
 		case "(":
 			Expression e = expression();
 			require(")");

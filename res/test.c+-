@@ -1,35 +1,36 @@
 void main() {
 	int fib = 20
 	
-	print "fibonacci:\n"
+	println "fibonacci:"
 	
 	print "fibdp(" + fib + ") = "
-	print fibdp(fib) + "\n"
+	println fibdp(fib)
 
 	print "fib(" + fib + ") = "
-	print fib(fib) + "\n"
+	println fib(fib)
 	
-	print "\nexponentiation by squaring:\n"
+	println ""
+	println "exponentiation by squaring:"
 	
 	float base = 3
 	float exp = 2
 	
 	print "exp(" + base + ", " + exp + ") = "
-	print exp(base, exp) + "\n"
+	println exp(base, exp)
 
-	print "\n"
+	println ""
 
-	//other tests for break, continue and typoe casting
+	//other tests for break, continue and type casting
 	int k
 	for(k = 0; k < 20; k++) {
 		if(k == 5) break
 		print k + "\n"
 	}
 	
-	print "\n"
+	println ""
 
-	print (int) 3.54 + "\n"
-	print (float) 3 / 2 + "\n"
+	println (int) 3.54
+	println (float) 3 / 2
 }
 
 //recursive fibonacci, because now we can!

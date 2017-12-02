@@ -25,32 +25,31 @@ import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 import com.bamless.interpreter.interpret.Interpreter;
 
 /**
- * AST walker that checks for non declared or uninitialized variables. It also
- * checks if expression used has statements have side effects, and warns the
- * user if not. In the case of an assignment operator it checks if the left hand
- * side in an lvalue, and throws an error if not.
+ * AST walker that checks for various context sensitive constrains, such as
+ * declaration of variables/functions before use, initialization of variables, 
+ * correct number of arguments passed to functions, etc...
  * 
  * @author fabrizio
  *
  */
-public class VarDeclChecker extends VoidVisitorAdapter<Void> {
+public class SemanticChecker extends VoidVisitorAdapter<Void> {
 	/**
 	 * Marker object used to denote the presence of an identifier in the 'varDecl'
 	 * symboltable
 	 */
 	private static final Object DECL = new Object();
-
 	/**
 	 * Symbol table to keep track of declared variables. The Object associated with
 	 * the identidfier is used as a marker.
 	 */
 	private SymbolTable<Object> varDecl;
+	
 	/**
 	 * Symbol table used to keep track of initialized variables. This symbol table
 	 * enters a new scope every control statement of the language. This is because
 	 * we're not guaranteed at compile time that the control statement would be
 	 * entered at runtime, and therefore we cannot be sure that the code that
-	 * initializes variables inside of it will be executed at runtime. By entering
+	 * initializes variables inside of it will be executed. By entering
 	 * and exiting a new scope when entering and exiting a control statement, we're
 	 * discarding eventual initializations that would be valid only for the current
 	 * statement.
@@ -58,7 +57,7 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 	private SymbolTable<Boolean> init;
 	private Map<String, FuncDecl> funcs;
 
-	public VarDeclChecker() {
+	public SemanticChecker() {
 		varDecl = new SymbolTable<>();
 		init = new SymbolTable<>();
 	}
@@ -96,13 +95,11 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 			ErrUtils.warn("Warning %s: computed value is not used", v.getAct().getPosition());
 		}
 
-		// the initialization of a for is always executed, so define in current init
-		// scope
+		// the initialization of a for is always executed, so define in current init scope
 		if (v.getInit() != null)
 			v.getInit().accept(this, arg);
 
-		// we're not guaranteed that further initializations will always be executed, so
-		// enter init scope
+		// we're not guaranteed that further initializations will always be executed, so enter init scope
 		init.enterScope();
 
 		if (v.getCond() != null)
@@ -147,7 +144,6 @@ public class VarDeclChecker extends VoidVisitorAdapter<Void> {
 			ErrUtils.semanticError(v.getPosition(), "double declaration of variable %s", v.getId().getVal());
 
 		varDecl.define(v.getId().getVal(), DECL);
-
 		init.define(v.getId().getVal(), false);
 
 		if (v.getInitializer() != null)

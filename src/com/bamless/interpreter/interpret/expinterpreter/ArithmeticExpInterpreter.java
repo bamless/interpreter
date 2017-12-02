@@ -10,6 +10,7 @@ import com.bamless.interpreter.ast.expression.CastExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
+import com.bamless.interpreter.ast.expression.LengthFuncExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
 import com.bamless.interpreter.ast.expression.PreIncrementOperation;
@@ -75,6 +76,14 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Frame> 
 			ret = BigDecimal.valueOf((float) retObj);
 		
 		return ret;
+	}
+	
+	@Override
+	public BigDecimal visit(LengthFuncExpression l, Frame arg) {
+		if(l.getArg().getType() == Type.STRING)
+			return BigDecimal.valueOf(l.getArg().accept(interpreter.getStringExpInterpreter(), arg).length());
+		else 
+			return BigDecimal.valueOf(l.getArg().accept(interpreter.getArrayExpInterpreter(), arg).getLength());
 	}
 	
 	@Override

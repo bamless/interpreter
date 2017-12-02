@@ -114,7 +114,7 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	
 	@Override
 	public void visit(PrintStatement p, Integer indent) {
-		print(indent, "PRINT " + p.getExpression());
+		print(indent, (p.isNweLine() ? "PRINTLN " : "PRINT ") + p.getExpression());
 	}
 	
 	@Override

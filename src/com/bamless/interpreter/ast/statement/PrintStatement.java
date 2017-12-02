@@ -7,10 +7,17 @@ import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class PrintStatement extends Statement {
 	private Expression e;
+	private boolean newLine;
 
 	public PrintStatement(Position start, Expression e) {
 		super(start);
 		this.e = e;
+	}
+	
+	public PrintStatement(Position start, Expression e, boolean newLine) {
+		super(start);
+		this.e = e;
+		this.newLine = newLine;
 	}
 
 	@Override
@@ -25,6 +32,10 @@ public class PrintStatement extends Statement {
 
 	public Expression getExpression() {
 		return e;
+	}
+	
+	public boolean isNweLine() {
+		return newLine;
 	}
 	
 }

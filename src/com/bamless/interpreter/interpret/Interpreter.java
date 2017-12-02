@@ -141,7 +141,10 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	
 	@Override
 	public void visit(PrintStatement p, Frame frame) {
-		System.out.print(p.getExpression().accept(si, frame));
+		if(p.isNweLine())
+			System.out.println(interpretExpression(p.getExpression(), frame));
+		else
+			System.out.print(interpretExpression(p.getExpression(), frame));
 	}
 
 	@Override
@@ -218,18 +221,18 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	
 	public void callFunction(FuncCallExpression funcCall) {
 		FuncDecl func = functions.get(funcCall.getFuncName().getVal());
-		List<Expression> frames = funcCall.getArgs();
+		List<Expression> args = funcCall.getArgs();
 		
-		//compute function frameument expressions
-		Object[] computedArgs = new Object[frames.size()];
+		//compute function argument expressions
+		Object[] computedArgs = new Object[args.size()];
 		for(int i = 0; i < func.getFormalArgs().size(); i++) {
-			computedArgs[i] = interpretExpression(frames.get(i), memEnv.getCurrentFrame());
+			computedArgs[i] = interpretExpression(args.get(i), memEnv.getCurrentFrame());
 		}
 		
 		//push a new stack frame
 		memEnv.pushStackFrame();
 		
-		//set arguments on the newly pushed stackframe
+		//set arguments on the newly pushed stack frame
 		for(int i = 0; i < func.getFormalArgs().size(); i++) {
 			memEnv.getCurrentFrame().define(func.getFormalArgs().get(i).getIdentifier(), computedArgs[i]);
 		}

@@ -6,9 +6,11 @@ ELSE            "else"
 FOR             "for"
 WHILE           "while"
 PRINT           "print"
+PRINTLN         "println"
 RETURN          "return"
 CONTINUE        "continue"
 BREAK           "break"
+LEN             "len\\("
 
 //type keywords
 INT             "int"

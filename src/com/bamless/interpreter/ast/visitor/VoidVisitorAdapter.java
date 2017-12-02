@@ -12,6 +12,7 @@ import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
+import com.bamless.interpreter.ast.expression.LengthFuncExpression;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
@@ -158,6 +159,11 @@ public class VoidVisitorAdapter<A> implements VoidVisitor<A> {
 	@Override
 	public void visit(CastExpression c, A arg) {
 		c.getExpression().accept(this, arg);
+	}
+	
+	@Override
+	public void visit(LengthFuncExpression l, A arg) {
+		l.getArg().accept(this, arg);
 	}
 	
 	@Override

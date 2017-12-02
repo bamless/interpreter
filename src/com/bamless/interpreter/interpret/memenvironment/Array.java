@@ -46,4 +46,15 @@ public class Array implements Cloneable {
 		return arr.length;
 	}
 	
+	@Override
+	public String toString() {
+		String s = "{";
+		for(int i = 0; i < arr.length; i++) {
+			s += arr[i];
+			if(i < arr.length - 1)
+				s += ", ";
+		}
+		return s + "}";
+	}
+	
 }
