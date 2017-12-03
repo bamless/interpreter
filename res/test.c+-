@@ -20,6 +20,14 @@ void main() {
 
 	println ""
 
+	int n = 10
+
+	println "factorial:"
+	print "fact(" + n + ") = "
+	println fact(n)
+
+	println ""
+
 	//other tests for break, continue and type casting
 	int k
 	for(k = 0; k < 20; k++) {
@@ -79,4 +87,9 @@ float exp(float base, float exp) {
 		return base * y
 	} else
 		return 1
+}
+
+int fact(int n) {
+	if(n == 0) return 1
+	return n * fact(n - 1)
 }
