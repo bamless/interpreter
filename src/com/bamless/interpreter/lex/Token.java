@@ -32,6 +32,6 @@ public class Token {
 	
 	@Override
 	public String toString() {
-		return pos + " " + type + ": " + lexeme + " ";
+		return pos + " " + type + (lexeme != null ? ": " + lexeme + " " : "");
 	}
 }

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +19,11 @@ import com.bamless.interpreter.ast.Position;
 /**
  * Generic Lexer that accepts a file with definable lexeme regexs.
  * It allows indefinite peeking in the token stream.
+ * 
+ * The lexer interns the token types and lexemes via {@link String#intern()} method
+ * in order to save space and to permit type comparison via == or != (i. e. tok.getType() == "AND_OP"
+ * instead of type.getType.equals("AND_OP")). This works because interned string are all mapped to the
+ * same memory object.
  * 
  * @author fabrizio
  *
@@ -32,6 +38,8 @@ public class Lexer {
 	
 	/**Hashmap that connects the user-defined token types to the regexs*/
 	private LinkedHashMap<String, Pattern> typesRegx = new LinkedHashMap<>();
+	/**Whether to save the source lexeme in the token*/
+	private HashMap<String, Boolean> keepLexeme = new HashMap<>();
 	/**Wheter to skip spaces or not*/
 	private boolean skipSpaces;
 	
@@ -45,18 +53,22 @@ public class Lexer {
 	}
 	
 	/**
-	 * Construct a new lexer by taking a string array of the form { TOKEN_TYPE, regex, TOKEN_TYPE, regex...} as input.
+	 * Construct a new lexer by taking a string array of the form { TOKEN_TYPE, regex, keep_flag, TOKEN_TYPE, regex, keep_flag...} as input.
+	 * the keep_flag string must be a 0 or a 1, indicating whether or not to save the source lexeme in the token.
 	 * @param skipSpaces whether to skip spaces or not. If this is false you must provide a token that matches spaces (otherwise Lexical error).
 	 * @param commentsRegx If provided, the lexer will skip the matching comments in the code
 	 */
 	public Lexer(String[] types, boolean skipSpaces, String commentsRegx) {
 		this(skipSpaces, commentsRegx);
-		if(types.length % 2 != 0) {
+		if(types.length % 3 != 0) {
 			throw new IllegalArgumentException("Invalid types array. "
 					+ "The array should be composed of pairs TYPE_NAME, REGEX.");
 		}
-		for(int i = 0; i < types.length; i+=2) {
-			typesRegx.put(types[i], Pattern.compile(types[i + 1]));
+		
+		//the token types get interned
+		for(int i = 0; i < types.length; i += 3) {
+			typesRegx.put(types[i].intern(), Pattern.compile(types[i + 1]));
+			keepLexeme.put(types[i].intern(), types[i + 2].equals("0") ? false: true);
 		}
 	}
 	
@@ -69,9 +81,12 @@ public class Lexer {
 	
 	/**
 	 * Construct a new lexer by taking lexical rules from a file of the form:
-	 * TYPE_NAME "REGEX"
-	 * TYPE_NAME "REGEX"
+	 * TYPE_NAME "REGEX" keep_flag
+	 * TYPE_NAME "REGEX" keep_flag
 	 * ...
+	 * 
+	 * The keep flag should be a 0 or a 1, indicating whether or not to save the source lexeme
+	 * in the token.
 	 * 
 	 * @param skipSpaces wheter to skip spaces or not. If this is false you must provide a token that matches spaces (otherwise Lexical error).
 	 * @param commentsRegx If provided, the lexer will skip the matching comments in the code
@@ -175,7 +190,8 @@ public class Lexer {
 						lineNo, invTok.start(), invTok.group()));
 			}
 
-			tokens.add(new Token(type, lexeme, new Position(lineNo, start + 1)));
+			//add interned lexeme if needed
+			tokens.add(new Token(type, keepLexeme.get(type) ? lexeme.intern() : null, new Position(lineNo, start + 1)));
  			start += length;
 		}
 	}
@@ -230,8 +246,9 @@ public class Lexer {
 		if(lex == null) throw new IllegalArgumentException("The inputstream cannot be null");
 		
 		Lexer tok = new Lexer(new String[] {
-				"REGEX",		"\"(\\\\.|[^\"])*\"",
-				"TYPE_NAME",	"[^\\s\"]+",
+				"KEEP_LEXEME",  "[0|1]",              "1",
+				"REGEX",        "\"(\\\\.|[^\"])*\"", "1",
+				"TYPE_NAME",    "[^\\s\"]+",          "1",
 		}, true, "//.*");
 		
 		try {
@@ -243,17 +260,23 @@ public class Lexer {
 		while(tok.hasNext()) {
 			Token type = tok.next();
 			Token regx = tok.next();
+			Token keep = tok.next();
 			
-			if(!type.getType().equals("TYPE_NAME"))
+			if(type.getType() != "TYPE_NAME")
 				throw new IllegalArgumentException("Error at " + type.getPosition() + ": " + type.getValue() + " is not a valid token type name.");
 			
-			if(!regx.getType().equals("REGEX")) {
+			if(regx.getType() != "REGEX") {
 				String errStr = regx == Lexer.END ? "Error: expected regex but instead found end of file." :
 					"Error at " + regx.getPosition() + ": " + regx.getValue() + " is not a valid regex.";
-				
 				throw new IllegalArgumentException(errStr);
 			}
-
+			
+			if(keep.getType() != "KEEP_LEXEME") {
+				String errStr = regx == Lexer.END ? "Error: expected flag but instead found end of file." :
+					"Error at " + regx.getPosition() + ": " + regx.getValue() + " is not a valid flag.";
+				throw new IllegalArgumentException(errStr);
+			}
+			
 			Pattern pattern;
 			try {
 				pattern = Pattern.compile(unescapeRegex(regx.getValue()));
@@ -262,6 +285,7 @@ public class Lexer {
 			}
 			
 			typesRegx.put(type.getValue(), pattern);
+			keepLexeme.put(type.getValue(), keep.getValue().equals("0") ? false : true);
 		}
 	}
 	

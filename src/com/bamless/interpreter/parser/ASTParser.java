@@ -134,7 +134,7 @@ public class ASTParser {
 		
 		require("(");
 		List<FormalArg> args = new ArrayList<>();
-		while(!lex.peek().getType().equals(")")) {
+		while(lex.peek().getType() != ")") {
 			Type argType = type();
 			
 			nameTok = require("IDENTIFIER");
@@ -142,7 +142,7 @@ public class ASTParser {
 			Identifier argId = new Identifier(nameTok.getPosition(), nameTok.getValue());
 			args.add(new FormalArg(argId.getPosition(), argType, argId));
 			
-			if(lex.peek().getType().equals(","))
+			if(lex.peek().getType() == ",")
 				lex.next();
 		}
 		require(")");
@@ -167,7 +167,7 @@ public class ASTParser {
 			error("Invalid type");
 		}
 		
-		while(lex.peek().getValue().equals("[")) {
+		while(lex.peek().getType() == "[") {
 			require("[");
 			t = Type.arrayType(t);
 			require("]");
@@ -222,10 +222,10 @@ public class ASTParser {
 		
 		Token peek;
 		List<Statement> statements = new ArrayList<>();
-		while(!(peek = lex.peek()).getType().equals("}")) {
+		while((peek = lex.peek()).getType() != "}") {
 			//can only declare var 	inside a block
-			if(peek.getType().equals("INT") || peek.getType().equals("BOOLEAN") || 
-					peek.getType().equals("FLOAT") || peek.getType().equals("STRING")) {
+			if(peek.getType() == "INT" || peek.getType() == "BOOLEAN" || 
+					peek.getType() == "FLOAT" || peek.getType() == "STRING") {
 				statements.add(varDecl());
 			} else {
 				statements.add(statement());
@@ -251,9 +251,9 @@ public class ASTParser {
 		Identifier id = new Identifier(idTok.getPosition(), idTok.getValue());
 		
 		//Array delcaration
-		if(lex.peek().getType().equals("[")) {
+		if(lex.peek().getType() == "[") {
 			List<Expression> dim = new ArrayList<>();
-			while(lex.peek().getType().equals("[")) {
+			while(lex.peek().getType() == "[") {
 				require("[");
 				
 				t = Type.arrayType(t);
@@ -267,7 +267,7 @@ public class ASTParser {
 		//Normal declaration
 		else {
 			Expression initializer = null;
-			if(lex.peek().getType().equals("=")) {
+			if(lex.peek().getType() == "=") {
 				require("=");
 				initializer = new AssignExpression(new VarLiteral(id), expression());
 			}
@@ -289,7 +289,7 @@ public class ASTParser {
 		Statement thenBody = statement();
 		Statement elseBody = null;
 		
-		if(lex.peek().getType().equals("ELSE")) {
+		if(lex.peek().getType() == "ELSE") {
 			lex.next();
 			elseBody = statement();
 		}
@@ -320,19 +320,19 @@ public class ASTParser {
 		require("(");
 		
 		Expression init = null;
-		if(!lex.peek().getType().equals(";"))
+		if(lex.peek().getType() != ";")
 			init = expression();
 		
 		require(";");
 		
 		Expression cond = null;
-		if(!lex.peek().getType().equals(";"))
+		if(lex.peek().getType() != ";")
 			cond = expression();
 		
 		require(";");
 		
 		Expression action = null;
-		if(!lex.peek().getType().equals(")"))
+		if(lex.peek().getType() != ")")
 			action = expression();
 		
 		require(")");
@@ -361,7 +361,7 @@ public class ASTParser {
 		Position start = require("RETURN").getPosition();
 		Expression e = null;
 		
-		if(lex.peek().getValue().equals(";"))
+		if(lex.peek().getValue() == ";")
 			lex.next();
 		else
 			e = expression();
@@ -380,7 +380,7 @@ public class ASTParser {
 	private List<Expression> exprList() {
 		List<Expression> exprs = new ArrayList<>();
 		exprs.add(expression());
-		while(lex.peek().getType().equals(",")) {
+		while(lex.peek().getType() == ",") {
 			lex.next();
 			exprs.add(expression());
 		}
@@ -436,7 +436,7 @@ public class ASTParser {
 		Expression left = equalityExpr();
 		
 		Token op;
-		while((op = lex.peek()).getType().equals("OR_OP") || op.getType().equals("AND_OP")) {
+		while((op = lex.peek()).getType() == "OR_OP" || op.getType() == "AND_OP") {
 			lex.next();
 			Expression right = equalityExpr();
 			
@@ -459,7 +459,7 @@ public class ASTParser {
 		Expression left = relationalExpr();
 		
 		Token op;
-		while((op = lex.peek()).getType().equals("EQ_OP") || op.getType().equals("NEQ_OP")) {
+		while((op = lex.peek()).getType() == "EQ_OP" || op.getType() == "NEQ_OP") {
 			lex.next();
 			Expression right = relationalExpr();
 			
@@ -482,8 +482,8 @@ public class ASTParser {
 		Expression left = additiveExpr();
 		
 		Token op;
-		while((op = lex.peek()).getType().equals("<") || op.getType().equals(">") ||
-				op.getType().equals("GE_OP") || op.getType().equals("LE_OP")) {
+		while((op = lex.peek()).getType() == "<" || op.getType() == ">" ||
+				op.getType() == "GE_OP" || op.getType() == "LE_OP") {
 			lex.next();
 			Expression right = additiveExpr();
 			
@@ -512,7 +512,7 @@ public class ASTParser {
 		Expression left = multiplicativeExpression();
 		
 		Token op;
-		while((op = lex.peek()).getType().equals("+") || op.getType().equals("-")) {
+		while((op = lex.peek()).getType() == "+" || op.getType() == "-") {
 			lex.next();
 			Expression right = multiplicativeExpression();
 			
@@ -535,8 +535,8 @@ public class ASTParser {
 		Expression left = unaryExpr();
 		
 		Token op;
-		while((op = lex.peek()).getType().equals("/") || op.getType().equals("*") ||
-				op.getType().equals("%")) {
+		while((op = lex.peek()).getType() == "/" || op.getType() == "*" ||
+				op.getType() == "%") {
 			lex.next();
 			Expression right = unaryExpr();
 			
@@ -561,28 +561,28 @@ public class ASTParser {
 	 *           | PostifixExp
 	 */
 	private Expression unaryExpr() {
-		if(lex.peek().getType().equals("!")) {
+		if(lex.peek().getType() == "!") {
 			Position pos = lex.next().getPosition();
 			return new LogicalNotExpression(unaryExpr(), pos);
 		}
-		if(lex.peek().getType().equals("+")) {
+		if(lex.peek().getType() == "+") {
 			lex.next();
 			return unaryExpr();
 		}
-		if(lex.peek().getType().equals("-")) {
+		if(lex.peek().getType() == "-") {
 			Position pos = lex.next().getPosition();
 			return new ArithmeticBinExpression(MULT, new IntegerLiteral(pos, -1), unaryExpr());
 		}
-		if(lex.peek().getType().equals("++")) {
+		if(lex.peek().getType() == "++") {
 			Position pos = lex.next().getPosition();
 			return new PreIncrementOperation(INCR, unaryExpr(), pos);
 		}
-		if(lex.peek().getType().equals("--")) {
+		if(lex.peek().getType() == "--") {
 			Position pos = lex.next().getPosition();
 			return new PreIncrementOperation(DECR, unaryExpr(), pos);
 		}
-		if(lex.peek().getType().equals("(") && (lex.peek(2).getType().equals("INT") || lex.peek(2).getType().equals("BOOLEAN") || 
-				lex.peek(2).getType().equals("FLOAT") || lex.peek(2).getType().equals("STRING"))) {
+		if(lex.peek().getType() == "(" && (lex.peek(2).getType() == "INT" || lex.peek(2).getType() == "BOOLEAN" || 
+				lex.peek(2).getType() == "FLOAT" || lex.peek(2).getType() == "STRING")) {
 			Position pos = lex.next().getPosition();
 			Type cast = type();
 			require(")");
@@ -604,7 +604,7 @@ public class ASTParser {
 		Expression left = literal();
 		
 		Token op;
-		while((op = lex.peek()).getType().equals("[") || op.getType().equals("++") || op.getType().equals("--")) {
+		while((op = lex.peek()).getType() == "[" || op.getType() == "++" || op.getType() == "--") {
 			lex.next();
 			
 			switch(op.getType()) {
@@ -655,10 +655,10 @@ public class ASTParser {
 			String s = litTok.getValue();
 			return new StringLiteral(litTok.getPosition(), unescapeJavaString(s.substring(1, s.length() - 1)));
 		case "IDENTIFIER":
-			if(lex.peek().getType().equals("(")) {
+			if(lex.peek().getType() == "(") {
 				require("(");
 				List<Expression> args = null;
-				if(!lex.peek().getValue().equals(")"))
+				if(lex.peek().getValue() != ")")
 						args = exprList();
 				require(")");
 				
@@ -681,7 +681,7 @@ public class ASTParser {
 	
 	private Token require(String tokType) {
 		Token next = lex.next();
-		if(!next.getType().equals(tokType)) {
+		if(next.getType() != tokType) {
 			error("expected \"%s\" but instead found \"%s\"", tokType, next.getValue());
 		}
 		return next;
@@ -692,7 +692,7 @@ public class ASTParser {
 		String tokenErr = "";
 		Position pos = new Position(0, 0);
 		if(lex.curr() != null) {
-			tokenErr = "near or at token \"" + lex.curr().getValue() + "\" ";
+			tokenErr = "near or at token \"" + (lex.curr().getValue() == null ? lex.curr().getType() : lex.curr().getValue()) + "\" ";
 			pos = lex.curr().getPosition();
 		}
 		throw new ParseException(String.format("Syntax error " + tokenErr + pos + ": " + format, args));
