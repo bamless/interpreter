@@ -1,7 +1,6 @@
 package com.bamless.interpreter.ast.statement;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
 
 import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Position;
@@ -12,12 +11,12 @@ import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class ArrayDecl extends Statement {
 	private Identifier id;
-	private List<Expression> dimensions;
+	private Expression[] dimensions;
 	private Type type;
 
-	public ArrayDecl(Position start, Type type, List<Expression> dimensions, Identifier id) {
+	public ArrayDecl(Position start, Type type, Collection<Expression> dimensions, Identifier id) {
 		super(start);
-		this.dimensions = dimensions;
+		this.dimensions = dimensions.toArray(new Expression[dimensions.size()]);
 		this.type = type;
 		this.id = id;
 	}
@@ -36,8 +35,8 @@ public class ArrayDecl extends Statement {
 		return type;
 	}
 
-	public List<Expression> getDimensions() {
-		return Collections.unmodifiableList(dimensions);
+	public Expression[] getDimensions() {
+		return dimensions;
 	}
 	
 	public Identifier getId() {

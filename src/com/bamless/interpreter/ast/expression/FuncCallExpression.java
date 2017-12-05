@@ -1,22 +1,20 @@
 package com.bamless.interpreter.ast.expression;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
 
 import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
 public class FuncCallExpression extends Expression {
-	private static final List<Expression> VOID_ARGS = Collections.unmodifiableList(new ArrayList<Expression>(0));
+	private static final Expression[] VOID_ARGS = new Expression[0];
 	
 	private Identifier funcName;
-	private List<Expression> args;
+	private Expression[] args;
 	
-	public FuncCallExpression(Identifier funcName, List<Expression> args) {
+	public FuncCallExpression(Identifier funcName, Collection<Expression> args) {
 		super(funcName.getPosition());
-		this.args = args == null ? VOID_ARGS : args;
+		this.args = args == null ? VOID_ARGS : args.toArray(new Expression[args.size()]);
 		this.funcName = funcName;
 	}
 	
@@ -39,7 +37,7 @@ public class FuncCallExpression extends Expression {
 		return funcName;
 	}
 	
-	public List<Expression> getArgs() {
+	public Expression[] getArgs() {
 		return args;
 	}
 
@@ -48,9 +46,9 @@ public class FuncCallExpression extends Expression {
 		StringBuilder sb = new StringBuilder();
 		sb.append(funcName.getVal() + "(");
 		
-		for(int i = 0; i < args.size(); i++) {
-			sb.append(args.get(i));
-			if(i < args.size() - 1) sb.append(", ");
+		for(int i = 0; i < args.length; i++) {
+			sb.append(args[i]);
+			if(i < args.length - 1) sb.append(", ");
 		}
 		
 		sb.append(")");

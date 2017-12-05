@@ -13,10 +13,10 @@ public class LoopBreakingChecker extends VoidVisitorAdapter<Statement> {
 
 	@Override
 	public void visit(BlockStatement v, Statement arg) {
-		for(int i = 0; i < v.getStmts().size(); i++) {
-			v.getStmts().get(i).accept(this, arg);
-			if(v.getStmts().get(i) instanceof BreakStatement && i < v.getStmts().size() - 1)
-				ErrUtils.semanticError(v.getStmts().get(i + 1).getPosition(), "Unreachable code");
+		for(int i = 0; i < v.getStmts().length; i++) {
+			v.getStmts()[i].accept(this, arg);
+			if(v.getStmts()[i] instanceof BreakStatement && i < v.getStmts().length - 1)
+				ErrUtils.semanticError(v.getStmts()[i + 1].getPosition(), "Unreachable code");
 		}
 	}
 	

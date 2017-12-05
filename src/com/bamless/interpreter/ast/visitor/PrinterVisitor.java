@@ -48,7 +48,7 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	public void visit(BlockStatement v, Integer indent) {
 		print(indent, "START BLOCK");
 		
-		for(Statement s : v) {
+		for(Statement s : v.getStmts()) {
 			if(s instanceof Expression)
 				print(indent + 1, s.toString());
 			else
@@ -153,9 +153,9 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 	public void visit(FuncDecl d, Integer indent) {
 		String func = d.getType() + " " + d.getId().getVal() + "(";
 		
-		for(int i = 0; i < d.getFormalArgs().size(); i++) {
-			func += d.getFormalArgs().get(i);
-			if(i < d.getFormalArgs().size() - 1) func += ", ";
+		for(int i = 0; i < d.getFormalArgs().length; i++) {
+			func += d.getFormalArgs()[i];
+			if(i < d.getFormalArgs().length - 1) func += ", ";
 		}
 		
 		func += ")";

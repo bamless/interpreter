@@ -2,7 +2,6 @@ package com.bamless.interpreter.interpret;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import com.bamless.interpreter.ast.FuncDecl;
@@ -221,20 +220,20 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	
 	public void callFunction(FuncCallExpression funcCall) {
 		FuncDecl func = functions.get(funcCall.getFuncName().getVal());
-		List<Expression> args = funcCall.getArgs();
+		Expression[] args = funcCall.getArgs();
 		
 		//compute function argument expressions
-		Object[] computedArgs = new Object[args.size()];
-		for(int i = 0; i < func.getFormalArgs().size(); i++) {
-			computedArgs[i] = interpretExpression(args.get(i), memEnv.getCurrentFrame());
+		Object[] computedArgs = new Object[args.length];
+		for(int i = 0; i < func.getFormalArgs().length; i++) {
+			computedArgs[i] = interpretExpression(args[i], memEnv.getCurrentFrame());
 		}
 		
 		//push a new stack frame
 		memEnv.pushStackFrame();
 		
 		//set arguments on the newly pushed stack frame
-		for(int i = 0; i < func.getFormalArgs().size(); i++) {
-			memEnv.getCurrentFrame().define(func.getFormalArgs().get(i).getIdentifier(), computedArgs[i]);
+		for(int i = 0; i < func.getFormalArgs().length; i++) {
+			memEnv.getCurrentFrame().define(func.getFormalArgs()[i].getIdentifier(), computedArgs[i]);
 		}
 		
 		//call the function

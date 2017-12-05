@@ -1,6 +1,5 @@
 package com.bamless.interpreter.semantic;
 
-import java.util.List;
 import java.util.Map;
 
 import com.bamless.interpreter.ErrUtils;
@@ -229,12 +228,12 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 		if (decl == null)
 			ErrUtils.semanticError(f.getPosition(), "Use of undeclared function `%s`.", f.getFuncName());
 
-		List<Expression> callArgs = f.getArgs();
-		List<FormalArg> declArgs = decl.getFormalArgs();
+		Expression[] callArgs = f.getArgs();
+		FormalArg[] declArgs = decl.getFormalArgs();
 
-		if (callArgs.size() != declArgs.size()) {
+		if (callArgs.length != declArgs.length) {
 			ErrUtils.semanticError(f.getPosition(), "Function %s requires %d arguments, but instead %d supplied",
-					f.getFuncName(), declArgs.size(), callArgs.size());
+					f.getFuncName(), declArgs.length, callArgs.length);
 		}
 	}
 

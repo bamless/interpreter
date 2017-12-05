@@ -67,8 +67,8 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 		boolean ret = false;
 
 		int i;
-		for(i = 0; i < v.getStmts().size(); i++) {
-			Statement s = v.getStmts().get(i);
+		for(i = 0; i < v.getStmts().length; i++) {
+			Statement s = v.getStmts()[i];
 			
 			if(s instanceof ReturnStatement || s instanceof IfStatement)
 				ret |= s.accept(this, arg);
@@ -78,8 +78,8 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 			if(ret) break;
 		}
 
-		if(i < v.getStmts().size() - 1) {
-			ErrUtils.semanticError(v.getStmts().get(i + 1).getPosition(), "Unreachable code.");
+		if(i < v.getStmts().length - 1) {
+			ErrUtils.semanticError(v.getStmts()[i + 1].getPosition(), "Unreachable code.");
 		}
 
 		return ret;

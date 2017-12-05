@@ -1,19 +1,17 @@
 package com.bamless.interpreter.ast.statement;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Collection;
 
 import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.visitor.GenericVisitor;
 import com.bamless.interpreter.ast.visitor.VoidVisitor;
 
-public class BlockStatement extends Statement implements Iterable<Statement> {
-	private List<Statement> stmts;
+public class BlockStatement extends Statement {
+	private Statement[] stmts;
 
-	public BlockStatement(List<Statement> stmts, Position pos) {
+	public BlockStatement(Collection<Statement> stmts, Position pos) {
 		super(pos);
-		this.stmts = stmts;
+		this.stmts = stmts.toArray(new Statement[stmts.size()]);
 	}
 
 	@Override
@@ -21,13 +19,8 @@ public class BlockStatement extends Statement implements Iterable<Statement> {
 		v.visit(this, arg);
 	}
 	
-	@Override
-	public Iterator<Statement> iterator() {
-		return stmts.iterator();
-	}
-	
-	public List<Statement> getStmts() {
-		return Collections.unmodifiableList(stmts);
+	public Statement[] getStmts() {
+		return stmts;
 	}
 
 	@Override

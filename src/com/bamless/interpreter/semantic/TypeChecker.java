@@ -1,6 +1,5 @@
 package com.bamless.interpreter.semantic;
 
-import java.util.List;
 import java.util.Map;
 
 import com.bamless.interpreter.ErrUtils;
@@ -337,15 +336,15 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 			e.accept(this, currentFunc);
 		}
 
-		List<Expression> callArgs = f.getArgs();
-		List<FormalArg> declArgs = funcs.get(f.getFuncName().getVal()).getFormalArgs();
+		Expression[] callArgs = f.getArgs();
+		FormalArg[] declArgs = funcs.get(f.getFuncName().getVal()).getFormalArgs();
 
-		for (int i = 0; i < callArgs.size(); i++) {
-			Type callType = callArgs.get(i).getType();
-			Type declType = declArgs.get(i).getType();
+		for (int i = 0; i < callArgs.length; i++) {
+			Type callType = callArgs[i].getType();
+			Type declType = declArgs[i].getType();
 
 			if (!callType.canAssign(declType)) {
-				typeError(callArgs.get(i).getPosition(),
+				typeError(callArgs[i].getPosition(),
 						"type mismatch, cannot convert %s to %s on %s argument of function call `%s`",
 						callType.toString().toLowerCase(), declType.toString().toLowerCase(), cardinal(i + 1),
 						f.getFuncName());
@@ -353,13 +352,13 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 
 			if (declType == Type.INT && callType == Type.FLOAT) {
 				ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
-						callArgs.get(i).getPosition());
+						callArgs[i].getPosition());
 			}
 			
 			//types are compatible, apply type coercion if needed
 			if(callType != declType) {
-				Expression e = callArgs.get(i);
-				callArgs.set(i, new CastExpression(declType, e, e.getPosition()));
+				Expression e = callArgs[i];
+				callArgs[i] = new CastExpression(declType, e, e.getPosition());
 			}
 		}
 
