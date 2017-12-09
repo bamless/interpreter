@@ -4,8 +4,8 @@ import java.util.Collection;
 
 import com.bamless.interpreter.ast.statement.BlockStatement;
 import com.bamless.interpreter.ast.type.Type;
-import com.bamless.interpreter.ast.visitor.GenericVisitor;
-import com.bamless.interpreter.ast.visitor.VoidVisitor;
+import com.bamless.interpreter.visitor.GenericVisitor;
+import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class FuncDecl extends ASTNode {
 	private static final FormalArg[] VOID_ARGS = new FormalArg[0];

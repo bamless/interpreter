@@ -38,8 +38,8 @@ import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.type.ArrayType;
 import com.bamless.interpreter.ast.type.Type;
-import com.bamless.interpreter.ast.visitor.GenericVisitor;
-import com.bamless.interpreter.ast.visitor.Visitable;
+import com.bamless.interpreter.visitor.GenericVisitor;
+import com.bamless.interpreter.visitor.Visitable;
 
 /**
  * This class walks the AST and verifies if all the types are used correctly

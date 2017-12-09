@@ -6,8 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.bamless.interpreter.ErrUtils;
-import com.bamless.interpreter.ast.visitor.GenericVisitor;
-import com.bamless.interpreter.ast.visitor.VoidVisitor;
+import com.bamless.interpreter.visitor.GenericVisitor;
+import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class Program extends ASTNode {
 	private Map<String, FuncDecl> functions;

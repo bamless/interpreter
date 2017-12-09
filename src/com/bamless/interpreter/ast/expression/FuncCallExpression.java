@@ -3,8 +3,8 @@ package com.bamless.interpreter.ast.expression;
 import java.util.Collection;
 
 import com.bamless.interpreter.ast.Identifier;
-import com.bamless.interpreter.ast.visitor.GenericVisitor;
-import com.bamless.interpreter.ast.visitor.VoidVisitor;
+import com.bamless.interpreter.visitor.GenericVisitor;
+import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class FuncCallExpression extends Expression {
 	private static final Expression[] VOID_ARGS = new Expression[0];

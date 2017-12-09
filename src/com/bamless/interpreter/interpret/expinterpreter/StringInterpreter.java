@@ -11,10 +11,10 @@ import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type;
-import com.bamless.interpreter.ast.visitor.VisitorAdapter;
 import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.interpret.RuntimeError;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
+import com.bamless.interpreter.visitor.VisitorAdapter;
 
 public class StringInterpreter extends VisitorAdapter<String, Frame> {
 	private Interpreter interpreter;

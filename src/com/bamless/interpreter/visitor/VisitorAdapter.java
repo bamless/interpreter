@@ -1,4 +1,4 @@
-package com.bamless.interpreter.ast.visitor;
+package com.bamless.interpreter.visitor;
 
 import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.Program;

@@ -1,8 +1,8 @@
 package com.bamless.interpreter.ast;
 
 import com.bamless.interpreter.ast.type.Type;
-import com.bamless.interpreter.ast.visitor.GenericVisitor;
-import com.bamless.interpreter.ast.visitor.VoidVisitor;
+import com.bamless.interpreter.visitor.GenericVisitor;
+import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class FormalArg extends ASTNode {
 	private Type type;

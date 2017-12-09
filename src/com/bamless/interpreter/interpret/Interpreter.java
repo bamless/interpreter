@@ -25,7 +25,6 @@ import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.type.ArrayType;
 import com.bamless.interpreter.ast.type.Type;
-import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 import com.bamless.interpreter.interpret.expinterpreter.ArithmeticInterpreter;
 import com.bamless.interpreter.interpret.expinterpreter.ArrayInterpreter;
 import com.bamless.interpreter.interpret.expinterpreter.BooleanInterpreter;
@@ -33,6 +32,7 @@ import com.bamless.interpreter.interpret.expinterpreter.StringInterpreter;
 import com.bamless.interpreter.interpret.memenvironment.Array;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
+import com.bamless.interpreter.visitor.VoidVisitorAdapter;
 
 /**
  * Interpret the language by directly interpreting the AST. This type of interpretation is slow,

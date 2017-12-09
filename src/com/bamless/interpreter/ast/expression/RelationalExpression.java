@@ -1,7 +1,7 @@
 package com.bamless.interpreter.ast.expression;
 
-import com.bamless.interpreter.ast.visitor.GenericVisitor;
-import com.bamless.interpreter.ast.visitor.VoidVisitor;
+import com.bamless.interpreter.visitor.GenericVisitor;
+import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class RelationalExpression extends BinaryExpression {
 	public static enum RelationalOperation {

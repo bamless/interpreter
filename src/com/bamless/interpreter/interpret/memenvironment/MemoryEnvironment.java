@@ -8,9 +8,9 @@ import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
-import com.bamless.interpreter.ast.visitor.VisitorAdapter;
-import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 import com.bamless.interpreter.interpret.Interpreter;
+import com.bamless.interpreter.visitor.VisitorAdapter;
+import com.bamless.interpreter.visitor.VoidVisitorAdapter;
 
 public class MemoryEnvironment {
 	private Interpreter interpreter;

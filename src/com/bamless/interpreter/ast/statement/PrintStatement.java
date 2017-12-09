@@ -2,8 +2,8 @@ package com.bamless.interpreter.ast.statement;
 
 import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.expression.Expression;
-import com.bamless.interpreter.ast.visitor.GenericVisitor;
-import com.bamless.interpreter.ast.visitor.VoidVisitor;
+import com.bamless.interpreter.visitor.GenericVisitor;
+import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class PrintStatement extends Statement {
 	private Expression e;

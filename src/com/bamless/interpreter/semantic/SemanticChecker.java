@@ -20,8 +20,8 @@ import com.bamless.interpreter.ast.statement.IfStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
-import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 import com.bamless.interpreter.interpret.Interpreter;
+import com.bamless.interpreter.visitor.VoidVisitorAdapter;
 
 /**
  * AST walker that checks for various context sensitive constrains, such as

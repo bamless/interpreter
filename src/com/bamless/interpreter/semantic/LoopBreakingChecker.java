@@ -7,7 +7,7 @@ import com.bamless.interpreter.ast.statement.ContinueStatement;
 import com.bamless.interpreter.ast.statement.ForStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.WhileStatement;
-import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
+import com.bamless.interpreter.visitor.VoidVisitorAdapter;
 
 public class LoopBreakingChecker extends VoidVisitorAdapter<Statement> {
 

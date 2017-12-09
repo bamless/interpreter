@@ -6,8 +6,8 @@ import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.type.Type;
-import com.bamless.interpreter.ast.visitor.GenericVisitor;
-import com.bamless.interpreter.ast.visitor.VoidVisitor;
+import com.bamless.interpreter.visitor.GenericVisitor;
+import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class ArrayDecl extends Statement {
 	private Identifier id;

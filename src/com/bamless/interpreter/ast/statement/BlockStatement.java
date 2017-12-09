@@ -3,8 +3,8 @@ package com.bamless.interpreter.ast.statement;
 import java.util.Collection;
 
 import com.bamless.interpreter.ast.Position;
-import com.bamless.interpreter.ast.visitor.GenericVisitor;
-import com.bamless.interpreter.ast.visitor.VoidVisitor;
+import com.bamless.interpreter.visitor.GenericVisitor;
+import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class BlockStatement extends Statement {
 	private Statement[] stmts;

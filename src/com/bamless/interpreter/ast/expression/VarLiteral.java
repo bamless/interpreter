@@ -1,8 +1,8 @@
 package com.bamless.interpreter.ast.expression;
 
 import com.bamless.interpreter.ast.Identifier;
-import com.bamless.interpreter.ast.visitor.GenericVisitor;
-import com.bamless.interpreter.ast.visitor.VoidVisitor;
+import com.bamless.interpreter.visitor.GenericVisitor;
+import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class VarLiteral extends Lvalue {
 	private Identifier id;

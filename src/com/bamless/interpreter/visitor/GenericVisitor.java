@@ -1,4 +1,4 @@
-package com.bamless.interpreter.ast.visitor;
+package com.bamless.interpreter.visitor;
 
 import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.Program;
@@ -30,41 +30,41 @@ import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 
-public interface VoidVisitor<A> {
-	void visit(Visitable v, A arg);
+public interface GenericVisitor<T, A> {
+	T visit(Visitable v, A arg);
 	
-	void visit(Program p, A arg);
+	T visit(Program p, A arg);
 	
-	void visit(IfStatement i, A arg);
-	void visit(WhileStatement w, A arg);
-	void visit(ForStatement f, A arg);
-	void visit(BlockStatement b, A arg);
-	void visit(PrintStatement p, A arg);
-	void visit(ReturnStatement r, A arg);
-	void visit(BreakStatement b, A arg);
-	void visit(ContinueStatement c, A arg);
+	T visit(IfStatement i, A arg);
+	T visit(WhileStatement w, A arg);
+	T visit(BlockStatement b, A arg);
+	T visit(ForStatement f, A arg);
+	T visit(PrintStatement p, A arg);
+	T visit(ReturnStatement r, A arg);
+	T visit(BreakStatement b, A arg);
+	T visit(ContinueStatement c, A arg);
 	
-	void visit(VarDecl v, A arg);
-	void visit(ArrayDecl a, A arg);
+	T visit(VarDecl v, A arg);
+	T visit(ArrayDecl a, A arg);
 	
-	void visit(ArithmeticBinExpression e, A arg);
-	void visit(LogicalExpression l, A arg);
-	void visit(RelationalExpression r, A arg);
-	void visit(EqualityExpression e, A arg);
-	void visit(LogicalNotExpression n, A arg);
-	void visit(PostIncrementOperation p, A arg);
-	void visit(PreIncrementOperation p, A arg);
-	void visit(AssignExpression e, A arg);
-	void visit(CastExpression c, A arg);
-	void visit(LengthFuncExpression l, A arg);
+	T visit(ArithmeticBinExpression e, A arg);
+	T visit(LogicalExpression l, A arg);
+	T visit(EqualityExpression e, A arg);
+	T visit(RelationalExpression r, A arg);
+	T visit(LogicalNotExpression n, A arg);
+	T visit(PostIncrementOperation p, A arg);
+	T visit(PreIncrementOperation p, A arg);
+	T visit(AssignExpression e, A arg);
+	T visit(CastExpression c, A arg);
+	T visit(LengthFuncExpression l, A arg);
 	
-	void visit(FloatLiteral f, A arg);
-	void visit(IntegerLiteral i, A arg);
-	void visit(BooleanLiteral b, A arg);
-	void visit(StringLiteral s, A arg);
-	void visit(VarLiteral v, A arg);
-	void visit(ArrayAccess a, A arg);
-	void visit(FuncCallExpression f, A arg);
+	T visit(FloatLiteral f, A arg);
+	T visit(IntegerLiteral i, A arg);
+	T visit(BooleanLiteral b, A arg);
+	T visit(StringLiteral s, A arg);
+	T visit(VarLiteral v, A arg);
+	T visit(ArrayAccess a, A arg);
+	T visit(FuncCallExpression f, A arg);
 	
-	void visit(FuncDecl d, A arg);
+	T visit(FuncDecl d, A arg);
 }

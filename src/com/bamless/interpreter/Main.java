@@ -4,10 +4,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.bamless.interpreter.ast.ASTNode;
-import com.bamless.interpreter.ast.visitor.PrinterVisitor;
 import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.parser.ASTParser;
 import com.bamless.interpreter.semantic.SemanticAnalyzer;
+import com.bamless.interpreter.visitor.PrinterVisitor;
 
 public class Main {
 	

@@ -1,4 +1,4 @@
-package com.bamless.interpreter.ast.visitor;
+package com.bamless.interpreter.visitor;
 
 public interface Visitable {
 	<T, A> T accept(GenericVisitor<T, A> v, A arg);
