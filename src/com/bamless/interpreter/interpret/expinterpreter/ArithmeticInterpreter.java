@@ -21,10 +21,10 @@ import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.interpret.RuntimeError;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
 
-public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Frame> {
+public class ArithmeticInterpreter extends VisitorAdapter<BigDecimal, Frame> {
 	private Interpreter interpreter;
 
-	public ArithmeticExpInterpreter(Interpreter interpreter) {
+	public ArithmeticInterpreter(Interpreter interpreter) {
 		this.interpreter = interpreter;
 	}
 	
@@ -68,17 +68,17 @@ public class ArithmeticExpInterpreter extends VisitorAdapter<BigDecimal, Frame> 
 		interpreter.callFunction(f);
 
 		if(f.getType() == Type.INT)
-			return BigDecimal.valueOf((int) frame.getReturnRegister());
+			return BigDecimal.valueOf(frame.<Integer>getReturnRegister());
 		else
-			return BigDecimal.valueOf((float) frame.getReturnRegister());
+			return BigDecimal.valueOf(frame.<Float>getReturnRegister());
 	}
 	
 	@Override
 	public BigDecimal visit(LengthFuncExpression l, Frame arg) {
 		if(l.getArg().getType() == Type.STRING)
-			return BigDecimal.valueOf(l.getArg().accept(interpreter.getStringExpInterpreter(), arg).length());
+			return BigDecimal.valueOf(l.getArg().accept(interpreter.stringInterpreter(), arg).length());
 		else 
-			return BigDecimal.valueOf(l.getArg().accept(interpreter.getArrayExpInterpreter(), arg).getLength());
+			return BigDecimal.valueOf(l.getArg().accept(interpreter.arrayInterpreter(), arg).getLength());
 	}
 	
 	@Override

@@ -103,7 +103,7 @@ public class PrinterVisitor extends VoidVisitorAdapter<Integer> {
 		if(forStmt.getAct() != null) 
 			exp3 = forStmt.getAct().toString();
 		
-		print(indent, "FOR " + exp1 + " ; " + exp2 + " ; " + exp3);
+		print(indent, "FOR (" + exp1 + " ; " + exp2 + " ; " + exp3 + ")");
 		
 		Statement body = forStmt.getBody();
 		if(body instanceof Expression)

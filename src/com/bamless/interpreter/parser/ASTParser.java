@@ -79,11 +79,12 @@ import com.bamless.interpreter.lex.Token;
  */
 public class ASTParser {
 	private final static String LEX_FILE = "/lexical-spec.lex";
+	private final static String COMMENTS_REGX = "//.*";
 	
 	private Lexer lex;
 	
 	public ASTParser() {
-		lex = new Lexer(ClassLoader.class.getResourceAsStream(LEX_FILE), true, "//.*");
+		lex = new Lexer(ClassLoader.class.getResourceAsStream(LEX_FILE), true, COMMENTS_REGX);
 	}
 	
 	public ASTNode parse(File f) throws FileNotFoundException, IOException {
@@ -361,7 +362,7 @@ public class ASTParser {
 		Position start = require("RETURN").getPosition();
 		Expression e = null;
 		
-		if(lex.peek().getValue() == ";")
+		if(lex.peek().getType() == ";")
 			lex.next();
 		else
 			e = expression();
@@ -422,7 +423,7 @@ public class ASTParser {
 				left = new AssignExpression(left, mod);
 				break;
 			default:
-				error("Expected assignment oprator but instead found \"%s\"", assignOp.getValue());
+				error("Expected assignment operator but instead found \"%s\"", assignOp.getValue());
 				return null;
 			}
 		}
@@ -692,7 +693,7 @@ public class ASTParser {
 		String tokenErr = "";
 		Position pos = new Position(0, 0);
 		if(lex.curr() != null) {
-			tokenErr = "near or at token \"" + (lex.curr().getValue() == null ? lex.curr().getType() : lex.curr().getValue()) + "\" ";
+			tokenErr = "near or at token \"" + lex.curr().getValue() + "\" ";
 			pos = lex.curr().getPosition();
 		}
 		throw new ParseException(String.format("Syntax error " + tokenErr + pos + ": " + format, args));

@@ -21,7 +21,7 @@ import com.bamless.interpreter.ast.Position;
  * It allows indefinite peeking in the token stream.
  * 
  * The lexer interns the token types and lexemes via {@link String#intern()} method
- * in order to save space and to permit type comparison via == or != (i. e. tok.getType() == "AND_OP"
+ * in order to save space and to permit type comparison via == or != (i.e. tok.getType() == "AND_OP"
  * instead of type.getType.equals("AND_OP")). This works because interned string are all mapped to the
  * same memory object.
  * 

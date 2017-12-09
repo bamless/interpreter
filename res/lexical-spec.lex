@@ -20,32 +20,31 @@ STRING          "string"   0
 VOID            "void"     0
 
 //constants
-INT_CONST       "[0-9]+"              1
-FLOAT_CONST     "[0-9]+(\\.[0-9]*)?"  1
-BOOL_CONST      "true|false"          1
-STRING_CONST    "\"(\\\\.|[^\"])*\""  1
-
+INT_CONST       "[0-9]+"                 1
+FLOAT_CONST     "[0-9]+(\\.[0-9]*)?"     1
+BOOL_CONST      "true|false"             1
+STRING_CONST    "\"(\\\\.|[^\"])*\""     1
 //identifier
-IDENTIFIER      "[_a-zA-Z][_a-zA-Z0-9]*"  1
+IDENTIFIER      "[_a-zA-Z][_a-zA-Z0-9]*" 1
 
 //symbols
-(               "\\("  0
-)               "\\)"  0
-{               "\\{"  0
-}               "\\}"  0
-,               ","    0
-;               ";"    0
-[               "\\["  0
-]               "\\]"  0
+(               "\\("     0
+)               "\\)"     0
+{               "\\{"     0
+}               "\\}"     0
+,               ","       0
+;               ";"       0
+[               "\\["     0
+]               "\\]"     0
 
 //assignment operators
-=               "="     0
-+=              "\\+="  0
--=              "-="    0
-*=              "\\*="  0
-/=              "/="    0
-%=              "%="    0
-+               "\\+"   0
+=               "="       0
++=              "\\+="    0
+-=              "-="      0
+*=              "\\*="    0
+/=              "/="      0
+%=              "%="      0
++               "\\+"     0
 
 //operators
 -               "-"       0

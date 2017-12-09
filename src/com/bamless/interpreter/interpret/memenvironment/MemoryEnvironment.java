@@ -13,14 +13,12 @@ import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
 import com.bamless.interpreter.interpret.Interpreter;
 
 public class MemoryEnvironment {
+	private Interpreter interpreter;
 	private Deque<Frame> environmet;
 	
-	private Interpreter interpreter;
-	
 	public MemoryEnvironment(Interpreter interpreter) {
-		environmet = new ArrayDeque<Frame>();
-		
 		this.interpreter = interpreter;
+		environmet = new ArrayDeque<Frame>();
 	}
 	
 	public void pushStackFrame() {
@@ -67,8 +65,9 @@ public class MemoryEnvironment {
 			returnRegister = val;
 		}
 		
-		public Object getReturnRegister() {
-			return returnRegister;
+		@SuppressWarnings("unchecked")
+		public <T> T getReturnRegister() {
+			return (T) returnRegister;
 		}
 		
 		private class VarSetter extends VoidVisitorAdapter<Object> {
@@ -79,10 +78,10 @@ public class MemoryEnvironment {
 			
 			@Override
 			public void visit(ArrayAccess a, Object arg) {
-				Array l = a.getLvalue().accept(interpreter.getArrayExpInterpreter(), getCurrentFrame());
+				Array l = a.getLvalue().accept(interpreter.arrayInterpreter(), getCurrentFrame());
 				
 				try {
-					l.set(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), getCurrentFrame()).intValue(), arg);
+					l.set(a.getIndex().accept(interpreter.arithmeticInterpreter(), getCurrentFrame()).intValue(), arg);
 				} catch(ArrayIndexOutOfBoundsException e) {
 					throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
 				}
@@ -97,11 +96,11 @@ public class MemoryEnvironment {
 			
 			@Override
 			public Object visit(ArrayAccess a, Void arg) {
-				Array array = a.getLvalue().accept(interpreter.getArrayExpInterpreter(), getCurrentFrame());
+				Array array = a.getLvalue().accept(interpreter.arrayInterpreter(), getCurrentFrame());
 				
 				Object o = null;
 				try {
-					o = array.get(a.getIndex().accept(interpreter.getArithmeticExpInterpreter(), getCurrentFrame()).intValue());
+					o = array.get(a.getIndex().accept(interpreter.arithmeticInterpreter(), getCurrentFrame()).intValue());
 				} catch(ArrayIndexOutOfBoundsException e) {
 					throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
 				}

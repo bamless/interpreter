@@ -19,7 +19,7 @@ public class Token {
 	}
 
 	public String getValue() {
-		return lexeme;
+		return lexeme != null ? lexeme : type;
 	}
 
 	public String getType() {

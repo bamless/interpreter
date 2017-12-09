@@ -10,10 +10,10 @@ import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.interpret.memenvironment.Array;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
 
-public class ArrayExpInterpreter extends VisitorAdapter<Array, Frame> {
+public class ArrayInterpreter extends VisitorAdapter<Array, Frame> {
 	private Interpreter interpreter;
 	
-	public ArrayExpInterpreter(Interpreter interpreter) {
+	public ArrayInterpreter(Interpreter interpreter) {
 		this.interpreter = interpreter;
 	}
 	
@@ -37,7 +37,7 @@ public class ArrayExpInterpreter extends VisitorAdapter<Array, Frame> {
 	@Override
 	public Array visit(FuncCallExpression f, Frame frame) {
 		interpreter.callFunction(f);
-		return (Array) frame.getReturnRegister();
+		return frame.<Array>getReturnRegister();
 	}
 
 }

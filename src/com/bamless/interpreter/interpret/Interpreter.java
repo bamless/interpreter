@@ -26,10 +26,10 @@ import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.type.ArrayType;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.visitor.VoidVisitorAdapter;
-import com.bamless.interpreter.interpret.expinterpreter.ArithmeticExpInterpreter;
-import com.bamless.interpreter.interpret.expinterpreter.ArrayExpInterpreter;
-import com.bamless.interpreter.interpret.expinterpreter.BooleanExpInterpreter;
-import com.bamless.interpreter.interpret.expinterpreter.StringExpInterpreter;
+import com.bamless.interpreter.interpret.expinterpreter.ArithmeticInterpreter;
+import com.bamless.interpreter.interpret.expinterpreter.ArrayInterpreter;
+import com.bamless.interpreter.interpret.expinterpreter.BooleanInterpreter;
+import com.bamless.interpreter.interpret.expinterpreter.StringInterpreter;
 import com.bamless.interpreter.interpret.memenvironment.Array;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
@@ -44,24 +44,23 @@ import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
 public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	public static final String MAIN_FUNC = "main";
 	
-	private ArithmeticExpInterpreter ai;
-	private BooleanExpInterpreter bi;
-	private StringExpInterpreter si;
-	private ArrayExpInterpreter arri;
+	private ArithmeticInterpreter ai;
+	private BooleanInterpreter bi;
+	private StringInterpreter si;
+	private ArrayInterpreter arri;
 	
 	private Map<String, FuncDecl> functions;
 	
 	private MemoryEnvironment memEnv;
-	
 	private boolean returning;
 	
 	public Interpreter() {
 		this.memEnv = new MemoryEnvironment(this);
 		
-		this.ai = new ArithmeticExpInterpreter(this);
-		this.bi = new BooleanExpInterpreter(this);
-		this.si = new StringExpInterpreter(this);
-		this.arri = new ArrayExpInterpreter(this);
+		this.ai = new ArithmeticInterpreter(this);
+		this.bi = new BooleanInterpreter(this);
+		this.si = new StringInterpreter(this);
+		this.arri = new ArrayInterpreter(this);
 	}
 	
 	@Override
@@ -194,7 +193,6 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 		else if(e.getType().isArray())
 			return e.accept(arri, frame);
 
-		
 		throw new RuntimeError("Fatal error.");
 	}
 	
@@ -250,19 +248,19 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 		returning = false;
 	}
 	
-	public ArithmeticExpInterpreter getArithmeticExpInterpreter() {
+	public ArithmeticInterpreter arithmeticInterpreter() {
 		return ai;
 	}
 
-	public BooleanExpInterpreter getBoolExpInterpreter() {
+	public BooleanInterpreter boolInterpreter() {
 		return bi;
 	}
 
-	public StringExpInterpreter getStringExpInterpreter() {
+	public StringInterpreter stringInterpreter() {
 		return si;
 	}
 
-	public ArrayExpInterpreter getArrayExpInterpreter() {
+	public ArrayInterpreter arrayInterpreter() {
 		return arri;
 	}
 

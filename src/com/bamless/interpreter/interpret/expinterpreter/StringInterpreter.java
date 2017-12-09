@@ -16,10 +16,10 @@ import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.interpret.RuntimeError;
 import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
 
-public class StringExpInterpreter extends VisitorAdapter<String, Frame> {
+public class StringInterpreter extends VisitorAdapter<String, Frame> {
 	private Interpreter interpreter;
 	
-	public StringExpInterpreter(Interpreter interpreter) {
+	public StringInterpreter(Interpreter interpreter) {
 		this.interpreter = interpreter;
 	}
 	
@@ -32,27 +32,27 @@ public class StringExpInterpreter extends VisitorAdapter<String, Frame> {
 		Type rightType = e.getRight().getType();
 		
 		if(leftType == Type.FLOAT || leftType == Type.INT) {
-			BigDecimal res = e.getLeft().accept(interpreter.getArithmeticExpInterpreter(), frame);
+			BigDecimal res = e.getLeft().accept(interpreter.arithmeticInterpreter(), frame);
 			
 			String l = leftType == Type.FLOAT ? res.floatValue() + "" : res.intValue() + "";
 			String r = e.getRight().accept(this, frame);
 			
 			return l + r;
 		} else if(rightType == Type.FLOAT || rightType == Type.INT) {
-			BigDecimal res = e.getRight().accept(interpreter.getArithmeticExpInterpreter(), frame);
+			BigDecimal res = e.getRight().accept(interpreter.arithmeticInterpreter(), frame);
 			
 			String l = e.getLeft().accept(this, frame);
 			String r = rightType == Type.FLOAT ? res.floatValue() + "" : res.intValue() + "";
 			
 			return l + r;
 		} else if(leftType == Type.BOOLEAN) {
-			String l = e.getLeft().accept(interpreter.getBoolExpInterpreter(), frame).toString();
+			String l = e.getLeft().accept(interpreter.boolInterpreter(), frame).toString();
 			String r = e.getRight().accept(this, frame);
 			
 			return l + r;
 		} else if(rightType == Type.BOOLEAN) {
 			String l = e.getLeft().accept(this, frame);
-			String r = e.getRight().accept(interpreter.getBoolExpInterpreter(), frame).toString();
+			String r = e.getRight().accept(interpreter.boolInterpreter(), frame).toString();
 			
 			return l + r;
 		}
@@ -85,7 +85,7 @@ public class StringExpInterpreter extends VisitorAdapter<String, Frame> {
 	@Override
 	public String visit(FuncCallExpression f, Frame frame) {
 		interpreter.callFunction(f);
-		return (String) frame.getReturnRegister();
+		return frame.<String>getReturnRegister();
 	}
 
 	
