@@ -50,7 +50,7 @@ public class ArrayType extends Type {
 	}
 
 	@Override
-	public boolean canAssign(Type other) {
+	public boolean isCompatible(Type other) {
 		return this == other;
 	}
 	

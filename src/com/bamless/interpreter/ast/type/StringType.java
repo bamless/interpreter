@@ -45,7 +45,7 @@ public class StringType extends Type {
 	}
 
 	@Override
-	public boolean canAssign(Type other) {
+	public boolean isCompatible(Type other) {
 		return other == Type.STRING;
 	}
 	

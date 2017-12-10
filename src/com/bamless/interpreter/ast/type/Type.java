@@ -54,7 +54,7 @@ public abstract class Type {
 	public abstract Type relationalOp(Type other);
 	public abstract Type equalityOp(Type other);
 	
-	public abstract boolean canAssign(Type other);
+	public abstract boolean isCompatible(Type other);
 	
 	public abstract boolean isArray();
 	

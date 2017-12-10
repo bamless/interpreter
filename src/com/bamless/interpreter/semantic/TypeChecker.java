@@ -172,7 +172,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	@Override
 	public Type visit(ReturnStatement r, FuncDecl currentFunc) {
 		Type exp = r.getExpression() == null ? Type.VOID : r.getExpression().accept(this, currentFunc);
-		boolean ret = currentFunc.getType().canAssign(exp);
+		boolean ret = currentFunc.getType().isCompatible(exp);
 
 		if (!ret) {
 			typeError(r.getPosition(), "Return type mismatch, cannot convert from %s to %s",
@@ -316,7 +316,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		Type lval = e.getLvalue().accept(this, currentFunc);
 		Type expr = e.getExpression().accept(this, currentFunc);
 
-		if (!lval.canAssign(expr)) {
+		if (!lval.isCompatible(expr)) {
 			typeError(e.getPosition(), "type mismatch, cannot assign %s to %s", expr.toString().toLowerCase(),
 					lval.toString().toLowerCase());
 		}
@@ -343,7 +343,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 			Type callType = callArgs[i].getType();
 			Type declType = declArgs[i].getType();
 
-			if (!callType.canAssign(declType)) {
+			if (!callType.isCompatible(declType)) {
 				typeError(callArgs[i].getPosition(),
 						"type mismatch, cannot convert %s to %s on %s argument of function call `%s`",
 						callType.toString().toLowerCase(), declType.toString().toLowerCase(), cardinal(i + 1),
@@ -369,7 +369,7 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	@Override
 	public Type visit(CastExpression c, FuncDecl arg) {
 		Type exprType = c.getExpression().accept(this, arg);
-		if (!c.getType().canAssign(exprType)) {
+		if (!c.getType().isCompatible(exprType)) {
 			typeError(c.getPosition(), "Cannot cast from %s to %s", exprType.toString().toLowerCase(),
 					c.getType().toString().toLowerCase());
 		}
