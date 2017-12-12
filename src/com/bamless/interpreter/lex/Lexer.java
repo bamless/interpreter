@@ -131,8 +131,7 @@ public class Lexer {
 			String line;
 			int lineNo = 0;
 			while((line = r.readLine()) != null) {
-				lineNo++;
-				tokenize(lineNo, line);
+				tokenize(++lineNo, line);
 			}
 		}
 	}
@@ -164,9 +163,8 @@ public class Lexer {
 				continue;
 			}
 			
-			String type = null;
-			String lexeme = null;
 			int length = 0;
+			String type = null, lexeme = null;
 			
 			for(Matcher m : matchersType.keySet()) {
 				if(m.find(start)) {
@@ -198,7 +196,6 @@ public class Lexer {
 
 	private LinkedHashMap<Matcher, String> initMatchers(String src) {
 		String[] tokenTypes = typesRegx.keySet().toArray(new String[typesRegx.keySet().size()]);
-		
 		LinkedHashMap<Matcher, String> matchersType = new LinkedHashMap<>();
 		for(int i = 0; i < tokenTypes.length; i++) {
 			matchersType.put(typesRegx.get(tokenTypes[i]).matcher(src), tokenTypes[i]);
