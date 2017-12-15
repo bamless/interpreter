@@ -1,0 +1,6 @@
+void main() {
+	int x = 20
+	int z = 50
+	boolean b = x < z
+	print b
+}
