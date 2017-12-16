@@ -1,6 +1,7 @@
 package com.bamless.interpreter.codegen;
 
 import static com.bamless.interpreter.codegen.Opcode.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,7 @@ import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.visitor.Visitable;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
-public class BytecodeGenerator implements VoidVisitor<Void> {
+public class BytecodeGenerator implements VoidVisitor<Boolean> {
 	private List<Integer> bytecode;
 	private int count;
 	
@@ -49,7 +50,7 @@ public class BytecodeGenerator implements VoidVisitor<Void> {
 	
 	private Map<String, Integer> localVar;
 	private Map<String, Integer> funcFrameSize;
-
+	
 	public BytecodeGenerator() {
 		bytecode = new ArrayList<>();
 		localVar = new HashMap<>();
@@ -57,89 +58,121 @@ public class BytecodeGenerator implements VoidVisitor<Void> {
 	}
 
 	@Override
-	public void visit(Visitable v, Void arg) {
+	public void visit(Visitable v, Boolean statement) {
 	}
 
 	@Override
-	public void visit(Program p, Void arg) {
+	public void visit(Program p, Boolean statement) {
 		gen(CALL, 5, 0, 0);
 		gen(HALT);
 		
 		for (String f : p.getFunctions().keySet())
-			p.getFunctions().get(f).accept(this, arg);
+			p.getFunctions().get(f).accept(this, statement);
 		
 		bytecode.set(3, funcFrameSize.get("main"));
 	}
 
 	@Override
-	public void visit(IfStatement i, Void arg) {
+	public void visit(IfStatement i, Boolean statement) {
+		i.getCondition().accept(this, statement);
+		gen(JMPF, 0);
+		int elseJmpAddr = count - 1;
+		
+		i.getThenStmt().accept(this, true);
+		
+		int endJmpAddr = 0;
+		if(i.getElseStmt() != null) {
+			gen(JMP, 0);
+			endJmpAddr = count - 1;
+		}
+		
+		bytecode.set(elseJmpAddr, count);
+		
+		if(i.getElseStmt() != null) {
+			i.getElseStmt().accept(this, true);
+			bytecode.set(endJmpAddr, count);
+		}
+	}
+
+	@Override
+	public void visit(WhileStatement w, Boolean statement) {
+		int whileStart = count;
+		w.getCondition().accept(this, false);
+		
+		// gen jump to while end with dummy address and save 
+		// the address position
+		gen(JMPF, 0);
+		int whileEndAddr = count - 1;
+		
+		w.getBody().accept(this, true);
+		
+		gen(JMP, whileStart);
+		
+		// now we know the address of the while end, we can
+		// replace the dummy address
+		bytecode.set(whileEndAddr, count);
+	}
+
+	@Override
+	public void visit(ForStatement f, Boolean statement) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void visit(WhileStatement w, Void arg) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void visit(ForStatement f, Void arg) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void visit(BlockStatement b, Void arg) {
+	public void visit(BlockStatement b, Boolean statement) {
 		int nextLocSave = nextLocal;
-		for(Statement s : b.getStmts())
-			s.accept(this, arg);
+		
+		for(Statement s : b.getStmts()) {
+			s.accept(this, true);
+		}
+		
 		maxLocal = Math.max(maxLocal, nextLocal);
 		nextLocal = nextLocSave;
 	}
 
 	@Override
-	public void visit(PrintStatement p, Void arg) {
-		p.getExpression().accept(this, arg);
+	public void visit(PrintStatement p, Boolean statement) {
+		p.getExpression().accept(this, false);
 		gen(PRINT);
 	}
 
 	@Override
-	public void visit(ReturnStatement r, Void arg) {
+	public void visit(ReturnStatement r, Boolean statement) {
 		if(r.getExpression() != null)
-			r.getExpression().accept(this, arg);
+			r.getExpression().accept(this, false);
 		gen(RET);
 	}
 
 	@Override
-	public void visit(BreakStatement b, Void arg) {
+	public void visit(BreakStatement b, Boolean statement) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void visit(ContinueStatement c, Void arg) {
+	public void visit(ContinueStatement c, Boolean statement) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void visit(VarDecl v, Void arg) {
+	public void visit(VarDecl v, Boolean statement) {
 		localVar.put(v.getId().getVal(), nextLocal++);
 		if(v.getInitializer() != null)
-			v.getInitializer().accept(this, arg);
+			v.getInitializer().accept(this, true);
 	}
 
 	@Override
-	public void visit(ArrayDecl a, Void arg) {
+	public void visit(ArrayDecl a, Boolean statement) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void visit(ArithmeticBinExpression e, Void arg) {
-		e.getLeft().accept(this, arg);
-		e.getRight().accept(this, arg);
+	public void visit(ArithmeticBinExpression e, Boolean statement) {
+		e.getLeft().accept(this, false);
+		e.getRight().accept(this, false);
 		switch(e.getOperation()) {
 		case DIV:
 			gen(DIV_I32);
@@ -160,9 +193,9 @@ public class BytecodeGenerator implements VoidVisitor<Void> {
 	}
 
 	@Override
-	public void visit(LogicalExpression l, Void arg) {
-		l.getLeft().accept(this, arg);
-		l.getRight().accept(this, arg);
+	public void visit(LogicalExpression l, Boolean statement) {
+		l.getLeft().accept(this, false);
+		l.getRight().accept(this, false);
 		switch(l.getOperation()) {
 		case AND:
 			break;
@@ -172,9 +205,9 @@ public class BytecodeGenerator implements VoidVisitor<Void> {
 	}
 
 	@Override
-	public void visit(RelationalExpression r, Void arg) {
-		r.getLeft().accept(this, arg);
-		r.getRight().accept(this, arg);
+	public void visit(RelationalExpression r, Boolean statement) {
+		r.getLeft().accept(this, false);
+		r.getRight().accept(this, false);
 		switch(r.getOperation()) {
 		case GE:
 			gen(GE_I32);
@@ -192,9 +225,9 @@ public class BytecodeGenerator implements VoidVisitor<Void> {
 	}
 
 	@Override
-	public void visit(EqualityExpression e, Void arg) {
-		e.getLeft().accept(this, arg);
-		e.getRight().accept(this, arg);
+	public void visit(EqualityExpression e, Boolean statement) {
+		e.getLeft().accept(this, false);
+		e.getRight().accept(this, false);
 		switch(e.getOperation()) {
 		case EQ:
 			gen(EQ_I32);
@@ -206,81 +239,107 @@ public class BytecodeGenerator implements VoidVisitor<Void> {
 	}
 
 	@Override
-	public void visit(LogicalNotExpression n, Void arg) {
+	public void visit(LogicalNotExpression n, Boolean statement) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void visit(PostIncrementOperation p, Void arg) {
-		// TODO Auto-generated method stub
-
+	public void visit(PostIncrementOperation p, Boolean statement) {
+		String var = ((VarLiteral) p.getExpression()).getId().getVal();
+		gen(LOAD, localVar.get(var));
+		if(!statement) gen(DUP);
+		gen(CONST_I32, 1);
+		
+		switch(p.getOperator()) {
+		case DECR:
+			gen(SUB_I32);
+			break;
+		case INCR:
+			gen(ADD_I32);
+			break;
+		}
+		
+		gen(STORE, localVar.get(var));
 	}
 
 	@Override
-	public void visit(PreIncrementOperation p, Void arg) {
-		// TODO Auto-generated method stub
-
+	public void visit(PreIncrementOperation p, Boolean statement) {
+		String var = ((VarLiteral) p.getExpression()).getId().getVal();
+		gen(LOAD, localVar.get(var));
+		gen(CONST_I32, 1);
+		
+		switch(p.getOperator()) {
+		case DECR:
+			gen(SUB_I32);
+			break;
+		case INCR:
+			gen(ADD_I32);
+			break;
+		}
+		if(!statement) gen(DUP);
+		gen(STORE, localVar.get(var));
 	}
 
 	@Override
-	public void visit(AssignExpression e, Void arg) {
-		e.getExpression().accept(this, arg);
+	public void visit(AssignExpression e, Boolean statement) {
+		e.getExpression().accept(this, false);
+		if(!statement) gen(DUP);
 		gen(STORE, localVar.get(((VarLiteral) e.getLvalue()).getId().getVal()));
 	}
 
 	@Override
-	public void visit(CastExpression c, Void arg) {
+	public void visit(CastExpression c, Boolean statement) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void visit(LengthFuncExpression l, Void arg) {
+	public void visit(LengthFuncExpression l, Boolean statement) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void visit(FloatLiteral f, Void arg) {
+	public void visit(FloatLiteral f, Boolean statement) {
 		
 	}
 
 	@Override
-	public void visit(IntegerLiteral i, Void arg) {
+	public void visit(IntegerLiteral i, Boolean statement) {
 		gen(CONST_I32, i.getValue());
 	}
 
 	@Override
-	public void visit(BooleanLiteral b, Void arg) {
+	public void visit(BooleanLiteral b, Boolean statement) {
 		gen(CONST_I32, b.getValue() ? 1 : 0);
 	}
 
 	@Override
-	public void visit(StringLiteral s, Void arg) {
+	public void visit(StringLiteral s, Boolean statement) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void visit(VarLiteral v, Void arg) {
+	public void visit(VarLiteral v, Boolean statement) {
 		gen(LOAD, localVar.get(v.getId().getVal()));
 	}
 
 	@Override
-	public void visit(ArrayAccess a, Void arg) {
+	public void visit(ArrayAccess a, Boolean statement) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void visit(FuncCallExpression f, Void arg) {
+	public void visit(FuncCallExpression f, Boolean statement) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void visit(FuncDecl d, Void arg) {
+	public void visit(FuncDecl d, Boolean statement) {
 		localVar.clear();
 		
 		nextLocal = 0;
@@ -292,7 +351,7 @@ public class BytecodeGenerator implements VoidVisitor<Void> {
 			gen(STORE,  localVar.get(a.getIdentifier().getVal()));
 		}
 		
-		d.getBody().accept(this, arg);
+		d.getBody().accept(this, statement);
 		funcFrameSize.put(d.getId().getVal(), maxLocal);
 		
 		gen(RET);

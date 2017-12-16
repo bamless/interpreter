@@ -40,7 +40,7 @@ public class Main {
 		
 		int[] bytecode = b.getBytecode();
 		for(int i = 0; i < bytecode.length; i++) {
-			System.out.println(bytecode[i]);
+			System.out.println("(" + i + ")" + bytecode[i]);
 		}
 		
 		String currentUsersHomeDir = System.getProperty("user.home");

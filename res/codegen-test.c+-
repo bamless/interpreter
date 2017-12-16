@@ -1,6 +1,10 @@
 void main() {
-	int x = 20
-	int z = 50
-	boolean b = x < z
-	print b
+	int x = 30
+	int z = 40
+	int y = 5
+	
+	while(x++ < z) {
+		if(x % 2 == 0)
+			print x
+	}
 }
