@@ -3,6 +3,10 @@ void main() {
 	int n = 35
 	print fib(n)
 	print fibdp(n)
+	
+	int fac = 12
+	print factr(fac)
+	print fact(fac)
 }
 
 int fib(int n) {
@@ -10,6 +14,19 @@ int fib(int n) {
 		return 1
 		
 	return fib(n - 1) + fib(n - 2)
+}
+
+int factr(int n) {
+	if(n == 0) return 1
+	return n * factr(n - 1)
+}
+
+int fact(int n) {
+	int res = n
+	int i
+	for(i = n - 1; i > 1; i--)
+		res *= i
+	return res
 }
 
 int fibdp(int n) {
