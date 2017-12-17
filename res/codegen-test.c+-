@@ -1,5 +1,5 @@
 void main() {
-	print 4.66666666666666
+	print 4.67
 	int n = 35
 	print fib(n)
 	print fibdp(n)
