@@ -115,8 +115,26 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 
 	@Override
 	public void visit(ForStatement f, Boolean statement) {
-		// TODO Auto-generated method stub
-
+		if(f.getInit() != null)
+			f.getInit().accept(this, true);
+		
+		int forStart = count;
+		
+		if(f.getCond() != null) {
+			f.getCond().accept(this, false);
+			gen(JMPF, 0);
+		}
+		int forEndAddr = count - 1;
+		
+		f.getBody().accept(this, true);
+		
+		if(f.getAct() != null)
+			f.getAct().accept(this, true);
+		
+		gen(JMP, forStart);
+		
+		if(f.getCond() != null)
+			bytecode.set(forEndAddr, count);
 	}
 
 	@Override
