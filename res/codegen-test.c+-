@@ -22,11 +22,10 @@ int factr(int n) {
 }
 
 int fact(int n) {
-	int res = n
 	int i
 	for(i = n - 1; i > 1; i--)
-		res *= i
-	return res
+		n *= i
+	return n
 }
 
 int fibdp(int n) {
