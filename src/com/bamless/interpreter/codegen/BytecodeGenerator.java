@@ -129,8 +129,26 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 
 	@Override
 	public void visit(ForStatement f, Boolean statement) {
-		// TODO Auto-generated method stub
-
+		if(f.getInit() != null)
+			f.getInit().accept(this, true);
+		
+		int forStart = count;
+		
+		if(f.getCond() != null) {
+			f.getCond().accept(this, false);
+			gen(JMPF, 0);
+		}
+		int forEndAddr = count - 1;
+		
+		f.getBody().accept(this, true);
+		
+		if(f.getAct() != null)
+			f.getAct().accept(this, true);
+		
+		gen(JMP, forStart);
+		
+		if(f.getCond() != null)
+			bytecode.set(forEndAddr, count);
 	}
 
 	@Override
@@ -347,8 +365,13 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 			e.accept(this, false);
 
 		gen(CALL);
-		unresolvedFuncCalls.put(count, f.getFuncName().getVal());
-		gen(0, f.getArgs().length, funcFrameSize.get(f.getFuncName().getVal()));
+		
+		Integer funcAddress = 0;
+		if((funcAddress = funcAddr.get(f.getFuncName().getVal())) == null)
+			unresolvedFuncCalls.put(count, f.getFuncName().getVal());
+			
+		gen(funcAddress == null ? 0 : funcAddress, f.getArgs().length, 
+				funcFrameSize.get(f.getFuncName().getVal()));
 	}
 
 	@Override

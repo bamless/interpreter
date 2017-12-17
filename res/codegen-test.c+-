@@ -1,7 +1,7 @@
 void main() {
-	int n = 30
-	print fibdp(n)
+	int n = 35
 	print fib(n)
+	print fibdp(n)
 }
 
 int fib(int n) {
