@@ -16,6 +16,7 @@ import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.CastExpression;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
+import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
@@ -42,19 +43,25 @@ import com.bamless.interpreter.visitor.Visitable;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class BytecodeGenerator implements VoidVisitor<Boolean> {
+	private static final String MAIN_FUNC = "main";
+	
 	private List<Integer> bytecode;
 	private int count;
 	
-	private int nextLocal;
-	private int maxLocal;
-	
-	private Map<String, Integer> localVar;
 	private Map<String, Integer> funcFrameSize;
 	
-	public BytecodeGenerator() {
-		bytecode = new ArrayList<>();
-		localVar = new HashMap<>();
-		funcFrameSize = new HashMap<>();
+	private int nextLocal;
+	private Map<String, Integer> localVar;
+	
+	private Map<Integer, String> unresolvedFuncCalls;
+	private Map<String, Integer> funcAddr;
+	
+	public BytecodeGenerator(Map<String, Integer> funcFrameSize) {
+		this.bytecode = new ArrayList<>();
+		this.unresolvedFuncCalls = new HashMap<>();
+		this.funcAddr = new HashMap<>();
+		this.localVar = new HashMap<>();
+		this.funcFrameSize = funcFrameSize;
 	}
 
 	@Override
@@ -63,13 +70,20 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 
 	@Override
 	public void visit(Program p, Boolean statement) {
-		gen(CALL, 5, 0, 0);
+		gen(CALL, 5, 0, funcFrameSize.get(MAIN_FUNC));
 		gen(HALT);
 		
-		for (String f : p.getFunctions().keySet())
-			p.getFunctions().get(f).accept(this, statement);
+		p.getFunctions().get(MAIN_FUNC).accept(this, statement);
 		
-		bytecode.set(3, funcFrameSize.get("main"));
+		for(String f : p.getFunctions().keySet()) {
+			if(f.equals(MAIN_FUNC)) continue;
+			p.getFunctions().get(f).accept(this, statement);
+		}
+		
+		for(int a : unresolvedFuncCalls.keySet()) {
+			String funcName = unresolvedFuncCalls.get(a);
+			bytecode.set(a, funcAddr.get(funcName));
+		}
 	}
 
 	@Override
@@ -121,14 +135,9 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 
 	@Override
 	public void visit(BlockStatement b, Boolean statement) {
-		int nextLocSave = nextLocal;
-		
 		for(Statement s : b.getStmts()) {
 			s.accept(this, true);
 		}
-		
-		maxLocal = Math.max(maxLocal, nextLocal);
-		nextLocal = nextLocSave;
 	}
 
 	@Override
@@ -334,16 +343,20 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 
 	@Override
 	public void visit(FuncCallExpression f, Boolean statement) {
-		// TODO Auto-generated method stub
+		for(Expression e : f.getArgs())
+			e.accept(this, false);
 
+		gen(CALL);
+		unresolvedFuncCalls.put(count, f.getFuncName().getVal());
+		gen(0, f.getArgs().length, funcFrameSize.get(f.getFuncName().getVal()));
 	}
 
 	@Override
 	public void visit(FuncDecl d, Boolean statement) {
 		localVar.clear();
-		
 		nextLocal = 0;
-		maxLocal = 0;
+		
+		funcAddr.put(d.getId().getVal(), count);
 		
 		for(FormalArg a : d.getFormalArgs()) {
 			localVar.put(a.getIdentifier().getVal(), nextLocal++);
@@ -352,9 +365,8 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 		}
 		
 		d.getBody().accept(this, statement);
-		funcFrameSize.put(d.getId().getVal(), maxLocal);
 		
-		gen(RET);
+		if(bytecode.get(count - 1) != RET) gen(RET);
 	}
 	
 	public int[] getBytecode() {

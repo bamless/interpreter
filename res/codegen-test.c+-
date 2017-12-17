@@ -1,10 +1,27 @@
 void main() {
-	int x = 30
-	int z = 40
-	int y = 5
+	int n = 30
+	print fibdp(n)
+	print fib(n)
+}
+
+int fib(int n) {
+	if(n < 3)
+		return 1
+		
+	return fib(n - 1) + fib(n - 2)
+}
+
+int fibdp(int n) {
+	int f1 = 1
+	int f2 = 1
+	int f3 = 1
 	
-	while(x++ < z) {
-		if(x % 2 == 0)
-			print x
-	}
+	int i
+	for(i = 2; i < n; i++) {
+		f3 = f1 + f2
+		f1 = f2
+		f2 = f3
+	} 
+	
+	return f3
 }

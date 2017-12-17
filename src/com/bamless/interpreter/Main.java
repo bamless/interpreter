@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import com.bamless.interpreter.ast.ASTNode;
 import com.bamless.interpreter.codegen.BytecodeGenerator;
+import com.bamless.interpreter.codegen.FrameSizeCalculator;
 import com.bamless.interpreter.parser.ASTParser;
 import com.bamless.interpreter.semantic.SemanticAnalyzer;
 import com.bamless.interpreter.visitor.PrinterVisitor;
@@ -33,7 +34,8 @@ public class Main {
 		
 		System.out.println("Generating bytecode...");
 		
-		BytecodeGenerator b = new BytecodeGenerator();
+		FrameSizeCalculator fc = new FrameSizeCalculator();
+		BytecodeGenerator b = new BytecodeGenerator(root.accept(fc, null));
 		root.accept(b, null);
 		
 		System.out.println("Done, printing bytecode:");
