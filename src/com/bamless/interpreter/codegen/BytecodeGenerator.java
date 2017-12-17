@@ -39,6 +39,7 @@ import com.bamless.interpreter.ast.statement.ReturnStatement;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
+import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.visitor.Visitable;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
@@ -161,7 +162,11 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 	@Override
 	public void visit(PrintStatement p, Boolean statement) {
 		p.getExpression().accept(this, false);
-		gen(PRINT);
+		
+		if(p.getExpression().getType() == Type.INT)
+			gen(PRINT);
+		else
+			gen(PRINT_FP);
 	}
 
 	@Override
@@ -329,7 +334,7 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 
 	@Override
 	public void visit(FloatLiteral f, Boolean statement) {
-		
+		gen(CONST_F32, Float.floatToRawIntBits(f.getValue()));
 	}
 
 	@Override

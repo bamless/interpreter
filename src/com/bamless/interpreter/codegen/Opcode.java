@@ -18,15 +18,15 @@ public class Opcode {
 	public static final int JMPF = 14;       // branch if false
 	public static final int CONST_I32 = 15;  // push constant integer
 	public static final int LOAD = 16;       // load from local
-	public static final int GLOAD = 17;      // load from global
-	public static final int STORE = 18;      // store in local
-	public static final int GSTORE = 19;     // store in global memory
-	public static final int PRINT = 20;      // print value on top of the stack
-	public static final int POP = 21;        // throw away top of the stack
-	public static final int CALL = 22;       // call procedure
-	public static final int GETARG = 23;
-	public static final int RET = 24;   // return from procedure
-	public static final int DUP = 25;
+	public static final int STORE = 17;      // store in local
+	public static final int PRINT = 18;      // print value on top of the stack
+	public static final int POP = 19;        // throw away top of the stack
+	public static final int CALL = 20;       // call procedure
+	public static final int GETARG = 21;
+	public static final int RET = 22;   // return from procedure
+	public static final int DUP = 23;
+	public static final int CONST_F32 = 24;
+	public static final int PRINT_FP = 25;
 	
 	private Opcode() {
 	}
