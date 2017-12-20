@@ -19,14 +19,16 @@ public class Opcode {
 	public static final int CONST_I32 = 15;  // push constant integer
 	public static final int LOAD = 16;       // load from local
 	public static final int STORE = 17;      // store in local
-	public static final int PRINT = 18;      // print value on top of the stack
-	public static final int POP = 19;        // throw away top of the stack
-	public static final int CALL = 20;       // call procedure
-	public static final int GETARG = 21;
-	public static final int RET = 22;   // return from procedure
-	public static final int DUP = 23;
-	public static final int CONST_F32 = 24;
-	public static final int PRINT_FP = 25;
+	public static final int PUSHARG = 18;
+	public static final int PRINT = 19;      // print value on top of the stack
+	public static final int POP = 20;        // throw away top of the stack
+	public static final int CALL = 21;       // call procedure
+	public static final int GETARG = 22;
+	public static final int RET = 23;   // return from procedure
+	public static final int RETVOID = 24;
+	public static final int DUP = 25;
+	public static final int CONST_F32 = 26;
+	public static final int PRINT_FP = 27;
 	
 	private Opcode() {
 	}

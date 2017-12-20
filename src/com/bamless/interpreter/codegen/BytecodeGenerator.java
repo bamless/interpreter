@@ -49,20 +49,17 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 	private List<Integer> bytecode;
 	private int count;
 	
-	private Map<String, Integer> funcFrameSize;
-	
 	private int nextLocal;
 	private Map<String, Integer> localVar;
 	
 	private Map<Integer, String> unresolvedFuncCalls;
 	private Map<String, Integer> funcAddr;
 	
-	public BytecodeGenerator(Map<String, Integer> funcFrameSize) {
+	public BytecodeGenerator() {
 		this.bytecode = new ArrayList<>();
 		this.unresolvedFuncCalls = new HashMap<>();
 		this.funcAddr = new HashMap<>();
 		this.localVar = new HashMap<>();
-		this.funcFrameSize = funcFrameSize;
 	}
 
 	@Override
@@ -71,7 +68,7 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 
 	@Override
 	public void visit(Program p, Boolean statement) {
-		gen(CALL, 5, 0, funcFrameSize.get(MAIN_FUNC));
+		gen(CALL, 4, 0);
 		gen(HALT);
 		
 		p.getFunctions().get(MAIN_FUNC).accept(this, statement);
@@ -171,9 +168,11 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 
 	@Override
 	public void visit(ReturnStatement r, Boolean statement) {
-		if(r.getExpression() != null)
+		if(r.getExpression() != null) {
 			r.getExpression().accept(this, false);
-		gen(RET);
+			gen(RET);
+		} else
+			gen(RETVOID);
 	}
 
 	@Override
@@ -366,8 +365,10 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 
 	@Override
 	public void visit(FuncCallExpression f, Boolean statement) {
-		for(Expression e : f.getArgs())
+		for(Expression e : f.getArgs()) {
 			e.accept(this, false);
+			gen(PUSHARG);
+		}
 
 		gen(CALL);
 		
@@ -375,8 +376,7 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 		if((funcAddress = funcAddr.get(f.getFuncName().getVal())) == null)
 			unresolvedFuncCalls.put(count, f.getFuncName().getVal());
 			
-		gen(funcAddress == null ? 0 : funcAddress, f.getArgs().length, 
-				funcFrameSize.get(f.getFuncName().getVal()));
+		gen(funcAddress == null ? 0 : funcAddress, f.getArgs().length);
 	}
 
 	@Override
@@ -388,13 +388,11 @@ public class BytecodeGenerator implements VoidVisitor<Boolean> {
 		
 		for(FormalArg a : d.getFormalArgs()) {
 			localVar.put(a.getIdentifier().getVal(), nextLocal++);
-			gen(GETARG, localVar.get(a.getIdentifier().getVal()));
-			gen(STORE,  localVar.get(a.getIdentifier().getVal()));
 		}
 		
 		d.getBody().accept(this, statement);
 		
-		if(bytecode.get(count - 1) != RET) gen(RET);
+		if(d.getType() == Type.VOID) gen(RETVOID);
 	}
 	
 	public int[] getBytecode() {
