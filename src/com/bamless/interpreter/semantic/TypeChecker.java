@@ -17,7 +17,6 @@ import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
-import com.bamless.interpreter.ast.expression.LengthFuncExpression;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
@@ -38,6 +37,7 @@ import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.type.ArrayType;
 import com.bamless.interpreter.ast.type.Type;
+import com.bamless.interpreter.natives.Native;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.Visitable;
 
@@ -50,9 +50,11 @@ import com.bamless.interpreter.visitor.Visitable;
 public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	private SymbolTable<Type> st;
 	private Map<String, FuncDecl> funcs;
+	private Map<String, Native<?>> natives;
 
-	public TypeChecker() {
+	public TypeChecker(Map<String, Native<?>> natives) {
 		this.st = new SymbolTable<>();
+		this.natives = natives;
 	}
 
 	public Type visit(Program p, FuncDecl currentFunc) {
@@ -335,13 +337,19 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		for (Expression e : f.getArgs()) {
 			e.accept(this, currentFunc);
 		}
-
+		
 		Expression[] callArgs = f.getArgs();
-		FormalArg[] declArgs = funcs.get(f.getFuncName().getVal()).getFormalArgs();
+		Type[] declArgsTypes = f.isNative() ? natives.get(f.getFuncName().getVal()).getArgTypes() :
+				funcs.get(f.getFuncName().getVal()).getFormalArgsTypes();
 
+		if (callArgs.length != declArgsTypes.length) {
+			ErrUtils.semanticError(f.getPosition(), "Function %s requires %d arguments, but instead %d supplied",
+					f.getFuncName(), declArgsTypes.length, callArgs.length);
+		}
+		
 		for (int i = 0; i < callArgs.length; i++) {
 			Type callType = callArgs[i].getType();
-			Type declType = declArgs[i].getType();
+			Type declType = declArgsTypes[i];
 
 			if (!callType.isCompatible(declType)) {
 				typeError(callArgs[i].getPosition(),
@@ -356,14 +364,16 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 			}
 			
 			//types are compatible, apply type coercion if needed
-			if(callType != declType) {
+			if(callType != declType && !callType.isArray()) {
 				Expression e = callArgs[i];
 				callArgs[i] = new CastExpression(declType, e, e.getPosition());
 			}
 		}
 
-		f.setType(funcs.get(f.getFuncName().getVal()).getType());
-		return f.getType();
+		Type retType = f.isNative() ? natives.get(f.getFuncName().getVal()).getType() :
+				funcs.get(f.getFuncName().getVal()).getType();
+		f.setType(retType);
+		return retType;
 	}
 
 	@Override
@@ -375,17 +385,6 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		}
 
 		return c.getType();
-	}
-
-	@Override
-	public Type visit(LengthFuncExpression l, FuncDecl arg) {
-		Type argType = l.getArg().accept(this, arg);
-		if (!(argType == Type.STRING || argType.isArray())) {
-			ErrUtils.semanticError(l.getArg().getPosition(),
-					"len() function expects argument of type string or array, but instead %s found",
-					argType.toString().toLowerCase());
-		}
-		return l.getType();
 	}
 
 	@Override

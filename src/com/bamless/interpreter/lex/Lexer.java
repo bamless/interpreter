@@ -124,8 +124,7 @@ public class Lexer {
 	public void tokenize(InputStream is) throws IOException {
 		if(is == null) throw new IllegalArgumentException("null input stream");
 		
-		pos = -1;
-		tokens.clear();
+		clear();
 		
 		try(BufferedReader r = new BufferedReader(new InputStreamReader(is))){
 			String line;
@@ -137,8 +136,7 @@ public class Lexer {
 	}
 	
 	public void tokenize(String src) {
-		pos = -1;
-		tokens.clear();
+		clear();
 		
 		String[] lines = src.split("\\r?\\n");
 		for(int i = 0; i < lines.length; i++) {
@@ -237,6 +235,11 @@ public class Lexer {
 		for(String key : typesRegx.keySet())
 			sb.append(key + " " + typesRegx.get(key) + "\n");
 		return sb.toString();
+	}
+	
+	public void clear() {
+		pos = -1;
+		tokens.clear();
 	}
 	
 	private void parseLexFile(InputStream lex) {

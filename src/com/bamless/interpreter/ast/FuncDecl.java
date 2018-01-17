@@ -46,6 +46,13 @@ public class FuncDecl extends ASTNode {
 		return args;
 	}
 	
+	public Type[] getFormalArgsTypes() {
+		Type[] t = new Type[args.length];
+		for(int i= 0; i < args.length; i++)
+			t[i] = args[i].getType();
+		return t;
+	}
+	
 	public BlockStatement getBody() {
 		return body;
 	}

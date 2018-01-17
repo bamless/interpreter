@@ -2,6 +2,10 @@ package com.bamless.interpreter.ast.type;
 
 public class VoidType extends Type {
 
+	public VoidType() {
+		super(TypeID.VOID);
+	}
+	
 	@Override
 	public Type plus(Type other) {
 		return null;

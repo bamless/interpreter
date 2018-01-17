@@ -1,6 +1,11 @@
 package com.bamless.interpreter.ast.type;
 
 public class IntType extends Type {
+	
+	public IntType() {
+		super(TypeID.INT);
+	}
+		
 	/**
 	 * Applying an arithmetic operation on an int would result in an int if the other operand is
 	 * also an int, or in a float if the other operand is a float (incompatible otherwise).

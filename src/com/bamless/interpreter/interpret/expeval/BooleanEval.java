@@ -1,4 +1,4 @@
-package com.bamless.interpreter.interpret.expinterpreter;
+package com.bamless.interpreter.interpret.expeval;
 
 import java.math.BigDecimal;
 
@@ -12,23 +12,23 @@ import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.VarLiteral;
-import com.bamless.interpreter.ast.type.Type;
+import com.bamless.interpreter.ast.type.Type.TypeID;
 import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.interpret.RuntimeError;
-import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
+import com.bamless.interpreter.interpret.memenv.MemoryEnvironment.Frame;
 import com.bamless.interpreter.visitor.VisitorAdapter;
 
-public class BooleanInterpreter extends VisitorAdapter<Boolean, Frame> {
+public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 	private Interpreter interpreter;
 	
-	public BooleanInterpreter(Interpreter interpreter) {
+	public BooleanEval(Interpreter interpreter) {
 		this.interpreter = interpreter;
 	}
 
 	@Override
 	public Boolean visit(RelationalExpression r, Frame frame) {
-		BigDecimal left  = r.getLeft().accept(interpreter.arithmeticInterpreter(), frame);
-		BigDecimal right = r.getRight().accept(interpreter.arithmeticInterpreter(), frame);
+		BigDecimal left  = r.getLeft().accept(interpreter.arithmetic(), frame);
+		BigDecimal right = r.getRight().accept(interpreter.arithmetic(), frame);
 		
 		switch(r.getOperation()) {
 		case LT:
@@ -47,9 +47,14 @@ public class BooleanInterpreter extends VisitorAdapter<Boolean, Frame> {
 	@Override
 	public Boolean visit(EqualityExpression e, Frame frame) {
 		Object l = null, r = null;
-		if(e.getLeft().getType() == Type.INT || e.getLeft().getType() == Type.FLOAT) {
-			BigDecimal bl = e.getLeft().accept(interpreter.arithmeticInterpreter(), frame);
-			BigDecimal br = e.getRight().accept(interpreter.arithmeticInterpreter(), frame);
+		
+		TypeID ltype = e.getLeft().getType().getId();
+		
+		switch(ltype) {
+		case INT:
+		case FLOAT:
+			BigDecimal bl = e.getLeft().accept(interpreter.arithmetic(), frame);
+			BigDecimal br = e.getRight().accept(interpreter.arithmetic(), frame);
 			
 			switch(e.getOperation()) {
 			case EQ:
@@ -57,15 +62,18 @@ public class BooleanInterpreter extends VisitorAdapter<Boolean, Frame> {
 			case NEQ:
 				return bl.compareTo(br) != 0;
 			}
-		} else if(e.getLeft().getType() == Type.STRING) {
-			l = e.getLeft().accept(interpreter.stringInterpreter(), frame);
-			r = e.getRight().accept(interpreter.stringInterpreter(), frame);
-		} else if(e.getLeft().getType().isArray()){
-			l = e.getLeft().accept(interpreter.arrayInterpreter(), frame);
-			r = e.getRight().accept(interpreter.arrayInterpreter(), frame);
-		} else {
+		case STRING:
+			l = e.getLeft().accept(interpreter.string(), frame);
+			r = e.getRight().accept(interpreter.string(), frame);
+			break;
+		case ARRAY:
+			l = e.getLeft().accept(interpreter.array(), frame);
+			r = e.getRight().accept(interpreter.array(), frame);
+			break;
+		case BOOLEAN:
 			l = e.getLeft().accept(this, frame);
 			r = e.getRight().accept(this, frame);
+			break;
 		}
 		
 		switch(e.getOperation()) {

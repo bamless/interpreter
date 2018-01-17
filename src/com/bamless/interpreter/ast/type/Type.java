@@ -11,8 +11,10 @@ public abstract class Type {
 	public static final Type VOID = new VoidType();
 	
 	private static final HashMap<Type, ArrayType> arrayFromType = new HashMap<>();
+	private TypeID id;
 	
-	protected Type() {
+	protected Type(TypeID id) {
+		this.id = id;
 	}
 	
 	public static Type valueOf(String type) {
@@ -59,4 +61,12 @@ public abstract class Type {
 	public abstract boolean isArray();
 	
 	public abstract String toString();
+	
+	public TypeID getId() {
+		return id;
+	}
+	
+	public enum TypeID {
+		INT, FLOAT, BOOLEAN, STRING, VOID, ARRAY
+	}
 }

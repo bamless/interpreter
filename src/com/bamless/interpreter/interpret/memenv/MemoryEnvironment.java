@@ -1,4 +1,4 @@
-package com.bamless.interpreter.interpret.memenvironment;
+package com.bamless.interpreter.interpret.memenv;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -78,10 +78,10 @@ public class MemoryEnvironment {
 			
 			@Override
 			public void visit(ArrayAccess a, Object arg) {
-				Array l = a.getLvalue().accept(interpreter.arrayInterpreter(), getCurrentFrame());
+				Array l = a.getLvalue().accept(interpreter.array(), getCurrentFrame());
 				
 				try {
-					l.set(a.getIndex().accept(interpreter.arithmeticInterpreter(), getCurrentFrame()).intValue(), arg);
+					l.set(a.getIndex().accept(interpreter.arithmetic(), getCurrentFrame()).intValue(), arg);
 				} catch(ArrayIndexOutOfBoundsException e) {
 					throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
 				}
@@ -96,11 +96,11 @@ public class MemoryEnvironment {
 			
 			@Override
 			public Object visit(ArrayAccess a, Void arg) {
-				Array array = a.getLvalue().accept(interpreter.arrayInterpreter(), getCurrentFrame());
+				Array array = a.getLvalue().accept(interpreter.array(), getCurrentFrame());
 				
 				Object o = null;
 				try {
-					o = array.get(a.getIndex().accept(interpreter.arithmeticInterpreter(), getCurrentFrame()).intValue());
+					o = array.get(a.getIndex().accept(interpreter.arithmetic(), getCurrentFrame()).intValue());
 				} catch(ArrayIndexOutOfBoundsException e) {
 					throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
 				}

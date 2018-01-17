@@ -10,7 +10,6 @@ PRINTLN         "println"  0
 RETURN          "return"   0
 CONTINUE        "continue" 0
 BREAK           "break"    0
-LEN             "len\\("   0
 
 //type keywords
 INT             "int"      0

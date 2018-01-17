@@ -2,6 +2,10 @@ package com.bamless.interpreter.ast.type;
 
 public class StringType extends Type {
 
+	public StringType() {
+		super(TypeID.STRING);
+	}
+	
 	@Override
 	public Type plus(Type other) {
 		return Type.STRING;

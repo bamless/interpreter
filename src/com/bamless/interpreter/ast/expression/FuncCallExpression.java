@@ -1,16 +1,16 @@
 package com.bamless.interpreter.ast.expression;
 
-import java.util.Collection;
-
 import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
+import java.util.Collection;
 
 public class FuncCallExpression extends Expression {
 	private static final Expression[] VOID_ARGS = new Expression[0];
 	
 	private Identifier funcName;
 	private Expression[] args;
+	private boolean isNative;
 	
 	public FuncCallExpression(Identifier funcName, Collection<Expression> args) {
 		super(funcName.getPosition());
@@ -21,7 +21,6 @@ public class FuncCallExpression extends Expression {
 	public FuncCallExpression(Identifier funcName) {
 		this(funcName, null);
 	}
-
 
 	@Override
 	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
@@ -41,6 +40,14 @@ public class FuncCallExpression extends Expression {
 		return args;
 	}
 
+	public boolean isNative() {
+		return isNative;
+	}
+	
+	public void setNative(boolean isNative) {
+		this.isNative = isNative;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

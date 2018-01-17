@@ -4,6 +4,7 @@ public class ArrayType extends Type {
 	private Type internal;
 	
 	protected ArrayType(Type internal) {
+		super(TypeID.ARRAY);
 		this.internal = internal;
 	}
 	
@@ -51,6 +52,9 @@ public class ArrayType extends Type {
 
 	@Override
 	public boolean isCompatible(Type other) {
+		//array with null internal type represents a generic array
+		if(other.isArray() && ((ArrayType) other).getInternalType() == null)
+			return true;
 		return this == other;
 	}
 	

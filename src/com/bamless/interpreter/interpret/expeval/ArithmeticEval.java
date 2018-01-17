@@ -1,4 +1,4 @@
-package com.bamless.interpreter.interpret.expinterpreter;
+package com.bamless.interpreter.interpret.expeval;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -10,21 +10,20 @@ import com.bamless.interpreter.ast.expression.CastExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
-import com.bamless.interpreter.ast.expression.LengthFuncExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
 import com.bamless.interpreter.ast.expression.PreIncrementOperation;
 import com.bamless.interpreter.ast.expression.VarLiteral;
-import com.bamless.interpreter.ast.type.Type;
+import com.bamless.interpreter.ast.type.Type.TypeID;
 import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.interpret.RuntimeError;
-import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
+import com.bamless.interpreter.interpret.memenv.MemoryEnvironment.Frame;
 import com.bamless.interpreter.visitor.VisitorAdapter;
 
-public class ArithmeticInterpreter extends VisitorAdapter<BigDecimal, Frame> {
+public class ArithmeticEval extends VisitorAdapter<BigDecimal, Frame> {
 	private Interpreter interpreter;
 
-	public ArithmeticInterpreter(Interpreter interpreter) {
+	public ArithmeticEval(Interpreter interpreter) {
 		this.interpreter = interpreter;
 	}
 	
@@ -43,7 +42,8 @@ public class ArithmeticInterpreter extends VisitorAdapter<BigDecimal, Frame> {
 		case MOD:
 			return l.remainder(r);
 		case DIV:
-			if(e.getLeft().getType() == Type.INT && e.getRight().getType() == Type.INT)
+			if(e.getLeft().getType().getId() == TypeID.INT && 
+					e.getRight().getType().getId() == TypeID.INT)
 				return l.divide(r, 6,RoundingMode.HALF_EVEN).abs();
 			else
 				return l.divide(r, 6, RoundingMode.HALF_EVEN);
@@ -55,7 +55,7 @@ public class ArithmeticInterpreter extends VisitorAdapter<BigDecimal, Frame> {
 	@Override
 	public BigDecimal visit(AssignExpression e, Frame frame) {
 		BigDecimal res = e.getExpression().accept(this, frame);
-		if(e.getType() == Type.INT)
+		if(e.getType().getId() == TypeID.INT)
 			frame.set((Lvalue) e.getLvalue(), res.intValue());
 		else
 			frame.set((Lvalue) e.getLvalue(), res.floatValue());
@@ -67,18 +67,10 @@ public class ArithmeticInterpreter extends VisitorAdapter<BigDecimal, Frame> {
 	public BigDecimal visit(FuncCallExpression f, Frame frame) {
 		interpreter.callFunction(f);
 
-		if(f.getType() == Type.INT)
+		if(f.getType().getId() == TypeID.INT)
 			return BigDecimal.valueOf(frame.<Integer>getReturnRegister());
 		else
 			return BigDecimal.valueOf(frame.<Float>getReturnRegister());
-	}
-	
-	@Override
-	public BigDecimal visit(LengthFuncExpression l, Frame arg) {
-		if(l.getArg().getType() == Type.STRING)
-			return BigDecimal.valueOf(l.getArg().accept(interpreter.stringInterpreter(), arg).length());
-		else 
-			return BigDecimal.valueOf(l.getArg().accept(interpreter.arrayInterpreter(), arg).getLength());
 	}
 	
 	@Override
@@ -94,7 +86,7 @@ public class ArithmeticInterpreter extends VisitorAdapter<BigDecimal, Frame> {
 			break;
 		}
 		
-		if(p.getType() == Type.INT)
+		if(p.getType().getId() == TypeID.INT)
 			frame.set((Lvalue) p.getExpression(), res.intValue());
 		else
 			frame.set((Lvalue) p.getExpression(), res.floatValue());
@@ -116,7 +108,7 @@ public class ArithmeticInterpreter extends VisitorAdapter<BigDecimal, Frame> {
 			break;
 		}
 		
-		if(p.getType() == Type.INT)
+		if(p.getType().getId() == TypeID.INT)
 			frame.set((Lvalue) p.getExpression(), res.intValue());
 		else
 			frame.set((Lvalue) p.getExpression(), res.floatValue());
@@ -127,14 +119,15 @@ public class ArithmeticInterpreter extends VisitorAdapter<BigDecimal, Frame> {
 	@Override
 	public BigDecimal visit(CastExpression c, Frame arg) {
 		BigDecimal ret = c.getExpression().accept(this, arg);
-		if(c.getType() == Type.INT)   ret = BigDecimal.valueOf(ret.intValue());
-		if(c.getType() == Type.FLOAT) ret = BigDecimal.valueOf(ret.floatValue()); 
-		return ret;
+		if(c.getType().getId() == TypeID.INT)
+			return BigDecimal.valueOf(ret.intValue());
+		else
+			return BigDecimal.valueOf(ret.floatValue()); 
 	}
 	
 	@Override
 	public BigDecimal visit(VarLiteral v, Frame frame) {
-		if(v.getType() == Type.INT)
+		if(v.getType().getId() == TypeID.INT)
 			return BigDecimal.valueOf(frame.<Integer>retrieve(v));
 		else 
 			return BigDecimal.valueOf(frame.<Float>retrieve(v));
@@ -142,7 +135,7 @@ public class ArithmeticInterpreter extends VisitorAdapter<BigDecimal, Frame> {
 	
 	@Override
 	public BigDecimal visit(ArrayAccess a, Frame frame) {
-		if(a.getType() == Type.INT)
+		if(a.getType().getId() == TypeID.INT)
 			return BigDecimal.valueOf(frame.<Integer>retrieve(a));
 		else
 			return BigDecimal.valueOf(frame.<Float>retrieve(a));

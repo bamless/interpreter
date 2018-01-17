@@ -24,14 +24,15 @@ import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.type.ArrayType;
-import com.bamless.interpreter.ast.type.Type;
-import com.bamless.interpreter.interpret.expinterpreter.ArithmeticInterpreter;
-import com.bamless.interpreter.interpret.expinterpreter.ArrayInterpreter;
-import com.bamless.interpreter.interpret.expinterpreter.BooleanInterpreter;
-import com.bamless.interpreter.interpret.expinterpreter.StringInterpreter;
-import com.bamless.interpreter.interpret.memenvironment.Array;
-import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment;
-import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
+import com.bamless.interpreter.ast.type.Type.TypeID;
+import com.bamless.interpreter.interpret.expeval.ArithmeticEval;
+import com.bamless.interpreter.interpret.expeval.ArrayEval;
+import com.bamless.interpreter.interpret.expeval.BooleanEval;
+import com.bamless.interpreter.interpret.expeval.StringEval;
+import com.bamless.interpreter.interpret.memenv.Array;
+import com.bamless.interpreter.interpret.memenv.MemoryEnvironment;
+import com.bamless.interpreter.interpret.memenv.MemoryEnvironment.Frame;
+import com.bamless.interpreter.natives.Native;
 import com.bamless.interpreter.visitor.VoidVisitorAdapter;
 
 /**
@@ -44,31 +45,41 @@ import com.bamless.interpreter.visitor.VoidVisitorAdapter;
 public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	public static final String MAIN_FUNC = "main";
 	
-	private ArithmeticInterpreter ai;
-	private BooleanInterpreter bi;
-	private StringInterpreter si;
-	private ArrayInterpreter arri;
+	private ArithmeticEval arithEval;
+	private BooleanEval boolEval;
+	private StringEval strEval;
+	private ArrayEval arrEval;
 	
 	private Map<String, FuncDecl> functions;
+	private Map<String, Native<?>> natives;
 	
 	private MemoryEnvironment memEnv;
 	private boolean returning;
 	
-	public Interpreter() {
+	private Object mainReturn;
+	
+	public Interpreter(Map<String, Native<?>> natives) {
 		this.memEnv = new MemoryEnvironment(this);
 		
-		this.ai = new ArithmeticInterpreter(this);
-		this.bi = new BooleanInterpreter(this);
-		this.si = new StringInterpreter(this);
-		this.arri = new ArrayInterpreter(this);
+		this.arithEval = new ArithmeticEval(this);
+		this.boolEval = new BooleanEval(this);
+		this.strEval = new StringEval(this);
+		this.arrEval = new ArrayEval(this);
+		
+		this.natives = natives;
 	}
 	
 	@Override
 	public void visit(Program p, Frame frame) {
 		functions = p.getFunctions();
 		
+		memEnv.pushStackFrame();
+		
 		FuncCallExpression main = new FuncCallExpression(new Identifier(MAIN_FUNC));
 		callFunction(main);
+		
+		mainReturn = memEnv.getCurrentFrame().getReturnRegister();
+		memEnv.popStackFrame();
 	}
 	
 	@Override
@@ -81,7 +92,7 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	
 	@Override
 	public void visit(IfStatement v, Frame frame) {
-		if(v.getCondition().accept(bi, frame)) {
+		if(v.getCondition().accept(boolEval, frame)) {
 			v.getThenStmt().accept(this, frame);
 		} else {
 			if(v.getElseStmt() != null)
@@ -92,7 +103,7 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	@Override
 	public void visit(WhileStatement v, Frame frame) {
 		try {
-			while(v.getCondition().accept(bi, frame)) {
+			while(v.getCondition().accept(boolEval, frame)) {
 				try {
 					v.getBody().accept(this, frame);
 				} catch(ContinueException c) {
@@ -122,7 +133,7 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 		
 		Expression cond = v.getCond();
 		try {
-			while(cond == null || cond.accept(bi, frame)) {
+			while(cond == null || cond.accept(boolEval, frame)) {
 				try {
 					v.getBody().accept(this, frame);
 				} catch(ContinueException c) {
@@ -161,7 +172,7 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	public void visit(ArrayDecl a, Frame frame) {
 		LinkedList<Integer> computetDim = new LinkedList<>();
 		for(Expression e : a.getDimensions()) {
-			computetDim.add(e.accept(ai, null).intValue());
+			computetDim.add(e.accept(arithEval, null).intValue());
 		}
 		
 		frame.define(a.getId(), new Array(computetDim, ((ArrayType) a.getType()).getInternalType()));
@@ -179,21 +190,24 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	/* ************************* */
 	
 	private Object interpretExpression(Expression e, Frame frame) {
-		if(e.getType() == Type.INT || e.getType() == Type.FLOAT) {
-			BigDecimal n = e.accept(ai, frame);
+		switch(e.getType().getId()) {
+		case INT:
+		case FLOAT:
+			BigDecimal n = e.accept(arithEval, frame);
 			
-			if(e.getType() == Type.INT)
+			if(e.getType().getId() == TypeID.INT)
 				return n.intValue();
 			else
 				return n.floatValue();
-		} else if(e.getType() == Type.BOOLEAN)
-			return e.accept(bi, frame);
-		else if(e.getType() == Type.STRING)
-			return e.accept(si, frame);
-		else if(e.getType().isArray())
-			return e.accept(arri, frame);
-
-		throw new RuntimeError("Fatal error.");
+		case BOOLEAN:
+			return e.accept(boolEval, frame);
+		case STRING:
+			return e.accept(strEval, frame);
+		case ARRAY:
+			return e.accept(arrEval, frame);
+		default:
+			throw new RuntimeError("Fatal error.");
+		}
 	}
 	
 	@Override
@@ -217,21 +231,30 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	}
 	
 	public void callFunction(FuncCallExpression funcCall) {
-		FuncDecl func = functions.get(funcCall.getFuncName().getVal());
 		Expression[] args = funcCall.getArgs();
 		
 		//compute function argument expressions
 		Object[] computedArgs = new Object[args.length];
-		for(int i = 0; i < func.getFormalArgs().length; i++) {
+		for(int i = 0; i < args.length; i++) {
 			computedArgs[i] = interpretExpression(args[i], memEnv.getCurrentFrame());
 		}
 		
+		if(funcCall.isNative()) {
+			nativeCall(funcCall.getFuncName().getVal(), computedArgs);
+		} else {
+			call(funcCall.getFuncName().getVal(), computedArgs);
+		}
+	}
+	
+	private void call(String funcID, Object[] args) {
 		//push a new stack frame
 		memEnv.pushStackFrame();
 		
+		FuncDecl func = functions.get(funcID);
+		
 		//set arguments on the newly pushed stack frame
 		for(int i = 0; i < func.getFormalArgs().length; i++) {
-			memEnv.getCurrentFrame().define(func.getFormalArgs()[i].getIdentifier(), computedArgs[i]);
+			memEnv.getCurrentFrame().define(func.getFormalArgs()[i].getIdentifier(), args[i]);
 		}
 		
 		//call the function
@@ -241,27 +264,38 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 		//clear the stack frames
 		memEnv.popStackFrame();
 		
-		if(memEnv.getCurrentFrame() != null)
-			memEnv.getCurrentFrame().setReturnRegister(ret);
+		memEnv.getCurrentFrame().setReturnRegister(ret);
 		
 		//return
 		returning = false;
 	}
 	
-	public ArithmeticInterpreter arithmeticInterpreter() {
-		return ai;
+	private void nativeCall(String funcID, Object[] args) {
+		Native<?> nativeCall = natives.get(funcID);
+		
+		Object ret = nativeCall.call(args);
+		
+		memEnv.getCurrentFrame().setReturnRegister(ret);
+	}
+	
+	public Object getMainReturn() {
+		return mainReturn;
+	}
+	
+	public ArithmeticEval arithmetic() {
+		return arithEval;
 	}
 
-	public BooleanInterpreter boolInterpreter() {
-		return bi;
+	public BooleanEval bool() {
+		return boolEval;
 	}
 
-	public StringInterpreter stringInterpreter() {
-		return si;
+	public StringEval string() {
+		return strEval;
 	}
 
-	public ArrayInterpreter arrayInterpreter() {
-		return arri;
+	public ArrayEval array() {
+		return arrEval;
 	}
 
 }

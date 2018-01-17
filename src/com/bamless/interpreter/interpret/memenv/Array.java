@@ -1,4 +1,4 @@
-package com.bamless.interpreter.interpret.memenvironment;
+package com.bamless.interpreter.interpret.memenv;
 
 import java.util.LinkedList;
 

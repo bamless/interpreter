@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bamless.interpreter.ast.ASTNode;
 import com.bamless.interpreter.ast.FormalArg;
 import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.Identifier;
@@ -39,7 +38,6 @@ import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
-import com.bamless.interpreter.ast.expression.LengthFuncExpression;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
@@ -87,23 +85,23 @@ public class ASTParser {
 		lex = new Lexer(ClassLoader.class.getResourceAsStream(LEX_FILE), true, COMMENTS_REGX);
 	}
 	
-	public ASTNode parse(File f) throws FileNotFoundException, IOException {
+	public Program parse(File f) throws FileNotFoundException, IOException {
 		lex.tokenize(f);
 		return parse();
 	}
 	
-	public ASTNode parse(InputStream src) throws IOException {
+	public Program parse(InputStream src) throws IOException {
 		lex.tokenize(src);
 		return parse();
 	}
 	
-	public ASTNode parse(String src) {
+	public Program parse(String src) {
 		lex.tokenize(src);
 		return parse();
 	}
 	
-	private ASTNode parse() {
-		ASTNode root = program();
+	private Program parse() {
+		Program root = program();
 		
 		if(!lex.isFinished()) {
 			throw new ParseException(String.format("Syntax error at %s: unexpected token \"%s\"", 
@@ -116,7 +114,7 @@ public class ASTParser {
 	/**
 	 * Program -> {FunctionDecl}+
 	 */
-	private ASTNode program() {
+	private Program program() {
 		List<FuncDecl> decls = new ArrayList<>();
 		while(lex.hasNext()) {
 			decls.add(functionDecl());
@@ -666,10 +664,6 @@ public class ASTParser {
 				return new FuncCallExpression(new Identifier(litTok.getPosition(), litTok.getValue()), args);
 			}
 			return new VarLiteral(new Identifier(litTok.getPosition(), litTok.getValue()));
-		case "LEN":
-			Expression arg = expression();
-			require(")");
-			return new LengthFuncExpression(litTok.getPosition(), arg);
 		case "(":
 			Expression e = expression();
 			require(")");
@@ -678,6 +672,10 @@ public class ASTParser {
 			error("expected expression before \"%s\"", litTok.getValue());
 			return null;
 		}
+	}
+	
+	public void clear() {
+		lex.clear();
 	}
 	
 	private Token require(String tokType) {

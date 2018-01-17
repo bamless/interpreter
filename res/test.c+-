@@ -1,4 +1,4 @@
-void main() {
+int[] main() {
 	int fib = 20
 	
 	println "fibonacci:"
@@ -39,6 +39,15 @@ void main() {
 
 	println (int) 3.54
 	println (float) 3 / 2
+
+        int arr[20]
+        for(k = 0; k < len(arr); k++) {
+            arr[k] = k + 1
+        }
+
+        println "arr length " + len(arr)
+
+        return arr
 }
 
 //recursive fibonacci, because now we can!

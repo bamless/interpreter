@@ -2,6 +2,10 @@ package com.bamless.interpreter.ast.type;
 
 public class FloatType extends Type {
 	
+	public FloatType() {
+		super(TypeID.FLOAT);
+	}
+	
 	/**
 	 * Applying an arithmetic operation on a float would reult in a float if
 	 * the other operand is a float or an int (incompatible otherwise).

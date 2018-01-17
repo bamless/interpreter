@@ -1,4 +1,4 @@
-package com.bamless.interpreter.interpret.expinterpreter;
+package com.bamless.interpreter.interpret.expeval;
 
 import java.math.BigDecimal;
 
@@ -10,16 +10,16 @@ import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
-import com.bamless.interpreter.ast.type.Type;
+import com.bamless.interpreter.ast.type.Type.TypeID;
 import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.interpret.RuntimeError;
-import com.bamless.interpreter.interpret.memenvironment.MemoryEnvironment.Frame;
+import com.bamless.interpreter.interpret.memenv.MemoryEnvironment.Frame;
 import com.bamless.interpreter.visitor.VisitorAdapter;
 
-public class StringInterpreter extends VisitorAdapter<String, Frame> {
+public class StringEval extends VisitorAdapter<String, Frame> {
 	private Interpreter interpreter;
 	
-	public StringInterpreter(Interpreter interpreter) {
+	public StringEval(Interpreter interpreter) {
 		this.interpreter = interpreter;
 	}
 	
@@ -28,32 +28,28 @@ public class StringInterpreter extends VisitorAdapter<String, Frame> {
 		if(e.getOperation() != ArithmeticBinOperation.PLUS)
 			throw new RuntimeError("fatal error");
 		
-		Type leftType = e.getLeft().getType();
-		Type rightType = e.getRight().getType();
+		TypeID leftType = e.getLeft().getType().getId();
+		TypeID rightType = e.getRight().getType().getId();
 		
-		if(leftType == Type.FLOAT || leftType == Type.INT) {
-			BigDecimal res = e.getLeft().accept(interpreter.arithmeticInterpreter(), frame);
+		if(leftType == TypeID.FLOAT || leftType == TypeID.INT) {
+			BigDecimal res = e.getLeft().accept(interpreter.arithmetic(), frame);
 			
-			String l = leftType == Type.FLOAT ? res.floatValue() + "" : res.intValue() + "";
+			String l = leftType == TypeID.FLOAT ? res.floatValue() + "" : res.intValue() + "";
 			String r = e.getRight().accept(this, frame);
-			
 			return l + r;
-		} else if(rightType == Type.FLOAT || rightType == Type.INT) {
-			BigDecimal res = e.getRight().accept(interpreter.arithmeticInterpreter(), frame);
+		} else if(rightType == TypeID.FLOAT || rightType == TypeID.INT) {
+			BigDecimal res = e.getRight().accept(interpreter.arithmetic(), frame);
 			
 			String l = e.getLeft().accept(this, frame);
-			String r = rightType == Type.FLOAT ? res.floatValue() + "" : res.intValue() + "";
-			
+			String r = rightType == TypeID.FLOAT ? res.floatValue() + "" : res.intValue() + "";
 			return l + r;
-		} else if(leftType == Type.BOOLEAN) {
-			String l = e.getLeft().accept(interpreter.boolInterpreter(), frame).toString();
+		} else if(leftType == TypeID.BOOLEAN) {
+			String l = e.getLeft().accept(interpreter.bool(), frame).toString();
 			String r = e.getRight().accept(this, frame);
-			
 			return l + r;
-		} else if(rightType == Type.BOOLEAN) {
+		} else if(rightType == TypeID.BOOLEAN) {
 			String l = e.getLeft().accept(this, frame);
-			String r = e.getRight().accept(interpreter.boolInterpreter(), frame).toString();
-			
+			String r = e.getRight().accept(interpreter.bool(), frame).toString();
 			return l + r;
 		}
 		
@@ -87,6 +83,5 @@ public class StringInterpreter extends VisitorAdapter<String, Frame> {
 		interpreter.callFunction(f);
 		return frame.<String>getReturnRegister();
 	}
-
 	
 }

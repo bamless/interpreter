@@ -12,7 +12,6 @@ import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
-import com.bamless.interpreter.ast.expression.LengthFuncExpression;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
@@ -215,11 +214,6 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 
 	@Override
 	public Boolean visit(ContinueStatement c, Void arg) {
-		return false;
-	}
-
-	@Override
-	public Boolean visit(LengthFuncExpression l, Void arg) {
 		return false;
 	}
 

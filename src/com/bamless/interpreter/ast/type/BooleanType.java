@@ -5,6 +5,10 @@ package com.bamless.interpreter.ast.type;
  * operand must also be a boolean.
  */
 public class BooleanType extends Type {
+	
+	protected BooleanType() {
+		super(TypeID.BOOLEAN);
+	}
 
 	@Override
 	public Type plus(Type other) {

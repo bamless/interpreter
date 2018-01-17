@@ -12,7 +12,6 @@ import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
-import com.bamless.interpreter.ast.expression.LengthFuncExpression;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
@@ -192,13 +191,6 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	@Override
 	public T visit(CastExpression c, A arg) {
 		c.getExpression().accept(this, arg);
-		
-		return null;
-	}
-	
-	@Override
-	public T visit(LengthFuncExpression l, A arg) {
-		l.getArg().accept(this, arg);
 		
 		return null;
 	}

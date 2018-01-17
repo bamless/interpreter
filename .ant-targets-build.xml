@@ -1,0 +1,10 @@
+build
+build-eclipse-compiler
+build-project
+build-refprojects
+build-subprojects
+clean
+cleanall
+init
+init-eclipse-compiler
+run-interpreter

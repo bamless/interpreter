@@ -225,16 +225,8 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 
 		FuncDecl decl = funcs.get(f.getFuncName().getVal());
 
-		if (decl == null)
+		if (decl == null && !f.isNative())
 			ErrUtils.semanticError(f.getPosition(), "Use of undeclared function `%s`.", f.getFuncName());
-
-		Expression[] callArgs = f.getArgs();
-		FormalArg[] declArgs = decl.getFormalArgs();
-
-		if (callArgs.length != declArgs.length) {
-			ErrUtils.semanticError(f.getPosition(), "Function %s requires %d arguments, but instead %d supplied",
-					f.getFuncName(), declArgs.length, callArgs.length);
-		}
 	}
 
 	@Override

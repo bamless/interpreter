@@ -51,6 +51,10 @@
     <target name="run-interpreter" depends="build">
         <java classname="com.bamless.interpreter.Main" failonerror="true" fork="yes">
             <classpath refid="Interpreter.classpath"/>
+            <arg line="${args}"/>
         </java>
+    </target>
+    <target name="input-runargs" unless="args" description="prompts for command line arguments if necessary">
+        <input addProperty="args" message="Type the desired command line arguments:"/>
     </target>
 </project>

@@ -11,7 +11,6 @@ import com.bamless.interpreter.ast.expression.EqualityExpression;
 import com.bamless.interpreter.ast.expression.FloatLiteral;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.IntegerLiteral;
-import com.bamless.interpreter.ast.expression.LengthFuncExpression;
 import com.bamless.interpreter.ast.expression.LogicalExpression;
 import com.bamless.interpreter.ast.expression.LogicalNotExpression;
 import com.bamless.interpreter.ast.expression.PostIncrementOperation;
@@ -56,7 +55,6 @@ public interface VoidVisitor<A> {
 	void visit(PreIncrementOperation p, A arg);
 	void visit(AssignExpression e, A arg);
 	void visit(CastExpression c, A arg);
-	void visit(LengthFuncExpression l, A arg);
 	
 	void visit(FloatLiteral f, A arg);
 	void visit(IntegerLiteral i, A arg);
