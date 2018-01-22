@@ -1,8 +1,9 @@
 package com.bamless.interpreter.ast.type;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public abstract class Type {
+public abstract class Type implements Serializable {
 	/**Singleton types*/
 	public static final Type INT = new IntType();
 	public static final Type FLOAT = new FloatType();

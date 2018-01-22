@@ -1,7 +1,9 @@
 package com.bamless.interpreter.ast;
 
-public class Identifier {
-	private Position position;
+import java.io.Serializable;
+
+public class Identifier implements Serializable {
+	private transient Position position;
 	private String id;
 	
 	public Identifier(Position pos, String id) {

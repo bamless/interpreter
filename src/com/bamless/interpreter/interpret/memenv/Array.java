@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import com.bamless.interpreter.ast.type.ArrayType;
 import com.bamless.interpreter.ast.type.Type;
+import com.bamless.interpreter.ast.type.Type.TypeID;
 
 public class Array implements Cloneable {
 	private Object[] arr;
@@ -23,9 +24,9 @@ public class Array implements Cloneable {
 	private void init(Type t) {
 		for(int i = 0; i < arr.length; i++) {
 			Object o = null;
-			if(t == Type.BOOLEAN) o = false;
-			if(t == Type.INT) o = 0;
-			if(t == Type.FLOAT) o = 0.0f;
+			if(t.getId() == TypeID.BOOLEAN) o = false;
+			if(t.getId() == TypeID.INT) o = 0;
+			if(t.getId() == TypeID.FLOAT) o = 0.0f;
 			arr[i] = o;
 		}
 	}

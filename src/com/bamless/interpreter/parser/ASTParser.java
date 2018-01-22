@@ -107,7 +107,7 @@ public class ASTParser {
 			throw new ParseException(String.format("Syntax error at %s: unexpected token \"%s\"", 
 					lex.peek().getPosition(), lex.peek().getValue()));
 		}
-		
+		lex.clear();
 		return root;
 	}
 	

@@ -8,9 +8,13 @@ import com.bamless.interpreter.natives.StrLen;
 import com.bamless.interpreter.parser.ASTParser;
 import com.bamless.interpreter.semantic.SemanticAnalyzer;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,20 +41,20 @@ public class CML {
 
 	public Program compile(File src) throws FileNotFoundException, IOException {
 		Program p = parser.parse(src);
-		parser.clear();
-		return analyze(p);
+		semantic.analyze(p);
+		return p;
 	}
 	
 	public Program compile(InputStream src) throws IOException {
 		Program p = parser.parse(src);
-		parser.clear();
-		return analyze(p);
+		semantic.analyze(p);
+		return p;
 	}
 	
 	public Program compile(String src) {
 		Program p = parser.parse(src);
-		parser.clear();
-		return analyze(p);
+		semantic.analyze(p);
+		return p;
 	}
 	
 	public Object run(Program program) {
@@ -58,9 +62,18 @@ public class CML {
 		return interpreter.getMainReturn();
 	}
 	
-	private Program analyze(Program p) {
-		semantic.analyze(p);
-		return p;
+	public static void serialize(Program p, String filepath) throws FileNotFoundException, IOException {
+		try(ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(new File(filepath)))) {
+			os.writeObject(p);
+		}
+	}
+	
+	public static Program deSerialize(String filepath) throws FileNotFoundException, IOException {
+		try(ObjectInputStream is = new ObjectInputStream(new FileInputStream(new File(filepath)))) {
+			return (Program) is.readObject();
+		} catch(ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 }

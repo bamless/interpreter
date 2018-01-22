@@ -74,6 +74,8 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 			l = e.getLeft().accept(this, frame);
 			r = e.getRight().accept(this, frame);
 			break;
+		default:
+			throw new RuntimeError("fatal error");
 		}
 		
 		switch(e.getOperation()) {
