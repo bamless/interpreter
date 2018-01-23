@@ -5,6 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.bamless.interpreter.ast.Program;
+import com.bamless.interpreter.lex.LexicalException;
+import com.bamless.interpreter.parser.ParseException;
+import com.bamless.interpreter.semantic.SemanticException;
+import com.bamless.interpreter.semantic.TypeException;
 
 public class Main {
 	private static String VALID_SRC_EXT = ".*\\.(cml|c\\+\\-)$";
@@ -17,7 +21,6 @@ public class Main {
 		}
 		
 		CML cml = new CML();
-		
 		try {
 			if(args[0].equals("-c")) {
 				if(args.length < 2) {
@@ -46,6 +49,9 @@ public class Main {
 						+ "be 'c+-' or 'cml' for source files, 'cc+-' or 'ccml' for compiled ones.");
 				usage();
 			}
+		} catch(LexicalException | ParseException | SemanticException | TypeException e) {
+			System.err.println(e.getMessage());
+			System.exit(1);
 		} catch(FileNotFoundException e) {
 			System.err.println("Error: " + e.getMessage());
 			System.exit(1);
