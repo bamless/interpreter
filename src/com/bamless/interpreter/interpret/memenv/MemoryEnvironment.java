@@ -83,7 +83,7 @@ public class MemoryEnvironment {
 				try {
 					l.set(a.getIndex().accept(interpreter.arithmetic(), getCurrentFrame()).intValue(), arg);
 				} catch(ArrayIndexOutOfBoundsException e) {
-					throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
+					throw new ArrayIndexOutOfBoundsException(a + ": " + e.getMessage());
 				}
 			}
 		}
@@ -102,7 +102,7 @@ public class MemoryEnvironment {
 				try {
 					o = array.get(a.getIndex().accept(interpreter.arithmetic(), getCurrentFrame()).intValue());
 				} catch(ArrayIndexOutOfBoundsException e) {
-					throw new ArrayIndexOutOfBoundsException(a.getPosition() + " " + a + ": " + e.getMessage());
+					throw new ArrayIndexOutOfBoundsException(a + ": " + e.getMessage());
 				}
 				
 				return o;

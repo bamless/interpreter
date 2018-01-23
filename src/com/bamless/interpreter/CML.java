@@ -18,10 +18,6 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- *
- * @author fabrizio
- */
 public class CML {
 	private static Map<String, Native<?>> natives = new HashMap<>();
 	static {
