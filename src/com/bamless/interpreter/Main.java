@@ -36,14 +36,23 @@ public class Main {
 	
 				Program p = cml.compile(new File(filename));
 				CML.serialize(p, filename.replaceAll(VALID_SRC_EXT.replace(".*", ""), ".ccml"));
+			} else if(args[0].equals("-e")) {
+				if(args.length < 2) {
+					System.err.println("No program provided");
+					System.exit(1);
+				}
+				
+				Program p = cml.compile(args[1]);
+				Object ret = cml.run(p);
+				if(ret != null) System.out.println("\nmain returned: " + ret);
 			} else if(args[0].matches(VALID_SRC_EXT)) {
 				Program p = cml.compile(new File(args[0]));
 				Object ret = cml.run(p);
-				System.out.println("\nmain returned: " + ret);
+				if(ret != null) System.out.println("\nmain returned: " + ret);
 			} else if(args[0].matches(VALID_CC_EXT)) {
 				Program p = CML.deSerialize(args[0]);
 				Object ret = cml.run(p);
-				System.out.println("\nmain returned: " + ret);
+				if(ret != null) System.out.println("\nmain returned: " + ret);
 			} else {
 				System.err.println("File format not recognized. File extension should "
 						+ "be 'c+-' or 'cml' for source files, 'cc+-' or 'ccml' for compiled ones.");
@@ -63,7 +72,7 @@ public class Main {
 	}
 	
 	private static void usage() {
-		System.err.println("Usage: cml [-c] filepath");
+		System.err.println("Usage: cml [-c|-e] filepath");
 		System.exit(1);
 	}
 	
