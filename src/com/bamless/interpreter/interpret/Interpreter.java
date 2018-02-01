@@ -1,5 +1,6 @@
 package com.bamless.interpreter.interpret;
 
+import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.Map;
@@ -53,6 +54,7 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	private Map<String, FuncDecl> functions;
 	private Map<String, Native<?>> natives;
 	
+	private PrintStream out = System.out;
 	private MemoryEnvironment memEnv;
 	private boolean returning;
 	
@@ -151,9 +153,9 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 	@Override
 	public void visit(PrintStatement p, Frame frame) {
 		if(p.isNweLine())
-			System.out.println(interpretExpression(p.getExpression(), frame));
+			out.println(interpretExpression(p.getExpression(), frame));
 		else
-			System.out.print(interpretExpression(p.getExpression(), frame));
+			out.print(interpretExpression(p.getExpression(), frame));
 	}
 
 	@Override
@@ -277,7 +279,11 @@ public class Interpreter  extends VoidVisitorAdapter<Frame> {
 		
 		memEnv.getCurrentFrame().setReturnRegister(ret);
 	}
-	
+
+	public void setOut(PrintStream out) {
+		this.out = out;
+	}
+
 	public Object getMainReturn() {
 		return mainReturn;
 	}

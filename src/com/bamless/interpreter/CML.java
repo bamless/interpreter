@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,6 +57,10 @@ public class CML {
 	public Object run(Program program) {
 		program.accept(interpreter, null);
 		return interpreter.getMainReturn();
+	}
+	
+	public void setStdOut(PrintStream out) {
+		interpreter.setOut(out);
 	}
 	
 	public static void serialize(Program p, String filepath) throws FileNotFoundException, IOException {
