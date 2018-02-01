@@ -43,7 +43,7 @@ import com.bamless.interpreter.visitor.VoidVisitorAdapter;
  * @author fabrizio
  *
  */
-public class Interpreter  extends VoidVisitorAdapter<Frame> {
+public class Interpreter extends VoidVisitorAdapter<Frame> {
 	public static final String MAIN_FUNC = "main";
 	
 	private ArithmeticEval arithEval;
