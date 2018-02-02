@@ -160,11 +160,7 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 
 	@Override
 	public void visit(VarDecl v, Frame frame) {
-		//define if not present
-		try {
-			frame.define(v.getId(), null);
-		} catch(IllegalArgumentException e) {
-		}
+		frame.define(v.getId(), null);
 		
 		if(v.getInitializer() != null)
 			v.getInitializer().accept(this, frame);

@@ -47,8 +47,6 @@ public class MemoryEnvironment {
 		}
 		
 		public <T> void define(Identifier id, T val) {
-			if(mem.get(id.getVal()) != null)
-				throw new IllegalArgumentException("Identifier " + id + " is already defined");
 			mem.put(id.getVal(), val);
 		}
 		
