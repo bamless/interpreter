@@ -170,7 +170,7 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	public void visit(ArrayDecl a, Frame frame) {
 		LinkedList<Integer> computetDim = new LinkedList<>();
 		for(Expression e : a.getDimensions()) {
-			computetDim.add(e.accept(arithEval, null).intValue());
+			computetDim.add(e.accept(arithEval, frame).intValue());
 		}
 		
 		frame.define(a.getId(), new Array(computetDim, ((ArrayType) a.getType()).getInternalType()));
