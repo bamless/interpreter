@@ -31,6 +31,7 @@ import com.bamless.interpreter.ast.Position;
 public class Lexer {
 	public final static Token END = new Token("_END_OF_INPUT_", "end of input", new Position(0, 0));
 	private final static Pattern SPACES = Pattern.compile("\\s+");
+	private final static String SHABANG = "^#!(.*)";
 	
 	/**Regex of a comment*/
 	private String commentRegx;
@@ -123,14 +124,15 @@ public class Lexer {
 	
 	public void tokenize(InputStream is) throws IOException {
 		if(is == null) throw new IllegalArgumentException("null input stream");
-		
 		clear();
 		
 		try(BufferedReader r = new BufferedReader(new InputStreamReader(is))){
 			String line;
-			int lineNo = 0;
+			int lineNo = 1;
 			while((line = r.readLine()) != null) {
-				tokenize(++lineNo, line);
+				if(lineNo == 1 && line.matches(SHABANG))
+					continue;
+				tokenize(lineNo++, line);
 			}
 		}
 	}
