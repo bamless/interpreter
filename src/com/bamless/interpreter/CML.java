@@ -41,7 +41,6 @@ public class CML {
 	public Program compile(File src) throws FileNotFoundException, IOException {
 		Program p = parser.parse(src);
 		semantic.analyze(p);
-		p.accept(new PrinterVisitor(4), null);
 		return p;
 	}
 	
