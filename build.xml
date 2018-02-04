@@ -4,9 +4,13 @@
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
     <property name="source" value="1.8"/>
+	<property name="bin" location="bin" />
+	<property name="jar" location="jar" />
+	<property name="main-class" value="com.bamless.interpreter.Main" />
     <path id="Interpreter.classpath">
         <pathelement location="bin"/>
     </path>
+	
     <target name="init">
         <mkdir dir="bin"/>
         <copy includeemptydirs="false" todir="bin">
@@ -20,12 +24,15 @@
             </fileset>
         </copy>
     </target>
+	
     <target name="clean">
         <delete dir="bin"/>
     </target>
+	
     <target depends="clean" name="cleanall"/>
     <target depends="build-subprojects,build-project" name="build"/>
     <target name="build-subprojects"/>
+	
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
@@ -34,26 +41,28 @@
             <classpath refid="Interpreter.classpath"/>
         </javac>
     </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
-        <copy todir="${ant.library.dir}">
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </copy>
-        <unzip dest="${ant.library.dir}">
-            <patternset includes="jdtCompilerAdapter.jar"/>
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </unzip>
-    </target>
-    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
-        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
-        <antcall target="build"/>
-    </target>
+	
     <target name="run-interpreter" depends="build, input-runargs">
         <java classname="com.bamless.interpreter.Main" failonerror="true" fork="yes">
             <classpath refid="Interpreter.classpath"/>
             <arg line="${args}"/>
         </java>
     </target>
+	
+	<target name="jar" depends="build" description="generates the executable jar">
+		<!-- Create the jar directory -->
+		<mkdir dir="${jar}" />
+
+		<!-- Put everything in ${bin} into the sudoku-${DSTAMP}.jar file -->
+		<jar jarfile="${jar}/cml.jar" basedir="${bin}">
+			<manifest>
+				<attribute name="Main-Class" value="${main-class}" />
+				<attribute name="Class-Path" value="." />
+			</manifest>
+		</jar>
+	</target>
+
+
     <target name="input-runargs" unless="args" description="prompts for command line arguments if necessary">
         <input addProperty="args" message="Type the desired command line arguments:"/>
     </target>

@@ -82,10 +82,7 @@ public class Main {
 			System.exit(1);
 		}
 		
-		if(p != null) {
-			Object ret = cml.run(p);
-			if(ret != null) System.out.println("\nmain returned: " + ret);
-		}
+		if(p != null) cml.run(p);
 	}
 	
 	private static void usage() {
