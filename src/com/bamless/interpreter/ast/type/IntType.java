@@ -3,7 +3,7 @@ package com.bamless.interpreter.ast.type;
 public class IntType extends Type {
 	
 	public IntType() {
-		super(TypeID.INT);
+		super(TypeID.INT, Type.INT_WIDENFACT);
 	}
 		
 	/**

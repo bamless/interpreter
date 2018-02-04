@@ -10,6 +10,7 @@ import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
+import com.bamless.interpreter.ast.expression.BinaryExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
 import com.bamless.interpreter.ast.expression.CastExpression;
 import com.bamless.interpreter.ast.expression.EqualityExpression;
@@ -181,9 +182,9 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 					exp.toString().toLowerCase(), currentFunc.getType().toString().toLowerCase());
 		}
 
-		if (currentFunc.getType() == Type.INT && exp == Type.FLOAT) {
-			ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
-					r.getExpression().getPosition());
+		if (currentFunc.getType().getWidenFactor() < exp.getWidenFactor()) {
+			ErrUtils.warn("Warning %s: implicit conversion from %s to %s, possible loss of precision",
+					r.getExpression().getPosition(), exp, currentFunc.getType());
 		}
 		
 		//types are compatible, apply type coercion if needed
@@ -227,6 +228,9 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 			undefOperatorError(e.getPosition(), e.getOperation().toString(), left.toString().toLowerCase(),
 					right.toString().toLowerCase());
 		}
+		
+		//apply widening type coercion if needed
+		widen(e);
 
 		e.setType(res);
 		return res;
@@ -258,6 +262,8 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 					right.toString().toLowerCase());
 		}
 
+		widen(e);
+		
 		e.setType(res);
 		return res;
 	}
@@ -273,6 +279,8 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 					right.toString().toLowerCase());
 		}
 
+		widen(r);
+		
 		r.setType(res);
 		return res;
 	}
@@ -323,11 +331,16 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 					lval.toString().toLowerCase());
 		}
 
-		if (lval == Type.INT && expr == Type.FLOAT) {
-			ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
-					e.getExpression().getPosition());
+		if (lval.getWidenFactor() < expr.getWidenFactor()) {
+			ErrUtils.warn("Warning %s: implicit conversion from %s to %s, possible loss of precision",
+					 e.getExpression().getPosition(), expr, lval);
 		}
-
+		
+		//types are compatible, apply type coercion if needed
+		if(lval != expr) {
+			e.setExpression(new CastExpression(lval, e.getExpression(), e.getExpression().getPosition()));
+		}
+		
 		e.setType(lval);
 		return lval;
 	}
@@ -342,11 +355,13 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		Type[] declArgsTypes = f.isNative() ? natives.get(f.getFuncName().getVal()).getArgTypes() :
 				funcs.get(f.getFuncName().getVal()).getFormalArgsTypes();
 
+		//check that number of arguments matches function decl
 		if (callArgs.length != declArgsTypes.length) {
 			ErrUtils.semanticError(f.getPosition(), "Function %s requires %d arguments, but instead %d supplied",
 					f.getFuncName(), declArgsTypes.length, callArgs.length);
 		}
 		
+		//check type of args against function decl
 		for (int i = 0; i < callArgs.length; i++) {
 			Type callType = callArgs[i].getType();
 			Type declType = declArgsTypes[i];
@@ -358,15 +373,14 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 						f.getFuncName());
 			}
 
-			if (declType == Type.INT && callType == Type.FLOAT) {
-				ErrUtils.warn("Warning %s: implicit conversion from float to int, possible loss of precision",
-						callArgs[i].getPosition());
+			if (declType.getWidenFactor() < callType.getWidenFactor()) {
+				ErrUtils.warn("Warning %s: implicit conversion from %s to %s, possible loss of precision", 
+						 callArgs[i].getPosition(), callType, declType);
 			}
 			
 			//types are compatible, apply type coercion if needed
 			if(callType != declType && !callType.isArray()) {
-				Expression e = callArgs[i];
-				callArgs[i] = new CastExpression(declType, e, e.getPosition());
+				callArgs[i] = new CastExpression(declType, callArgs[i], callArgs[i].getPosition());
 			}
 		}
 
@@ -469,6 +483,25 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 	@Override
 	public Type visit(ContinueStatement c, FuncDecl arg) {
 		return null;
+	}
+	
+	/**
+	 * Widens one of the two subexpression of a binary expression to the wider type.
+	 * The 2 types should be compatible, i.e. {@link Type#isCompatible(Type)} should
+	 * return true.
+	 */
+	private void widen(BinaryExpression e) {
+		Type l = e.getLeft().getType();
+		Type r = e.getRight().getType();
+		
+		if(l == r || l.getWidenFactor() == Type.NULL_WIDENFACT || r.getWidenFactor() == Type.NULL_WIDENFACT)
+			return;
+		
+		Type widen = l.getWidenFactor() < r.getWidenFactor() ? r : l;
+		if(widen == r)
+			e.setLeft(new CastExpression(widen, e.getLeft(), e.getLeft().getPosition()));
+		else
+			e.setRight(new CastExpression(widen, e.getRight(), e.getRight().getPosition()));
 	}
 
 }

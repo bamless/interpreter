@@ -1,7 +1,5 @@
 package com.bamless.interpreter.interpret.expeval;
 
-import java.math.BigDecimal;
-
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression;
 import com.bamless.interpreter.ast.expression.ArithmeticBinExpression.ArithmeticBinOperation;
 import com.bamless.interpreter.ast.expression.ArrayAccess;
@@ -31,18 +29,22 @@ public class StringEval extends VisitorAdapter<String, Frame> {
 		TypeID leftType = e.getLeft().getType().getId();
 		TypeID rightType = e.getRight().getType().getId();
 		
-		if(leftType == TypeID.FLOAT || leftType == TypeID.INT) {
-			BigDecimal res = e.getLeft().accept(interpreter.arithmetic(), frame);
-			
-			String l = leftType == TypeID.FLOAT ? res.floatValue() + "" : res.intValue() + "";
+		if(leftType == TypeID.FLOAT) {
+			String l = e.getLeft().accept(interpreter.floatingPoint(), frame).toString();
 			String r = e.getRight().accept(this, frame);
 			return l + r;
-		} else if(rightType == TypeID.FLOAT || rightType == TypeID.INT) {
-			BigDecimal res = e.getRight().accept(interpreter.arithmetic(), frame);
-			
+		} else if(rightType == TypeID.FLOAT) {
+			String r = e.getRight().accept(interpreter.floatingPoint(), frame).toString();
 			String l = e.getLeft().accept(this, frame);
-			String r = rightType == TypeID.FLOAT ? res.floatValue() + "" : res.intValue() + "";
 			return l + r;
+		} else if(leftType == TypeID.INT) {
+			String l = e.getLeft().accept(interpreter.integer(), frame).toString();
+			String r = e.getRight().accept(this, frame);
+			return l + r;
+		} else if(rightType == TypeID.INT) {
+			String r = e.getRight().accept(interpreter.integer(), frame).toString();
+			String l = e.getLeft().accept(this, frame);
+			return l + r; 
 		} else if(leftType == TypeID.BOOLEAN) {
 			String l = e.getLeft().accept(interpreter.bool(), frame).toString();
 			String r = e.getRight().accept(this, frame);

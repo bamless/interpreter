@@ -4,7 +4,7 @@ public class ArrayType extends Type {
 	private Type internal;
 	
 	protected ArrayType(Type internal) {
-		super(TypeID.ARRAY);
+		super(TypeID.ARRAY, Type.NULL_WIDENFACT);
 		this.internal = internal;
 	}
 	

@@ -3,7 +3,7 @@ package com.bamless.interpreter.ast.type;
 public class FloatType extends Type {
 	
 	public FloatType() {
-		super(TypeID.FLOAT);
+		super(TypeID.FLOAT, Type.FLOAT_WIDENFACT);
 	}
 	
 	/**

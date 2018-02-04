@@ -7,7 +7,7 @@ package com.bamless.interpreter.ast.type;
 public class BooleanType extends Type {
 	
 	protected BooleanType() {
-		super(TypeID.BOOLEAN);
+		super(TypeID.BOOLEAN, Type.NULL_WIDENFACT);
 	}
 
 	@Override

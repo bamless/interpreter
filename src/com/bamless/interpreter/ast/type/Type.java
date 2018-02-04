@@ -11,11 +11,23 @@ public abstract class Type implements Serializable {
 	public static final Type STRING = new StringType();
 	public static final Type VOID = new VoidType();
 	
+	public final static int INT_WIDENFACT = 1;
+	public final static int FLOAT_WIDENFACT = 2;
+	public final static int NULL_WIDENFACT = -1;
+	
 	private static final HashMap<Type, ArrayType> arrayFromType = new HashMap<>();
+	
 	private TypeID id;
 	
-	protected Type(TypeID id) {
+	/**
+	 * widen factor of the type. Used to apply type coercion
+	 * to the widest type when needed
+	 */
+	private int widenFactor;
+	
+	protected Type(TypeID id, int widenFactor) {
 		this.id = id;
+		this.widenFactor = widenFactor;
 	}
 	
 	public static Type valueOf(String type) {
@@ -58,7 +70,6 @@ public abstract class Type implements Serializable {
 	public abstract Type equalityOp(Type other);
 	
 	public abstract boolean isCompatible(Type other);
-	
 	public abstract boolean isArray();
 	
 	public abstract String toString();
@@ -67,6 +78,10 @@ public abstract class Type implements Serializable {
 		return id;
 	}
 	
+	public int getWidenFactor() {
+		return widenFactor;
+	}
+
 	public enum TypeID {
 		INT, FLOAT, BOOLEAN, STRING, VOID, ARRAY
 	}

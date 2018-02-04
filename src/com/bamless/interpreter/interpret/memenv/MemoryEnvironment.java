@@ -40,7 +40,7 @@ public class MemoryEnvironment {
 		private HashMap<String, Object> mem;
 		private Object returnRegister;
 		
-		public Frame() {
+		private Frame() {
 			mem = new HashMap<>();
 			setter = new VarSetter();
 			retriever = new VarRetriever();
@@ -79,7 +79,7 @@ public class MemoryEnvironment {
 				Array l = a.getLvalue().accept(interpreter.array(), getCurrentFrame());
 				
 				try {
-					l.set(a.getIndex().accept(interpreter.arithmetic(), getCurrentFrame()).intValue(), arg);
+					l.set(a.getIndex().accept(interpreter.integer(), getCurrentFrame()), arg);
 				} catch(ArrayIndexOutOfBoundsException e) {
 					throw new ArrayIndexOutOfBoundsException(a + ": " + e.getMessage());
 				}
@@ -98,7 +98,7 @@ public class MemoryEnvironment {
 				
 				Object o = null;
 				try {
-					o = array.get(a.getIndex().accept(interpreter.arithmetic(), getCurrentFrame()).intValue());
+					o = array.get(a.getIndex().accept(interpreter.integer(), getCurrentFrame()));
 				} catch(ArrayIndexOutOfBoundsException e) {
 					throw new ArrayIndexOutOfBoundsException(a + ": " + e.getMessage());
 				}

@@ -3,7 +3,7 @@ package com.bamless.interpreter.ast.type;
 public class StringType extends Type {
 
 	public StringType() {
-		super(TypeID.STRING);
+		super(TypeID.STRING, Type.NULL_WIDENFACT);
 	}
 	
 	@Override

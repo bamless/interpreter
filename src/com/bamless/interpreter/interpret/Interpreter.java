@@ -1,7 +1,6 @@
 package com.bamless.interpreter.interpret;
 
 import java.io.PrintStream;
-import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -25,10 +24,10 @@ import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.statement.VarDecl;
 import com.bamless.interpreter.ast.statement.WhileStatement;
 import com.bamless.interpreter.ast.type.ArrayType;
-import com.bamless.interpreter.ast.type.Type.TypeID;
-import com.bamless.interpreter.interpret.expeval.ArithmeticEval;
 import com.bamless.interpreter.interpret.expeval.ArrayEval;
 import com.bamless.interpreter.interpret.expeval.BooleanEval;
+import com.bamless.interpreter.interpret.expeval.FloatEval;
+import com.bamless.interpreter.interpret.expeval.IntEval;
 import com.bamless.interpreter.interpret.expeval.StringEval;
 import com.bamless.interpreter.interpret.memenv.Array;
 import com.bamless.interpreter.interpret.memenv.MemoryEnvironment;
@@ -46,7 +45,8 @@ import com.bamless.interpreter.visitor.VoidVisitorAdapter;
 public class Interpreter extends VoidVisitorAdapter<Frame> {
 	public static final String MAIN_FUNC = "main";
 	
-	private ArithmeticEval arithEval;
+	private IntEval intEval;
+	private FloatEval floatEval;
 	private BooleanEval boolEval;
 	private StringEval strEval;
 	private ArrayEval arrEval;
@@ -63,7 +63,8 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	public Interpreter(Map<String, Native<?>> natives) {
 		this.memEnv = new MemoryEnvironment(this);
 		
-		this.arithEval = new ArithmeticEval(this);
+		this.intEval = new IntEval(this);
+		this.floatEval = new FloatEval(this);
 		this.boolEval = new BooleanEval(this);
 		this.strEval = new StringEval(this);
 		this.arrEval = new ArrayEval(this);
@@ -170,7 +171,7 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	public void visit(ArrayDecl a, Frame frame) {
 		LinkedList<Integer> computetDim = new LinkedList<>();
 		for(Expression e : a.getDimensions()) {
-			computetDim.add(e.accept(arithEval, frame).intValue());
+			computetDim.add(e.accept(intEval, frame));
 		}
 		
 		frame.define(a.getId(), new Array(computetDim, ((ArrayType) a.getType()).getInternalType()));
@@ -190,13 +191,9 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	private Object interpretExpression(Expression e, Frame frame) {
 		switch(e.getType().getId()) {
 		case INT:
+			return e.accept(intEval, frame);
 		case FLOAT:
-			BigDecimal n = e.accept(arithEval, frame);
-			
-			if(e.getType().getId() == TypeID.INT)
-				return n.intValue();
-			else
-				return n.floatValue();
+			return e.accept(floatEval, frame);
 		case BOOLEAN:
 			return e.accept(boolEval, frame);
 		case STRING:
@@ -284,8 +281,12 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 		return mainReturn;
 	}
 	
-	public ArithmeticEval arithmetic() {
-		return arithEval;
+	public IntEval integer() {
+		return intEval;
+	}
+	
+	public FloatEval floatingPoint() {
+		return floatEval;
 	}
 
 	public BooleanEval bool() {

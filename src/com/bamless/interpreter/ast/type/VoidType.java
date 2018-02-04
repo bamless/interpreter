@@ -3,7 +3,7 @@ package com.bamless.interpreter.ast.type;
 public class VoidType extends Type {
 
 	public VoidType() {
-		super(TypeID.VOID);
+		super(TypeID.VOID, Type.NULL_WIDENFACT);
 	}
 	
 	@Override

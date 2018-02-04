@@ -31,6 +31,10 @@ public class AssignExpression extends Expression {
 		return e;
 	}
 	
+	public void setExpression(Expression e) {
+		this.e = e;
+	}
+
 	@Override
 	public String toString() {
 		return lvalue + " = " + e.toString();

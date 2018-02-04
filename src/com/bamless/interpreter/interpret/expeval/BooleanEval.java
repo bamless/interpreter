@@ -1,7 +1,5 @@
 package com.bamless.interpreter.interpret.expeval;
 
-import java.math.BigDecimal;
-
 import com.bamless.interpreter.ast.expression.ArrayAccess;
 import com.bamless.interpreter.ast.expression.AssignExpression;
 import com.bamless.interpreter.ast.expression.BooleanLiteral;
@@ -27,18 +25,31 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 
 	@Override
 	public Boolean visit(RelationalExpression r, Frame frame) {
-		BigDecimal left  = r.getLeft().accept(interpreter.arithmetic(), frame);
-		BigDecimal right = r.getRight().accept(interpreter.arithmetic(), frame);
+		float left, right;
+		
+		switch(r.getLeft().getType().getId()) {
+		case FLOAT:
+			left = r.getLeft().accept(interpreter.floatingPoint(), frame);
+			right = r.getRight().accept(interpreter.floatingPoint(), frame);
+			break;
+		case INT:
+			left = r.getLeft().accept(interpreter.integer(), frame);
+			right = r.getRight().accept(interpreter.integer(), frame);
+			break;
+		default:
+			throw new RuntimeError("Fatal error");
+		
+		}
 		
 		switch(r.getOperation()) {
 		case LT:
-			return left.compareTo(right) < 0;
+			return left < right;
 		case LE:
-			return left.compareTo(right) <= 0;
+			return left <= right;
 		case GT:
-			return left.compareTo(right) > 0;
+			return left > right;
 		case GE:
-			return left.compareTo(right) >= 0;
+			return left >= right;
 		default:
 			throw new RuntimeError("fatal error");
 		}
@@ -52,16 +63,13 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 		
 		switch(ltype) {
 		case INT:
+			l = e.getLeft().accept(interpreter.integer(), frame);
+			r = e.getRight().accept(interpreter.integer(), frame);
+			break;
 		case FLOAT:
-			BigDecimal bl = e.getLeft().accept(interpreter.arithmetic(), frame);
-			BigDecimal br = e.getRight().accept(interpreter.arithmetic(), frame);
-			
-			switch(e.getOperation()) {
-			case EQ:
-				return bl.compareTo(br) == 0;
-			case NEQ:
-				return bl.compareTo(br) != 0;
-			}
+			l = e.getLeft().accept(interpreter.floatingPoint(), frame);
+			r = e.getRight().accept(interpreter.floatingPoint(), frame);
+			break;
 		case STRING:
 			l = e.getLeft().accept(interpreter.string(), frame);
 			r = e.getRight().accept(interpreter.string(), frame);
