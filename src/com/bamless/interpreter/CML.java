@@ -1,14 +1,5 @@
 package com.bamless.interpreter;
 
-import com.bamless.interpreter.ast.Program;
-import com.bamless.interpreter.interpret.Interpreter;
-import com.bamless.interpreter.natives.Length;
-import com.bamless.interpreter.natives.Native;
-import com.bamless.interpreter.natives.StrLen;
-import com.bamless.interpreter.parser.ASTParser;
-import com.bamless.interpreter.semantic.SemanticAnalyzer;
-import com.bamless.interpreter.visitor.PrinterVisitor;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -20,6 +11,14 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.bamless.interpreter.ast.Program;
+import com.bamless.interpreter.interpret.Interpreter;
+import com.bamless.interpreter.natives.Length;
+import com.bamless.interpreter.natives.Native;
+import com.bamless.interpreter.natives.StrLen;
+import com.bamless.interpreter.parser.ASTParser;
+import com.bamless.interpreter.semantic.SemanticAnalyzer;
 
 public class CML {
 	private static Map<String, Native<?>> natives = new HashMap<>();

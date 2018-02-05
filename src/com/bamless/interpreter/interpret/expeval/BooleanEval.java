@@ -12,6 +12,7 @@ import com.bamless.interpreter.ast.expression.RelationalExpression;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type.TypeID;
 import com.bamless.interpreter.interpret.Interpreter;
+import com.bamless.interpreter.interpret.Return;
 import com.bamless.interpreter.interpret.RuntimeError;
 import com.bamless.interpreter.interpret.memenv.MemoryEnvironment.Frame;
 import com.bamless.interpreter.visitor.VisitorAdapter;
@@ -115,12 +116,12 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 	
 	@Override
 	public Boolean visit(VarLiteral v, Frame frame) {
-		return frame.<Boolean>retrieve(v);
+		return (Boolean) frame.retrieve(v);
 	}
 	
 	@Override
 	public Boolean visit(ArrayAccess a, Frame frame) {
-		return frame.<Boolean>retrieve(a);
+		return (Boolean) frame.retrieve(a);
 	}
 	
 	@Override
@@ -137,8 +138,12 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 	
 	@Override
 	public Boolean visit(FuncCallExpression f, Frame frame) {
-		interpreter.callFunction(f);
-		return frame.<Boolean>getReturnRegister();
+		try {
+			interpreter.callFunction(f);
+		} catch(Return r) {
+			return (Boolean) r.getVal();
+		}
+		throw new RuntimeError("Fatal error, function " + f + " declares return type but doesn't return");
 	}
 
 }

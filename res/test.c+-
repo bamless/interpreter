@@ -40,14 +40,14 @@ int[] main() {
 	println (int) 3.54
 	println (float) 3 / 2
 
-        int arr[20]
-        for(k = 0; k < len(arr); k++) {
-            arr[k] = k + 1
-        }
+	int arr[20]
+	for(k = 0; k < len(arr); k++) {
+		arr[k] = k + 1
+	}
 
-        println "arr length " + len(arr)
+	println "arr length " + len(arr)
 
-        return arr
+	return arr
 }
 
 //recursive fibonacci, because now we can!

@@ -11,6 +11,7 @@ import com.bamless.interpreter.ast.expression.PostIncrementOperation;
 import com.bamless.interpreter.ast.expression.PreIncrementOperation;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.interpret.Interpreter;
+import com.bamless.interpreter.interpret.Return;
 import com.bamless.interpreter.interpret.RuntimeError;
 import com.bamless.interpreter.interpret.memenv.MemoryEnvironment.Frame;
 import com.bamless.interpreter.visitor.VisitorAdapter;
@@ -52,8 +53,12 @@ public class IntEval extends VisitorAdapter<Integer, Frame> {
 	
 	@Override
 	public Integer visit(FuncCallExpression f, Frame frame) {
-		interpreter.callFunction(f);
-		return frame.<Integer>getReturnRegister();
+		try {
+			interpreter.callFunction(f);
+		} catch(Return r) {
+			return (Integer) r.getVal();
+		}
+		throw new RuntimeError("Fatal error, function " + f + " declares return type but doesn't return");
 	}
 	
 	@Override
@@ -106,12 +111,12 @@ public class IntEval extends VisitorAdapter<Integer, Frame> {
 	
 	@Override
 	public Integer visit(VarLiteral v, Frame frame) {
-		return frame.<Integer>retrieve(v);
+		return (Integer) frame.retrieve(v);
 	}
 	
 	@Override
 	public Integer visit(ArrayAccess a, Frame frame) {
-		return frame.<Integer>retrieve(a);
+		return (Integer) frame.retrieve(a);
 	}
 	
 	@Override

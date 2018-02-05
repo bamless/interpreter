@@ -6,6 +6,8 @@ import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.ast.expression.Lvalue;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.interpret.Interpreter;
+import com.bamless.interpreter.interpret.Return;
+import com.bamless.interpreter.interpret.RuntimeError;
 import com.bamless.interpreter.interpret.memenv.Array;
 import com.bamless.interpreter.interpret.memenv.MemoryEnvironment.Frame;
 import com.bamless.interpreter.visitor.VisitorAdapter;
@@ -19,12 +21,12 @@ public class ArrayEval extends VisitorAdapter<Array, Frame> {
 	
 	@Override
 	public Array visit(VarLiteral v, Frame frame) {
-		return frame.<Array>retrieve(v);
+		return (Array) frame.retrieve(v);
 	}
 	
 	@Override
 	public Array visit(ArrayAccess a, Frame frame) {
-		return frame.<Array>retrieve(a);
+		return (Array) frame.retrieve(a);
 	}
 	
 	@Override
@@ -36,8 +38,12 @@ public class ArrayEval extends VisitorAdapter<Array, Frame> {
 	
 	@Override
 	public Array visit(FuncCallExpression f, Frame frame) {
-		interpreter.callFunction(f);
-		return frame.<Array>getReturnRegister();
+		try {
+			interpreter.callFunction(f);
+		} catch(Return r) {
+			return (Array) r.getVal();
+		}
+		throw new RuntimeError("Fatal error, function " + f + " declares return type but doesn't return");
 	}
 
 }

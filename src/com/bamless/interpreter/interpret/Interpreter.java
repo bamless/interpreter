@@ -56,7 +56,6 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	
 	private PrintStream out = System.out;
 	private MemoryEnvironment memEnv;
-	private boolean returning;
 	
 	private Object mainReturn;
 	
@@ -76,20 +75,20 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	public void visit(Program p, Frame frame) {
 		functions = p.getFunctions();
 		
-		memEnv.pushStackFrame();
-		
 		FuncCallExpression main = new FuncCallExpression(new Identifier(MAIN_FUNC));
-		callFunction(main);
 		
-		mainReturn = memEnv.getCurrentFrame().getReturnRegister();
-		memEnv.popStackFrame();
+		try {
+			callFunction(main);
+		} catch (Return r) {
+			mainReturn = r.getVal();
+		}
+		
 	}
 	
 	@Override
 	public void visit(BlockStatement v, Frame frame) {
 		for(Statement s : v.getStmts()) {
 			s.accept(this, frame);
-			if(returning) break;
 		}
 	}
 	
@@ -109,24 +108,23 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 			while(v.getCondition().accept(boolEval, frame)) {
 				try {
 					v.getBody().accept(this, frame);
-				} catch(ContinueException c) {
+				} catch(Continue c) {
 					//continue the cicle
 				}
-				if(returning) break;
 			}
-		} catch(BreakException b) {
+		} catch(Break b) {
 			//break out of cicle
 		}
 	}
 	
 	@Override
 	public void visit(BreakStatement b, Frame arg) {
-		throw new BreakException();
+		throw new Break();
 	}
 	
 	@Override
 	public void visit(ContinueStatement c, Frame arg) {
-		throw new ContinueException();
+		throw new Continue();
 	}
 	
 	@Override
@@ -139,15 +137,13 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 			while(cond == null || cond.accept(boolEval, frame)) {
 				try {
 					v.getBody().accept(this, frame);
-				} catch(ContinueException c) {
+				} catch(Continue c) {
 				}
 	
-				if(returning) break;
-				
 				if(v.getAct() != null)
 					v.getAct().accept(this, frame);
 			}
-		} catch(BreakException b) {
+		} catch(Break b) {
 		}
 	}
 	
@@ -179,9 +175,11 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	
 	@Override
 	public void visit(ReturnStatement r, Frame frame) {
-		if(r.getExpression() != null)
-			frame.setReturnRegister(interpretExpression(r.getExpression(), frame));
-		returning = true;
+		Object ret = null;
+		if(r.getExpression() != null) {
+			ret = interpretExpression(r.getExpression(), frame);
+		}
+		throw new Return(ret);
 	}
 	
 	/* ************************* */
@@ -222,7 +220,10 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	
 	@Override
 	public void visit(FuncCallExpression f, Frame frame) {
-		callFunction(f);
+		try {
+			callFunction(f);
+		} catch (Return r) {
+		}
 	}
 	
 	public void callFunction(FuncCallExpression funcCall) {
@@ -246,31 +247,23 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 		memEnv.pushStackFrame();
 		
 		FuncDecl func = functions.get(funcID);
-		
 		//set arguments on the newly pushed stack frame
 		for(int i = 0; i < func.getFormalArgs().length; i++) {
 			memEnv.getCurrentFrame().define(func.getFormalArgs()[i].getIdentifier(), args[i]);
 		}
 		
 		//call the function
-		func.getBody().accept(this, memEnv.getCurrentFrame());
-		Object ret = memEnv.getCurrentFrame().getReturnRegister();
-		
-		//clear the stack frames
-		memEnv.popStackFrame();
-		
-		memEnv.getCurrentFrame().setReturnRegister(ret);
-		
-		//return
-		returning = false;
+		try {
+			func.getBody().accept(this, memEnv.getCurrentFrame());
+		} finally {
+			//clear the stack frame
+			memEnv.popStackFrame();
+		}
 	}
 	
 	private void nativeCall(String funcID, Object[] args) {
 		Native<?> nativeCall = natives.get(funcID);
-		
-		Object ret = nativeCall.call(args);
-		
-		memEnv.getCurrentFrame().setReturnRegister(ret);
+		throw new Return(nativeCall.call(args));
 	}
 
 	public void setOut(PrintStream out) {

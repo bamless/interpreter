@@ -20,10 +20,9 @@ import com.bamless.interpreter.ast.Position;
  * Generic Lexer that accepts a file with definable lexeme regexs.
  * It allows indefinite peeking in the token stream.
  * 
- * The lexer interns the token types and lexemes via {@link String#intern()} method
- * in order to save space and to permit type comparison via == or != (i.e. tok.getType() == "AND_OP"
- * instead of type.getType.equals("AND_OP")). This works because interned string are all mapped to the
- * same memory object.
+ * The lexer interns the token types via {@link String#intern()} method n order to save space and to 
+ * permit type comparison via == or != (i.e. tok.getType() == "AND_OP" instead of type.getType.equals("AND_OP")).
+ * This works because interned string are all mapped to the same memory object.
  * 
  * @author fabrizio
  *
@@ -63,13 +62,13 @@ public class Lexer {
 		this(skipSpaces, commentsRegx);
 		if(types.length % 3 != 0) {
 			throw new IllegalArgumentException("Invalid types array. "
-					+ "The array should be composed of pairs TYPE_NAME, REGEX.");
+					+ "The array should be composed of triples TYPE_NAME, REGEX, keep_flag.");
 		}
 		
 		//the token types get interned
 		for(int i = 0; i < types.length; i += 3) {
 			typesRegx.put(types[i].intern(), Pattern.compile(types[i + 1]));
-			keepLexeme.put(types[i].intern(), types[i + 2].equals("0") ? false: true);
+			keepLexeme.put(types[i], types[i + 2].equals("0") ? false: true);
 		}
 	}
 	
@@ -183,13 +182,11 @@ public class Lexer {
 			if(type == null) {
 				Matcher invTok = invalid.matcher(line);
 				invTok.find(start);
-				
 				throw new LexicalException(String.format("Lexical error (%d, %d): invalid token \"%s\"",
 						lineNo, invTok.start(), invTok.group()));
 			}
 
-			//add interned lexeme if needed
-			tokens.add(new Token(type, keepLexeme.get(type) ? lexeme.intern() : null, new Position(lineNo, start + 1)));
+			tokens.add(new Token(type, keepLexeme.get(type) ? lexeme : null, new Position(lineNo, start + 1)));
  			start += length;
 		}
 	}
@@ -286,7 +283,7 @@ public class Lexer {
 				throw new IllegalArgumentException("Error at " + regx.getPosition() + ": " + regx.getValue() + " is not a valid regex.", e);
 			}
 			
-			typesRegx.put(type.getValue(), pattern);
+			typesRegx.put(type.getValue().intern(), pattern);
 			keepLexeme.put(type.getValue(), keep.getValue().equals("0") ? false : true);
 		}
 	}

@@ -38,7 +38,6 @@ public class MemoryEnvironment {
 		private VarRetriever retriever;
 		
 		private HashMap<String, Object> mem;
-		private Object returnRegister;
 		
 		private Frame() {
 			mem = new HashMap<>();
@@ -46,26 +45,16 @@ public class MemoryEnvironment {
 			retriever = new VarRetriever();
 		}
 		
-		public <T> void define(Identifier id, T val) {
+		public void define(Identifier id, Object val) {
 			mem.put(id.getVal(), val);
 		}
 		
-		public <T> void set(Lvalue var, T val) {
+		public void set(Lvalue var, Object val) {
 			var.accept(setter, val);
 		}
 		
-		@SuppressWarnings("unchecked")
-		public <T> T retrieve(Lvalue var) {
-			return (T) var.accept(retriever, null);
-		}
-		
-		public <T> void setReturnRegister(T val) {
-			returnRegister = val;
-		}
-		
-		@SuppressWarnings("unchecked")
-		public <T> T getReturnRegister() {
-			return (T) returnRegister;
+		public Object retrieve(Lvalue var) {
+			return var.accept(retriever, null);
 		}
 		
 		private class VarSetter extends VoidVisitorAdapter<Object> {

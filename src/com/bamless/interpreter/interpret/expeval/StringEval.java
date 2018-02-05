@@ -10,6 +10,7 @@ import com.bamless.interpreter.ast.expression.StringLiteral;
 import com.bamless.interpreter.ast.expression.VarLiteral;
 import com.bamless.interpreter.ast.type.Type.TypeID;
 import com.bamless.interpreter.interpret.Interpreter;
+import com.bamless.interpreter.interpret.Return;
 import com.bamless.interpreter.interpret.RuntimeError;
 import com.bamless.interpreter.interpret.memenv.MemoryEnvironment.Frame;
 import com.bamless.interpreter.visitor.VisitorAdapter;
@@ -60,12 +61,12 @@ public class StringEval extends VisitorAdapter<String, Frame> {
 	
 	@Override
 	public String visit(VarLiteral v, Frame frame) {
-		return frame.<String>retrieve(v);
+		return (String) frame.retrieve(v);
 	}
 	
 	@Override
 	public String visit(ArrayAccess a, Frame frame) {
-		return frame.<String>retrieve(a);
+		return (String) frame.retrieve(a);
 	}
 	
 	@Override
@@ -82,8 +83,12 @@ public class StringEval extends VisitorAdapter<String, Frame> {
 	
 	@Override
 	public String visit(FuncCallExpression f, Frame frame) {
-		interpreter.callFunction(f);
-		return frame.<String>getReturnRegister();
+		try {
+			interpreter.callFunction(f);
+		} catch(Return r) {
+			return (String) r.getVal();
+		}
+		throw new RuntimeError("Fatal error, function " + f + " declares return type but doesn't return");
 	}
 	
 }
