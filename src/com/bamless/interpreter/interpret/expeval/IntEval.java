@@ -56,7 +56,7 @@ public class IntEval extends VisitorAdapter<Integer, Frame> {
 		try {
 			interpreter.callFunction(f);
 		} catch(Return r) {
-			return (Integer) r.getVal();
+			return (Integer) r.val;
 		}
 		throw new RuntimeError("Fatal error, function " + f + " declares return type but doesn't return");
 	}

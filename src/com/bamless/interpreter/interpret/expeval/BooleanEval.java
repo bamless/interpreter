@@ -141,7 +141,7 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 		try {
 			interpreter.callFunction(f);
 		} catch(Return r) {
-			return (Boolean) r.getVal();
+			return (Boolean) r.val;
 		}
 		throw new RuntimeError("Fatal error, function " + f + " declares return type but doesn't return");
 	}

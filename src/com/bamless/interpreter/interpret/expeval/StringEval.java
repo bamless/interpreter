@@ -86,7 +86,7 @@ public class StringEval extends VisitorAdapter<String, Frame> {
 		try {
 			interpreter.callFunction(f);
 		} catch(Return r) {
-			return (String) r.getVal();
+			return (String) r.val;
 		}
 		throw new RuntimeError("Fatal error, function " + f + " declares return type but doesn't return");
 	}

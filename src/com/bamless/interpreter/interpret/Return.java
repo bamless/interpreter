@@ -1,14 +1,21 @@
 package com.bamless.interpreter.interpret;
 
+@SuppressWarnings("serial")
 public class Return extends RuntimeException {
-	private Object val;
+	private static final Return instance = new Return();
+
+	public Object val;
 	
-	public Return(Object val) {
-		this.val = val;
+	private Return() {
 	}
 	
-	public Object getVal() {
-		 return val;
+	public static Return instance() {
+		return instance;
+	}
+	
+	public static Return instance(Object val) {
+		instance.val = val;
+		return instance;
 	}
 
 }

@@ -41,7 +41,7 @@ public class ArrayEval extends VisitorAdapter<Array, Frame> {
 		try {
 			interpreter.callFunction(f);
 		} catch(Return r) {
-			return (Array) r.getVal();
+			return (Array) r.val;
 		}
 		throw new RuntimeError("Fatal error, function " + f + " declares return type but doesn't return");
 	}

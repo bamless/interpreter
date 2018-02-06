@@ -80,7 +80,7 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 		try {
 			callFunction(main);
 		} catch (Return r) {
-			mainReturn = r.getVal();
+			mainReturn = r.val;
 		}
 		
 	}
@@ -119,12 +119,12 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	
 	@Override
 	public void visit(BreakStatement b, Frame arg) {
-		throw new Break();
+		throw Break.instance();
 	}
 	
 	@Override
 	public void visit(ContinueStatement c, Frame arg) {
-		throw new Continue();
+		throw Continue.instance();
 	}
 	
 	@Override
@@ -179,7 +179,7 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 		if(r.getExpression() != null) {
 			ret = interpretExpression(r.getExpression(), frame);
 		}
-		throw new Return(ret);
+		throw Return.instance(ret);
 	}
 	
 	/* ************************* */
@@ -263,7 +263,7 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	
 	private void nativeCall(String funcID, Object[] args) {
 		Native<?> nativeCall = natives.get(funcID);
-		throw new Return(nativeCall.call(args));
+		throw Return.instance(nativeCall.call(args));
 	}
 
 	public void setOut(PrintStream out) {
