@@ -16,15 +16,17 @@ import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.interpret.Interpreter;
 import com.bamless.interpreter.natives.Length;
 import com.bamless.interpreter.natives.Native;
+import com.bamless.interpreter.natives.ReadIn;
 import com.bamless.interpreter.natives.StrLen;
 import com.bamless.interpreter.parser.ASTParser;
 import com.bamless.interpreter.semantic.SemanticAnalyzer;
 
 public class CML {
-	private static Map<String, Native<?>> natives = new HashMap<>();
+	private static final Map<String, Native<?>> natives = new HashMap<>();
 	static {
 		natives.put(Length.ID, new Length());
 		natives.put(StrLen.ID, new StrLen());
+		natives.put(ReadIn.ID, new ReadIn());
 	}
 
 	private SemanticAnalyzer semantic;
@@ -62,6 +64,10 @@ public class CML {
 	
 	public void setStdOut(PrintStream out) {
 		interpreter.setOut(out);
+	}
+	
+	public void setStdIn(InputStream in) {
+		interpreter.setIn(in);
 	}
 	
 	public static void serialize(Program p, String filepath) throws FileNotFoundException, IOException {

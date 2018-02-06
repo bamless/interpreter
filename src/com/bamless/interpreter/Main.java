@@ -20,12 +20,9 @@ public class Main {
 	 * If no argument is provided the interpreter begins reading the program from standard input.
 	 * 
 	 * If arguments are provided:
-	 * 
-	 * If the `-c` option is specified the program gets compiled and saved in the same path as the source file 
-	 * but with ccml exentsion. It is reccomended to compile only medium to large source files.
 	 *
 	 * If no option (or the `-c`) option is specified the interpreter runs (or respectively compile) the source 
-	 * file provided as the next argument.
+	 * file provided as the next argument. It is recommended to compile only medium to large source files.
 	 * 
 	 * If the option `-e` is specified the second argument is interpreted as source code instead of a path
 	 * to a source file and gets executed.

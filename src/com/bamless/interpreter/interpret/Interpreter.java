@@ -1,5 +1,6 @@
 package com.bamless.interpreter.interpret;
 
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.Map;
@@ -29,7 +30,7 @@ import com.bamless.interpreter.interpret.expeval.BooleanEval;
 import com.bamless.interpreter.interpret.expeval.FloatEval;
 import com.bamless.interpreter.interpret.expeval.IntEval;
 import com.bamless.interpreter.interpret.expeval.StringEval;
-import com.bamless.interpreter.interpret.memenv.Array;
+import com.bamless.interpreter.interpret.memenv.CmlArr;
 import com.bamless.interpreter.interpret.memenv.MemoryEnvironment;
 import com.bamless.interpreter.interpret.memenv.MemoryEnvironment.Frame;
 import com.bamless.interpreter.natives.Native;
@@ -55,6 +56,7 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	private Map<String, Native<?>> natives;
 	
 	private PrintStream out = System.out;
+	private InputStream in = System.in;
 	private MemoryEnvironment memEnv;
 	
 	private Object mainReturn;
@@ -170,7 +172,7 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 			computetDim.add(e.accept(intEval, frame));
 		}
 		
-		frame.define(a.getId(), new Array(computetDim, ((ArrayType) a.getType()).getInternalType()));
+		frame.define(a.getId(), new CmlArr(computetDim, ((ArrayType) a.getType()).getInternalType()));
 	}
 	
 	@Override
@@ -263,11 +265,23 @@ public class Interpreter extends VoidVisitorAdapter<Frame> {
 	
 	private void nativeCall(String funcID, Object[] args) {
 		Native<?> nativeCall = natives.get(funcID);
-		throw Return.instance(nativeCall.call(args));
+		throw Return.instance(nativeCall.call(this, args));
 	}
-
+	
 	public void setOut(PrintStream out) {
 		this.out = out;
+	}
+	
+	public PrintStream getOut() {
+		return out;
+	}
+	
+	public InputStream getIn() {
+		return in;
+	}
+
+	public void setIn(InputStream in) {
+		this.in = in;
 	}
 
 	public Object getMainReturn() {

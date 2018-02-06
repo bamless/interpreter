@@ -6,18 +6,20 @@ import com.bamless.interpreter.ast.type.ArrayType;
 import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.ast.type.Type.TypeID;
 
-public class Array implements Cloneable {
+public class CmlArr implements Cloneable {
 	private Object[] arr;
 	
-	public Array(LinkedList<Integer> dimensions, Type t) {
+	public CmlArr(LinkedList<Integer> dimensions, Type t) {
 		arr = new Object[dimensions.poll()];
 		
-		if(dimensions.size() == 0)
+		if(dimensions.size() == 0) {
 			init(t);
-		else {
-			for(int i = 0; i < arr.length; i++)
-					arr[i] = new Array(dimensions, ((ArrayType) t).getInternalType());
+		} else {
+			for(int i = 0; i < arr.length; i++) {
+					arr[i] = new CmlArr(dimensions, ((ArrayType) t).getInternalType());
+			}
 		}
+		
 		dimensions.push(arr.length);
 	}
 	
@@ -32,14 +34,10 @@ public class Array implements Cloneable {
 	}
 	
 	public Object get(int i) {
-		if(i < 0 || i > arr.length - 1)
-			throw new ArrayIndexOutOfBoundsException(i);
 		return arr[i];
 	}
 	
 	public void set(int i, Object o) {
-		if(i < 0 || i > arr.length - 1) 
-			throw new ArrayIndexOutOfBoundsException(i);
 		arr[i] = o;
 	}
 	

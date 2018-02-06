@@ -1,8 +1,11 @@
 package com.bamless.interpreter.natives;
 
 import com.bamless.interpreter.ast.type.Type;
+import com.bamless.interpreter.interpret.Interpreter;
 
 public abstract class Native<T> {
+	public static final Type[] VOID = new Type[0];
+	
 	private String id;
 	private Type type;
 	private Type[] argType;
@@ -13,7 +16,7 @@ public abstract class Native<T> {
 		this.argType = argType;
 	}
 	
-	public abstract T call(Object... args);
+	public abstract T call(Interpreter i, Object... args);
 	
 	public Type getType() {
 		return type;

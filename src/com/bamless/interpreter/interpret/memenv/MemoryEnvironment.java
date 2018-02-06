@@ -65,7 +65,7 @@ public class MemoryEnvironment {
 			
 			@Override
 			public void visit(ArrayAccess a, Object arg) {
-				Array l = a.getLvalue().accept(interpreter.array(), getCurrentFrame());
+				CmlArr l = a.getLvalue().accept(interpreter.array(), getCurrentFrame());
 				
 				try {
 					l.set(a.getIndex().accept(interpreter.integer(), getCurrentFrame()), arg);
@@ -83,7 +83,7 @@ public class MemoryEnvironment {
 			
 			@Override
 			public Object visit(ArrayAccess a, Void arg) {
-				Array array = a.getLvalue().accept(interpreter.array(), getCurrentFrame());
+				CmlArr array = a.getLvalue().accept(interpreter.array(), getCurrentFrame());
 				
 				Object o = null;
 				try {
