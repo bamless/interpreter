@@ -14,10 +14,12 @@ import java.util.Map;
 
 import com.bamless.interpreter.ast.Program;
 import com.bamless.interpreter.interpret.Interpreter;
+import com.bamless.interpreter.natives.Charat;
 import com.bamless.interpreter.natives.Length;
 import com.bamless.interpreter.natives.Native;
 import com.bamless.interpreter.natives.ReadIn;
 import com.bamless.interpreter.natives.StrLen;
+import com.bamless.interpreter.natives.Substr;
 import com.bamless.interpreter.parser.ASTParser;
 import com.bamless.interpreter.semantic.SemanticAnalyzer;
 
@@ -27,6 +29,8 @@ public class CML {
 		natives.put(Length.ID, new Length());
 		natives.put(StrLen.ID, new StrLen());
 		natives.put(ReadIn.ID, new ReadIn());
+		natives.put(Charat.ID, new Charat());
+		natives.put(Substr.ID, new Substr());
 	}
 
 	private SemanticAnalyzer semantic;

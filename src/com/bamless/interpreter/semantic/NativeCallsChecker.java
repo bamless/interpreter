@@ -3,6 +3,7 @@ package com.bamless.interpreter.semantic;
 import com.bamless.interpreter.ErrUtils;
 import com.bamless.interpreter.ast.FuncDecl;
 import com.bamless.interpreter.ast.Program;
+import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.ast.expression.FuncCallExpression;
 import com.bamless.interpreter.natives.Native;
 import com.bamless.interpreter.visitor.VoidVisitorAdapter;
@@ -29,6 +30,10 @@ public class NativeCallsChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(FuncCallExpression f, Void arg) {
+		for(Expression a : f.getArgs()) {
+			a.accept(this, arg);
+		}
+		
 		if(natives.containsKey(f.getFuncName().getVal()))
 			f.setNative(true);
 	}
