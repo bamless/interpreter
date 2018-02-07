@@ -588,8 +588,7 @@ public class ASTParser {
 			Position pos = lex.next().getPosition();
 			return new PreIncrementOperation(DECR, unaryExpr(), pos);
 		}
-		if(lex.peek().getType() == "(" && (lex.peek(2).getType() == "INT" || lex.peek(2).getType() == "BOOLEAN" || 
-				lex.peek(2).getType() == "FLOAT" || lex.peek(2).getType() == "STRING")) {
+		if(lex.peek().getType() == "(" && isPrimitiveType(lex.peek(2))) {
 			Position pos = lex.next().getPosition();
 			Type cast = type();
 			require(")");
