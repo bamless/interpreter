@@ -224,8 +224,7 @@ public class ASTParser {
 		List<Statement> statements = new ArrayList<>();
 		while((peek = lex.peek()).getType() != "}") {
 			//can only declare var 	inside a block
-			if(peek.getType() == "INT" || peek.getType() == "BOOLEAN" || 
-					peek.getType() == "FLOAT" || peek.getType() == "STRING") {
+			if(isPrimitiveType(peek)) {
 				statements.add(varDecl());
 			} else {
 				statements.add(statement());
@@ -319,9 +318,9 @@ public class ASTParser {
 		
 		require("(");
 		
-		Expression init = null;
+		Statement init = null;
 		if(lex.peek().getType() != ";")
-			init = expression();
+			init = varDeclOrExpr();
 		
 		require(";");
 		
@@ -341,6 +340,14 @@ public class ASTParser {
 		return new ForStatement(start, init, cond, action, body);
 	}
 	
+	private Statement varDeclOrExpr() {
+		if(isPrimitiveType(lex.peek())) {
+			return varDecl();
+		} else {
+			return expression();
+		}
+	}
+
 	/**
 	 * Print -> print Expression
 	 *        | println Expression
@@ -673,6 +680,13 @@ public class ASTParser {
 			error("expected expression before \"%s\"", litTok.getValue());
 			return null;
 		}
+	}
+	
+	private boolean isPrimitiveType(Token tok) {
+		if(tok.getType() == "INT" || tok.getType() == "BOOLEAN" || 
+				tok.getType() == "FLOAT" || tok.getType() == "STRING")
+			return true;
+		return false;
 	}
 	
 	public void clear() {

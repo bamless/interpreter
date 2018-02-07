@@ -111,13 +111,17 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 
 	@Override
 	public Type visit(ForStatement f, FuncDecl currentFunc) {
+		boolean forDecl = f.getInit() instanceof VarDecl;
+		
+		if(forDecl) st.enterScope();
+		
 		// propagate visitor to the other 2 expressions and to the body
 		if (f.getInit() != null)
 			f.getInit().accept(this, currentFunc);
 
 		// check condition type
-		Type condition = f.getCond() == null ? Type.BOOLEAN : f.getCond().accept(this, currentFunc);
-		if (condition != Type.BOOLEAN) {
+		Type condition = f.getCond() == null ? null : f.getCond().accept(this, currentFunc);
+		if (condition != null && condition != Type.BOOLEAN) {
 			typeError(f.getCond().getPosition(), "cannot convert %s to boolean", condition.toString().toLowerCase());
 		}
 
@@ -125,6 +129,8 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 			f.getAct().accept(this, currentFunc);
 
 		f.getBody().accept(this, currentFunc);
+		
+		if(forDecl) st.exitScope();
 
 		return null;
 	}

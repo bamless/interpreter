@@ -6,13 +6,13 @@ import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class ForStatement extends Statement {
-	private Expression init;
+	private Statement init;
 	private Expression cond;
 	private Expression act;
 	
 	private Statement body;
 
-	public ForStatement(Position start, Expression init, Expression cond, Expression act, Statement body) {
+	public ForStatement(Position start, Statement init, Expression cond, Expression act, Statement body) {
 		super(start);
 		this.init = init;
 		this.cond = cond;
@@ -30,7 +30,7 @@ public class ForStatement extends Statement {
 		v.visit(this, arg);
 	}
 
-	public Expression getInit() {
+	public Statement getInit() {
 		return init;
 	}
 

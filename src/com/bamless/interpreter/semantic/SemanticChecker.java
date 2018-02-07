@@ -87,18 +87,25 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(ForStatement v, Void arg) {
-		if (v.getInit() != null && !hasSideEffect(v.getInit())) {
+		if (v.getInit() != null && (v.getInit() instanceof Expression && !hasSideEffect((Expression) v.getInit()))) {
 			ErrUtils.warn("Warning %s: computed value is not used", v.getInit().getPosition());
 		}
 		if (v.getAct() != null && !hasSideEffect(v.getAct())) {
 			ErrUtils.warn("Warning %s: computed value is not used", v.getAct().getPosition());
 		}
+		boolean forDecl = v.getInit() instanceof VarDecl;
+		
+		if(forDecl) varDecl.enterScope();
 
-		// the initialization of a for is always executed, so define in current init scope
+		//if the init part of the for is a variable declaration enter a new init scope.
+		//if it isn't a vardecl then its an assignement, and because the init clause of
+		//a for is always executed the variable will be initialized from here on, so do 
+		//not enter init scope
+		if(forDecl) init.enterScope();
+		
 		if (v.getInit() != null)
 			v.getInit().accept(this, arg);
 
-		// we're not guaranteed that further initializations will always be executed, so enter init scope
 		init.enterScope();
 
 		if (v.getCond() != null)
@@ -109,6 +116,9 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 		v.getBody().accept(this, arg);
 
 		init.exitScope();
+		
+		if(forDecl) init.exitScope();
+		if(forDecl) varDecl.exitScope();
 	}
 
 	@Override
