@@ -32,28 +32,15 @@ import com.bamless.interpreter.visitor.VoidVisitorAdapter;
  *
  */
 public class SemanticChecker extends VoidVisitorAdapter<Void> {
-	/**
-	 * Marker object used to denote the presence of an identifier in the 'varDecl'
-	 * symboltable
-	 */
+	/** Marker object used to denote the presence of an identifier in the 'varDecl'
+	 * symboltable */
 	private static final Object DECL = new Object();
-	/**
-	 * Symbol table to keep track of declared variables. The Object associated with
-	 * the identidfier is used as a marker.
-	 */
+	/** Symbol table to keep track of declared variables. The Object associated with
+	 * the identidfier is used as a marker. */
 	private SymbolTable<Object> varDecl;
-	
-	/**
-	 * Symbol table used to keep track of initialized variables. This symbol table
-	 * enters a new scope every control statement of the language. This is because
-	 * we're not guaranteed at compile time that the control statement would be
-	 * entered at runtime, and therefore we cannot be sure that the code that
-	 * initializes variables inside of it will be executed. By entering
-	 * and exiting a new scope when entering and exiting a control statement, we're
-	 * discarding eventual initializations that would be valid only for the current
-	 * statement.
-	 */
+	/** Symbol table to keep track of initialized variables. */
 	private SymbolTable<Boolean> init;
+	
 	private Map<String, FuncDecl> funcs;
 
 	public SemanticChecker() {
@@ -71,6 +58,22 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 		for (String id : funcs.keySet()) {
 			funcs.get(id).accept(this, arg);
 		}
+	}
+	
+	@Override
+	public void visit(FuncDecl d, Void arg) {
+		varDecl.enterScope();
+		init.enterScope();
+
+		for (FormalArg a : d.getFormalArgs()) {
+			varDecl.define(a.getIdentifier().getVal(), DECL);
+			init.define(a.getIdentifier().getVal(), true);
+		}
+
+		d.getBody().accept(this, arg);
+
+		init.exitScope();
+		varDecl.exitScope();
 	}
 
 	@Override
@@ -93,14 +96,10 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 		if (v.getAct() != null && !hasSideEffect(v.getAct())) {
 			ErrUtils.warn("Warning %s: computed value is not used", v.getAct().getPosition());
 		}
+		
 		boolean forDecl = v.getInit() instanceof VarDecl;
 		
 		if(forDecl) varDecl.enterScope();
-
-		//if the init part of the for is a variable declaration enter a new init scope.
-		//if it isn't a vardecl then its an assignement, and because the init clause of
-		//a for is always executed the variable will be initialized from here on, so do 
-		//not enter init scope
 		if(forDecl) init.enterScope();
 		
 		if (v.getInit() != null)
@@ -188,12 +187,7 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 
 			e.getExpression().accept(this, arg);
 
-			// if not defined in current init scope define it
-			if (init.probe(v.getId().getVal()) == null)
-				init.define(v.getId().getVal(), true);
-			// else set the current scope entry to true
-			else
-				init.set(v.getId().getVal(), true);
+			init.defineOrSet(v.getId().getVal(), true);
 
 			e.getLvalue().accept(this, arg);
 		} else {
@@ -237,22 +231,6 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 
 		if (decl == null && !f.isNative())
 			ErrUtils.semanticError(f.getPosition(), "Use of undeclared function `%s`.", f.getFuncName());
-	}
-
-	@Override
-	public void visit(FuncDecl d, Void arg) {
-		varDecl.enterScope();
-		init.enterScope();
-
-		for (FormalArg a : d.getFormalArgs()) {
-			varDecl.define(a.getIdentifier().getVal(), DECL);
-			init.define(a.getIdentifier().getVal(), true);
-		}
-
-		d.getBody().accept(this, arg);
-
-		init.exitScope();
-		varDecl.exitScope();
 	}
 
 	private boolean hasSideEffect(Expression e) {

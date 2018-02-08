@@ -68,12 +68,7 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 		int i;
 		for(i = 0; i < v.getStmts().length; i++) {
 			Statement s = v.getStmts()[i];
-			
-			if(s instanceof ReturnStatement || s instanceof IfStatement)
-				ret |= s.accept(this, arg);
-			else
-				s.accept(this, arg);
-			
+			ret |= s.accept(this, arg);
 			if(ret) break;
 		}
 
@@ -86,12 +81,14 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 
 	@Override
 	public Boolean visit(ForStatement v, Void arg) {
-		return v.getBody().accept(this, arg);
+		v.getBody().accept(this, arg);
+		return false;
 	}
 
 	@Override
 	public Boolean visit(WhileStatement v, Void arg) {
-		return v.getBody().accept(this, arg);
+		v.getBody().accept(this, arg);
+		return false;
 	}
 
 	@Override
@@ -106,6 +103,7 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 	public Boolean visit(ReturnStatement r, Void arg) {
 		return true;
 	}
+	
 
 	@Override
 	public Boolean visit(Visitable v, Void arg) {

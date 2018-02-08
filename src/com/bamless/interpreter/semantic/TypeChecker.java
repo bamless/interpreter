@@ -500,14 +500,15 @@ public class TypeChecker implements GenericVisitor<Type, FuncDecl> {
 		Type l = e.getLeft().getType();
 		Type r = e.getRight().getType();
 		
-		if(l == r || l.getWidenFactor() == Type.NULL_WIDENFACT || r.getWidenFactor() == Type.NULL_WIDENFACT)
+		if(l == r || l.getWidenFactor() == Type.NULL_WIDENFACT || r.getWidenFactor() == Type.NULL_WIDENFACT) {
 			return;
+		}
 		
-		Type widen = l.getWidenFactor() < r.getWidenFactor() ? r : l;
-		if(widen == r)
-			e.setLeft(new CastExpression(widen, e.getLeft(), e.getLeft().getPosition()));
-		else
-			e.setRight(new CastExpression(widen, e.getRight(), e.getRight().getPosition()));
+		if(l.getWidenFactor() < r.getWidenFactor()) {
+			e.setLeft(new CastExpression(r, e.getLeft(), e.getLeft().getPosition()));
+		} else {
+			e.setRight(new CastExpression(l, e.getRight(), e.getRight().getPosition()));
+		}
 	}
 
 }

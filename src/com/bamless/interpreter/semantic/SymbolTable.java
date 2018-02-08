@@ -38,6 +38,12 @@ public class SymbolTable<T> {
 		throw new IllegalArgumentException("Symbol " + id + " does not exist in any scope");
 	}
 	
+	public void defineOrSet(String id, T val) {
+		if(scopes.peek().containsKey(id))
+			scopes.peek().put(id, val);
+		scopes.peek().put(id, val);
+	}
+	
 	public T lookup(String id) {
 		Iterator<HashMap<String, T>> i = scopes.iterator();
 		while(i.hasNext()) {
