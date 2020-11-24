@@ -5,8 +5,8 @@ import com.bamless.interpreter.ast.Position;
 
 public abstract class Statement extends ASTNode {
 
-	public Statement(Position start) {
-		super(start);
-	}
+    public Statement(Position start) {
+        super(start);
+    }
 
 }

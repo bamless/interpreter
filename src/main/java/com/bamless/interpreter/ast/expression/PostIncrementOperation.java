@@ -4,30 +4,30 @@ import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class PostIncrementOperation extends PostFixExpression {
-	private IncrementOperator op;
+    private IncrementOperator op;
 
-	public PostIncrementOperation(IncrementOperator op, Expression e) {
-		super(e);
-		this.op = op;
-	}
+    public PostIncrementOperation(IncrementOperator op, Expression e) {
+        super(e);
+        this.op = op;
+    }
 
-	@Override
-	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
-		return v.visit(this, arg);
-	}
+    @Override
+    public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
+        return v.visit(this, arg);
+    }
 
-	@Override
-	public <A> void accept(VoidVisitor<A> v, A arg) {
-		v.visit(this, arg);
-	}
+    @Override
+    public <A> void accept(VoidVisitor<A> v, A arg) {
+        v.visit(this, arg);
+    }
 
-	public IncrementOperator getOperator() {
-		return op;
-	}
+    public IncrementOperator getOperator() {
+        return op;
+    }
 
-	@Override
-	public String toString() {
-		return getExpression() + op.toString();
-	}
+    @Override
+    public String toString() {
+        return getExpression() + op.toString();
+    }
 
 }

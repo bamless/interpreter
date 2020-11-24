@@ -6,18 +6,18 @@ import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class BreakStatement extends Statement {
 
-	public BreakStatement(Position start) {
-		super(start);
-	}
+    public BreakStatement(Position start) {
+        super(start);
+    }
 
-	@Override
-	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
-		return v.visit(this, arg);
-	}
+    @Override
+    public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
+        return v.visit(this, arg);
+    }
 
-	@Override
-	public <A> void accept(VoidVisitor<A> v, A arg) {
-		v.visit(this, arg);
-	}
+    @Override
+    public <A> void accept(VoidVisitor<A> v, A arg) {
+        v.visit(this, arg);
+    }
 
 }

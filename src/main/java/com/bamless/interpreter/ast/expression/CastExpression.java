@@ -7,24 +7,24 @@ import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class CastExpression extends UnaryExpression {
 
-	public CastExpression(Type castType, Expression e, Position pos) {
-		super(e, pos);
-		setType(castType);
-	}
+    public CastExpression(Type castType, Expression e, Position pos) {
+        super(e, pos);
+        setType(castType);
+    }
 
-	@Override
-	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
-		return v.visit(this, arg);
-	}
+    @Override
+    public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
+        return v.visit(this, arg);
+    }
 
-	@Override
-	public <A> void accept(VoidVisitor<A> v, A arg) {
-		v.visit(this, arg);
-	}
+    @Override
+    public <A> void accept(VoidVisitor<A> v, A arg) {
+        v.visit(this, arg);
+    }
 
-	@Override
-	public String toString() {
-		return "(" + getType() + ") " + "(" + getExpression() + ")";
-	}
+    @Override
+    public String toString() {
+        return "(" + getType() + ") " + "(" + getExpression() + ")";
+    }
 
 }

@@ -4,8 +4,8 @@ import com.bamless.interpreter.ast.Position;
 
 public abstract class Lvalue extends Expression {
 
-	public Lvalue(Position start) {
-		super(start);
-	}
+    public Lvalue(Position start) {
+        super(start);
+    }
 
 }

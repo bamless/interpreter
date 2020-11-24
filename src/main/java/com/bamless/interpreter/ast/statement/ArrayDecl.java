@@ -10,37 +10,37 @@ import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class ArrayDecl extends Statement {
-	private Identifier id;
-	private Expression[] dimensions;
-	private Type type;
+    private Identifier id;
+    private Expression[] dimensions;
+    private Type type;
 
-	public ArrayDecl(Position start, Type type, Collection<Expression> dimensions, Identifier id) {
-		super(start);
-		this.dimensions = dimensions.toArray(new Expression[dimensions.size()]);
-		this.type = type;
-		this.id = id;
-	}
+    public ArrayDecl(Position start, Type type, Collection<Expression> dimensions, Identifier id) {
+        super(start);
+        this.dimensions = dimensions.toArray(new Expression[dimensions.size()]);
+        this.type = type;
+        this.id = id;
+    }
 
-	@Override
-	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
-		return v.visit(this, arg);
-	}
+    @Override
+    public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
+        return v.visit(this, arg);
+    }
 
-	@Override
-	public <A> void accept(VoidVisitor<A> v, A arg) {
-		v.visit(this, arg);
-	}
+    @Override
+    public <A> void accept(VoidVisitor<A> v, A arg) {
+        v.visit(this, arg);
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+        return type;
+    }
 
-	public Expression[] getDimensions() {
-		return dimensions;
-	}
+    public Expression[] getDimensions() {
+        return dimensions;
+    }
 
-	public Identifier getId() {
-		return id;
-	}
+    public Identifier getId() {
+        return id;
+    }
 
 }

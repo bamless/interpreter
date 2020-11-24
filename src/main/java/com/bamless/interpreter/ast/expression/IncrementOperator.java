@@ -1,16 +1,16 @@
 package com.bamless.interpreter.ast.expression;
 
 public enum IncrementOperator {
-	INCR("++"), DECR("--");
+    INCR("++"), DECR("--");
 
-	private String repr;
+    private String repr;
 
-	private IncrementOperator(String repr) {
-		this.repr = repr;
-	}
+    private IncrementOperator(String repr) {
+        this.repr = repr;
+    }
 
-	@Override
-	public String toString() {
-		return repr;
-	}
+    @Override
+    public String toString() {
+        return repr;
+    }
 }

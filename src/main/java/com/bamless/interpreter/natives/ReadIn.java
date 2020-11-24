@@ -8,22 +8,22 @@ import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.interpret.Interpreter;
 
 public class ReadIn extends Native<String> {
-	public static final String ID = "read_in";
+    public static final String ID = "read_in";
 
-	public ReadIn() {
-		super(Type.STRING, ID, VOID);
-	}
+    public ReadIn() {
+        super(Type.STRING, ID, VOID);
+    }
 
-	@Override
-	public String call(Interpreter i, Object... args) {
-		BufferedReader in = new BufferedReader(new InputStreamReader(i.getIn()));
+    @Override
+    public String call(Interpreter i, Object... args) {
+        BufferedReader in = new BufferedReader(new InputStreamReader(i.getIn()));
 
-		try {
-			String inStr = in.readLine();
-			return inStr == null ? "" : inStr;
-		} catch (IOException e) {
-			return "";
-		}
-	}
+        try {
+            String inStr = in.readLine();
+            return inStr == null ? "" : inStr;
+        } catch (IOException e) {
+            return "";
+        }
+    }
 
 }

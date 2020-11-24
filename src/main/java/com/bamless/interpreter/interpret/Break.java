@@ -2,13 +2,13 @@ package com.bamless.interpreter.interpret;
 
 @SuppressWarnings("serial")
 public class Break extends RuntimeException {
-	private final static Break instance = new Break();
+    private final static Break instance = new Break();
 
-	private Break() {
-	}
+    private Break() {
+    }
 
-	public static Break instance() {
-		return instance;
-	}
+    public static Break instance() {
+        return instance;
+    }
 
 }

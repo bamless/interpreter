@@ -24,70 +24,70 @@ import com.bamless.interpreter.parser.ASTParser;
 import com.bamless.interpreter.semantic.SemanticAnalyzer;
 
 public class CML {
-	private static final Map<String, Native<?>> natives = new HashMap<>();
-	static {
-		natives.put(Length.ID, new Length());
-		natives.put(StrLen.ID, new StrLen());
-		natives.put(ReadIn.ID, new ReadIn());
-		natives.put(Charat.ID, new Charat());
-		natives.put(Substr.ID, new Substr());
-	}
+    private static final Map<String, Native<?>> natives = new HashMap<>();
+    static {
+        natives.put(Length.ID, new Length());
+        natives.put(StrLen.ID, new StrLen());
+        natives.put(ReadIn.ID, new ReadIn());
+        natives.put(Charat.ID, new Charat());
+        natives.put(Substr.ID, new Substr());
+    }
 
-	private SemanticAnalyzer semantic;
-	private Interpreter interpreter;
-	private ASTParser parser;
+    private SemanticAnalyzer semantic;
+    private Interpreter interpreter;
+    private ASTParser parser;
 
-	public CML() {
-		semantic = new SemanticAnalyzer(natives);
-		interpreter = new Interpreter(natives);
-		parser = new ASTParser();
-	}
+    public CML() {
+        semantic = new SemanticAnalyzer(natives);
+        interpreter = new Interpreter(natives);
+        parser = new ASTParser();
+    }
 
-	public Program compile(File src) throws FileNotFoundException, IOException {
-		Program p = parser.parse(src);
-		semantic.analyze(p);
-		return p;
-	}
+    public Program compile(File src) throws FileNotFoundException, IOException {
+        Program p = parser.parse(src);
+        semantic.analyze(p);
+        return p;
+    }
 
-	public Program compile(InputStream src) throws IOException {
-		Program p = parser.parse(src);
-		semantic.analyze(p);
-		return p;
-	}
+    public Program compile(InputStream src) throws IOException {
+        Program p = parser.parse(src);
+        semantic.analyze(p);
+        return p;
+    }
 
-	public Program compile(String src) {
-		Program p = parser.parse(src);
-		semantic.analyze(p);
-		return p;
-	}
+    public Program compile(String src) {
+        Program p = parser.parse(src);
+        semantic.analyze(p);
+        return p;
+    }
 
-	public Object run(Program program) {
-		program.accept(interpreter, null);
-		return interpreter.getMainReturn();
-	}
+    public Object run(Program program) {
+        program.accept(interpreter, null);
+        return interpreter.getMainReturn();
+    }
 
-	public void setStdOut(PrintStream out) {
-		interpreter.setOut(out);
-	}
+    public void setStdOut(PrintStream out) {
+        interpreter.setOut(out);
+    }
 
-	public void setStdIn(InputStream in) {
-		interpreter.setIn(in);
-	}
+    public void setStdIn(InputStream in) {
+        interpreter.setIn(in);
+    }
 
-	public static void serialize(Program p, String filepath)
-			throws FileNotFoundException, IOException {
-		try(ObjectOutputStream os = new ObjectOutputStream(
-				new FileOutputStream(new File(filepath)))) {
-			os.writeObject(p);
-		}
-	}
+    public static void serialize(Program p, String filepath)
+            throws FileNotFoundException, IOException {
+        try(ObjectOutputStream os = new ObjectOutputStream(
+                new FileOutputStream(new File(filepath)))) {
+            os.writeObject(p);
+        }
+    }
 
-	public static Program deSerialize(String filepath) throws FileNotFoundException, IOException {
-		try(ObjectInputStream is = new ObjectInputStream(new FileInputStream(new File(filepath)))) {
-			return (Program) is.readObject();
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    public static Program deSerialize(String filepath) throws FileNotFoundException, IOException {
+        try(ObjectInputStream is = new ObjectInputStream(new FileInputStream(new File(filepath)))) {
+            return (Program) is.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

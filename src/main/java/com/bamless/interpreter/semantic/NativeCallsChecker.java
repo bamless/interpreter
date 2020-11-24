@@ -10,32 +10,32 @@ import com.bamless.interpreter.visitor.VoidVisitorAdapter;
 import java.util.Map;
 
 public class NativeCallsChecker extends VoidVisitorAdapter<Void> {
-	private Map<String, Native<?>> natives;
+    private Map<String, Native<?>> natives;
 
-	public NativeCallsChecker(Map<String, Native<?>> natives) {
-		this.natives = natives;
-	}
+    public NativeCallsChecker(Map<String, Native<?>> natives) {
+        this.natives = natives;
+    }
 
-	@Override
-	public void visit(Program p, Void arg) {
-		for(String s : p.getFunctions().keySet()) {
-			FuncDecl f = p.getFunctions().get(s);
-			if(natives.containsKey(s)) {
-				ErrUtils.semanticError(f.getPosition(), "Double declaration of native function %s",
-						s);
-			}
-			f.accept(this, null);
-		}
-	}
+    @Override
+    public void visit(Program p, Void arg) {
+        for(String s : p.getFunctions().keySet()) {
+            FuncDecl f = p.getFunctions().get(s);
+            if(natives.containsKey(s)) {
+                ErrUtils.semanticError(f.getPosition(), "Double declaration of native function %s",
+                        s);
+            }
+            f.accept(this, null);
+        }
+    }
 
-	@Override
-	public void visit(FuncCallExpression f, Void arg) {
-		for(Expression a : f.getArgs()) {
-			a.accept(this, arg);
-		}
+    @Override
+    public void visit(FuncCallExpression f, Void arg) {
+        for(Expression a : f.getArgs()) {
+            a.accept(this, arg);
+        }
 
-		if(natives.containsKey(f.getFuncName().getVal()))
-			f.setNative(true);
-	}
+        if(natives.containsKey(f.getFuncName().getVal()))
+            f.setNative(true);
+    }
 
 }
