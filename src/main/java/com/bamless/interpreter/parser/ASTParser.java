@@ -82,7 +82,7 @@ public class ASTParser {
 	private Lexer lex;
 	
 	public ASTParser() {
-		lex = new Lexer(ClassLoader.class.getResourceAsStream(LEX_FILE), true, COMMENTS_REGX);
+		lex = new Lexer(getClass().getResourceAsStream(LEX_FILE), true, COMMENTS_REGX);
 	}
 	
 	public Program parse(File f) throws FileNotFoundException, IOException {
