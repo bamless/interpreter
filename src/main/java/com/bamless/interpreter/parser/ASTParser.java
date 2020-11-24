@@ -239,8 +239,8 @@ public class ASTParser {
         Token idTok = require("IDENTIFIER");
         Identifier id = new Identifier(idTok.getPosition(), idTok.getValue());
 
-        // Array delcaration
         if(lex.peek().getType() == "[") {
+            // Array declaration
             List<Expression> dim = new ArrayList<>();
             while(lex.peek().getType() == "[") {
                 require("[");
@@ -252,9 +252,8 @@ public class ASTParser {
             }
 
             return new ArrayDecl(typeTok.getPosition(), t, dim, id);
-        }
-        // Normal declaration
-        else {
+        } else {
+            // Normal declaration
             Expression initializer = null;
             if(lex.peek().getType() == "=") {
                 require("=");
