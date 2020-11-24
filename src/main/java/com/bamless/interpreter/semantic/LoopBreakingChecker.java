@@ -19,7 +19,7 @@ public class LoopBreakingChecker extends VoidVisitorAdapter<Statement> {
 				ErrUtils.semanticError(v.getStmts()[i + 1].getPosition(), "Unreachable code");
 		}
 	}
-	
+
 	@Override
 	public void visit(WhileStatement v, Statement arg) {
 		v.getBody().accept(this, v);
@@ -33,14 +33,16 @@ public class LoopBreakingChecker extends VoidVisitorAdapter<Statement> {
 	@Override
 	public void visit(BreakStatement b, Statement arg) {
 		if(arg == null) {
-			ErrUtils.semanticError(b.getPosition(), "break statement can only be used inside a loop");
+			ErrUtils.semanticError(b.getPosition(),
+					"break statement can only be used inside a loop");
 		}
 	}
 
 	@Override
 	public void visit(ContinueStatement c, Statement arg) {
 		if(arg == null) {
-			ErrUtils.semanticError(c.getPosition(), "continue statement can only be used inside a loop");
+			ErrUtils.semanticError(c.getPosition(),
+					"continue statement can only be used inside a loop");
 		}
 	}
 

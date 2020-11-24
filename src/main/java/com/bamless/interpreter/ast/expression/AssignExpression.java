@@ -6,7 +6,7 @@ import com.bamless.interpreter.visitor.VoidVisitor;
 public class AssignExpression extends Expression {
 	private Expression lvalue;
 	private Expression e;
-	
+
 	public AssignExpression(Expression lvalue, Expression e) {
 		super(lvalue.getPosition());
 		this.lvalue = lvalue;
@@ -17,7 +17,7 @@ public class AssignExpression extends Expression {
 	public <A> void accept(VoidVisitor<A> v, A arg) {
 		v.visit(this, arg);
 	}
-	
+
 	@Override
 	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
 		return v.visit(this, arg);
@@ -30,7 +30,7 @@ public class AssignExpression extends Expression {
 	public Expression getExpression() {
 		return e;
 	}
-	
+
 	public void setExpression(Expression e) {
 		this.e = e;
 	}
@@ -39,6 +39,5 @@ public class AssignExpression extends Expression {
 	public String toString() {
 		return lvalue + " = " + e.toString();
 	}
-
 
 }

@@ -7,7 +7,7 @@ import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class ReturnStatement extends Statement {
 	private Expression expression;
-	
+
 	public ReturnStatement(Position start, Expression exp) {
 		super(start);
 		this.expression = exp;
@@ -22,11 +22,11 @@ public class ReturnStatement extends Statement {
 	public <A> void accept(VoidVisitor<A> v, A arg) {
 		v.visit(this, arg);
 	}
-	
+
 	public Expression getExpression() {
 		return expression;
 	}
-	
+
 	public void setExpression(Expression e) {
 		this.expression = e;
 	}

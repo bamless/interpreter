@@ -25,5 +25,5 @@ public abstract class BinaryExpression extends Expression {
 	public void setRight(Expression right) {
 		this.right = right;
 	}
-	
+
 }

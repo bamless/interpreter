@@ -19,7 +19,7 @@ import com.bamless.interpreter.visitor.VisitorAdapter;
 
 public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 	private Interpreter interpreter;
-	
+
 	public BooleanEval(Interpreter interpreter) {
 		this.interpreter = interpreter;
 	}
@@ -27,7 +27,7 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 	@Override
 	public Boolean visit(RelationalExpression r, Frame frame) {
 		float left, right;
-		
+
 		switch(r.getLeft().getType().getId()) {
 		case FLOAT:
 			left = r.getLeft().accept(interpreter.floatingPoint(), frame);
@@ -39,9 +39,9 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 			break;
 		default:
 			throw new RuntimeError("Fatal error");
-		
+
 		}
-		
+
 		switch(r.getOperation()) {
 		case LT:
 			return left < right;
@@ -55,13 +55,13 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 			throw new RuntimeError("fatal error");
 		}
 	}
-	
+
 	@Override
 	public Boolean visit(EqualityExpression e, Frame frame) {
 		Object l = null, r = null;
-		
+
 		TypeID ltype = e.getLeft().getType().getId();
-		
+
 		switch(ltype) {
 		case INT:
 			l = e.getLeft().accept(interpreter.integer(), frame);
@@ -86,7 +86,7 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 		default:
 			throw new RuntimeError("fatal error");
 		}
-		
+
 		switch(e.getOperation()) {
 		case EQ:
 			return l.equals(r);
@@ -96,7 +96,7 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 			throw new RuntimeError("fatal error");
 		}
 	}
-	
+
 	@Override
 	public Boolean visit(LogicalExpression l, Frame frame) {
 		switch(l.getOperation()) {
@@ -108,42 +108,43 @@ public class BooleanEval extends VisitorAdapter<Boolean, Frame> {
 			throw new RuntimeError("fatal error");
 		}
 	}
-	
+
 	@Override
 	public Boolean visit(LogicalNotExpression n, Frame frame) {
 		return !n.getExpression().accept(this, frame);
 	}
-	
+
 	@Override
 	public Boolean visit(VarLiteral v, Frame frame) {
 		return (Boolean) frame.retrieve(v);
 	}
-	
+
 	@Override
 	public Boolean visit(ArrayAccess a, Frame frame) {
 		return (Boolean) frame.retrieve(a);
 	}
-	
+
 	@Override
 	public Boolean visit(BooleanLiteral b, Frame frame) {
 		return b.getValue();
 	}
-	
+
 	@Override
 	public Boolean visit(AssignExpression e, Frame frame) {
 		boolean res = e.getExpression().accept(this, frame);
 		frame.set((Lvalue) e.getLvalue(), res);
 		return res;
 	}
-	
+
 	@Override
 	public Boolean visit(FuncCallExpression f, Frame frame) {
 		try {
 			interpreter.callFunction(f);
-		} catch(Return r) {
+		} catch (Return r) {
 			return (Boolean) r.val;
 		}
-		throw new RuntimeError("Fatal error, function " + f + " declares return type but doesn't return");
+		throw new RuntimeError(
+				"Fatal error, function " + f + " declares return type but doesn't return");
 	}
 
 }

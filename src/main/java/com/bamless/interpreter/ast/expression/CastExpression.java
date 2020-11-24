@@ -6,7 +6,7 @@ import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class CastExpression extends UnaryExpression {
-	
+
 	public CastExpression(Type castType, Expression e, Position pos) {
 		super(e, pos);
 		setType(castType);
@@ -26,5 +26,5 @@ public class CastExpression extends UnaryExpression {
 	public String toString() {
 		return "(" + getType() + ") " + "(" + getExpression() + ")";
 	}
-	
+
 }

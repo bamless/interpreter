@@ -5,12 +5,12 @@ import java.io.Serializable;
 public class Identifier implements Serializable {
 	private transient Position position;
 	private String id;
-	
+
 	public Identifier(Position pos, String id) {
 		this.position = pos;
 		this.id = id;
 	}
-	
+
 	public Identifier(String id) {
 		this(new Position(0, 0), id);
 	}
@@ -33,24 +33,24 @@ public class Identifier implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if(this == obj)
 			return true;
-		if (obj == null)
+		if(obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if(getClass() != obj.getClass())
 			return false;
 		Identifier other = (Identifier) obj;
-		if (id == null) {
-			if (other.id != null)
+		if(id == null) {
+			if(other.id != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if(!id.equals(other.id))
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return id;
 	}
-	
+
 }

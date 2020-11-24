@@ -11,13 +11,15 @@ import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class Program extends ASTNode {
 	private Map<String, FuncDecl> functions;
-	
+
 	public Program(Position start, Collection<FuncDecl> functions) {
 		super(start);
 		this.functions = new LinkedHashMap<>();
 		for(FuncDecl d : functions) {
-			if(this.functions.get(d.getId().getVal()) != null)
-				ErrUtils.semanticError(d.getPosition(), "double declaration od function `%s`", d.getId());
+			if(this.functions.get(d.getId().getVal()) != null) {
+				ErrUtils.semanticError(d.getPosition(), "double declaration od function `%s`",
+						d.getId());
+			}
 			this.functions.put(d.getId().getVal(), d);
 		}
 	}
@@ -35,5 +37,5 @@ public class Program extends ASTNode {
 	public Map<String, FuncDecl> getFunctions() {
 		return Collections.unmodifiableMap(functions);
 	}
-	
+
 }

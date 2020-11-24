@@ -1,14 +1,14 @@
 package com.bamless.interpreter.ast.type;
 
 public class FloatType extends Type {
-	
+
 	public FloatType() {
 		super(TypeID.FLOAT, Type.FLOAT_WIDENFACT);
 	}
-	
+
 	/**
-	 * Applying an arithmetic operation on a float would reult in a float if
-	 * the other operand is a float or an int (incompatible otherwise).
+	 * Applying an arithmetic operation on a float would reult in a float if the
+	 * other operand is a float or an int (incompatible otherwise).
 	 */
 	@Override
 	public Type plus(Type other) {
@@ -48,8 +48,8 @@ public class FloatType extends Type {
 	}
 
 	/**
-	 * relational and equality expression over a float resolves to a boolean
-	 * if the other operand is another float or an int
+	 * relational and equality expression over a float resolves to a boolean if the
+	 * other operand is another float or an int
 	 */
 	@Override
 	public Type relationalOp(Type other) {
@@ -64,7 +64,7 @@ public class FloatType extends Type {
 			return Type.BOOLEAN;
 		return null;
 	}
-	
+
 	@Override
 	public Type logicalOp(Type other) {
 		return null;
@@ -74,12 +74,12 @@ public class FloatType extends Type {
 	public boolean isCompatible(Type other) {
 		return other == Type.FLOAT || other == Type.INT;
 	}
-	
+
 	@Override
 	public boolean isArray() {
 		return false;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "FLOAT";

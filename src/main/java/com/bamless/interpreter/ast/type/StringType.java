@@ -5,7 +5,7 @@ public class StringType extends Type {
 	public StringType() {
 		super(TypeID.STRING, Type.NULL_WIDENFACT);
 	}
-	
+
 	@Override
 	public Type plus(Type other) {
 		return Type.STRING;
@@ -52,7 +52,7 @@ public class StringType extends Type {
 	public boolean isCompatible(Type other) {
 		return other == Type.STRING;
 	}
-	
+
 	@Override
 	public boolean isArray() {
 		return false;

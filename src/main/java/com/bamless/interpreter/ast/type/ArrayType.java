@@ -2,12 +2,12 @@ package com.bamless.interpreter.ast.type;
 
 public class ArrayType extends Type {
 	private Type internal;
-	
+
 	protected ArrayType(Type internal) {
 		super(TypeID.ARRAY, Type.NULL_WIDENFACT);
 		this.internal = internal;
 	}
-	
+
 	@Override
 	public Type plus(Type other) {
 		return null;
@@ -52,12 +52,12 @@ public class ArrayType extends Type {
 
 	@Override
 	public boolean isCompatible(Type other) {
-		//array with null internal type represents a generic array
+		// array with null internal type represents a generic array
 		if(other.isArray() && ((ArrayType) other).getInternalType() == null)
 			return true;
 		return this == other;
 	}
-	
+
 	@Override
 	public boolean isArray() {
 		return true;
@@ -67,7 +67,7 @@ public class ArrayType extends Type {
 	public String toString() {
 		return internal + "[]";
 	}
-	
+
 	public Type getInternalType() {
 		return internal;
 	}

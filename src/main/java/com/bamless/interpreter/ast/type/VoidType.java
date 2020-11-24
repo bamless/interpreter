@@ -5,7 +5,7 @@ public class VoidType extends Type {
 	public VoidType() {
 		super(TypeID.VOID, Type.NULL_WIDENFACT);
 	}
-	
+
 	@Override
 	public Type plus(Type other) {
 		return null;

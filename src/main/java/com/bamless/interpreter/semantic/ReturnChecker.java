@@ -35,8 +35,9 @@ import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.Visitable;
 
 /**
- * AST walker that checks if every functions declaring a return type actually returns on every
- * execution path.
+ * AST walker that checks if every functions declaring a return type actually
+ * returns on every execution path.
+ * 
  * @author fabrizio
  *
  */
@@ -55,8 +56,9 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 	public Boolean visit(FuncDecl d, Void arg) {
 		boolean ret = d.getBody().accept(this, arg);
 		if(!ret && d.getType() != Type.VOID) {
-			ErrUtils.semanticError(d.getPosition(), "Function `%s` declares return type of %s, but does not return.",
-					d.getId(), d.getType().toString().toLowerCase());
+			ErrUtils.semanticError(d.getPosition(),
+					"Function `%s` declares return type of %s, but does not return.", d.getId(),
+					d.getType().toString().toLowerCase());
 		}
 		return ret;
 	}
@@ -69,7 +71,8 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 		for(i = 0; i < v.getStmts().length; i++) {
 			Statement s = v.getStmts()[i];
 			ret |= s.accept(this, arg);
-			if(ret) break;
+			if(ret)
+				break;
 		}
 
 		if(i < v.getStmts().length - 1) {
@@ -103,7 +106,6 @@ public class ReturnChecker implements GenericVisitor<Boolean, Void> {
 	public Boolean visit(ReturnStatement r, Void arg) {
 		return true;
 	}
-	
 
 	@Override
 	public Boolean visit(Visitable v, Void arg) {

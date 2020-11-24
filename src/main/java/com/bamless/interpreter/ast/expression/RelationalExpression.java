@@ -6,18 +6,21 @@ import com.bamless.interpreter.visitor.VoidVisitor;
 public class RelationalExpression extends BinaryExpression {
 	public static enum RelationalOperation {
 		LT("<"), GT(">"), LE("<="), GE(">=");
-		
+
 		private String repr;
-		
+
 		private RelationalOperation(String repr) {
 			this.repr = repr;
 		}
-		
+
 		@Override
-		public String toString() { return repr; }
+		public String toString() {
+			return repr;
+		}
 	}
+
 	private RelationalOperation operation;
-	
+
 	public RelationalExpression(RelationalOperation op, Expression left, Expression right) {
 		super(left, right);
 		this.operation = op;
@@ -32,14 +35,14 @@ public class RelationalExpression extends BinaryExpression {
 	public <A> void accept(VoidVisitor<A> v, A arg) {
 		v.visit(this, arg);
 	}
-	
+
 	public RelationalOperation getOperation() {
 		return operation;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "(" + getLeft() +" "+ operation +" "+ getRight() + ")";
+		return "(" + getLeft() + " " + operation + " " + getRight() + ")";
 	}
-	
+
 }

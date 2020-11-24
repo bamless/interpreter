@@ -38,9 +38,9 @@ public class ArrayDecl extends Statement {
 	public Expression[] getDimensions() {
 		return dimensions;
 	}
-	
+
 	public Identifier getId() {
 		return id;
 	}
-	
+
 }

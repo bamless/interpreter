@@ -6,7 +6,7 @@ import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class VarLiteral extends Lvalue {
 	private Identifier id;
-	
+
 	public VarLiteral(Identifier id) {
 		super(id.getPosition());
 		this.id = id;
@@ -25,10 +25,10 @@ public class VarLiteral extends Lvalue {
 	public Identifier getId() {
 		return id;
 	}
-	
+
 	@Override
 	public String toString() {
 		return id.getVal();
 	}
-	
+
 }

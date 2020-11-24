@@ -12,7 +12,7 @@ public class Substr extends Native<String> {
 
 	@Override
 	public String call(Interpreter i, Object... args) {
-		return ((String)args[0]).substring((int)args[1], (int)args[2]);
+		return ((String) args[0]).substring((int) args[1], (int) args[2]);
 	}
 
 }

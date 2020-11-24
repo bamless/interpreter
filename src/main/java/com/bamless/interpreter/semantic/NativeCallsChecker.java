@@ -21,8 +21,8 @@ public class NativeCallsChecker extends VoidVisitorAdapter<Void> {
 		for(String s : p.getFunctions().keySet()) {
 			FuncDecl f = p.getFunctions().get(s);
 			if(natives.containsKey(s)) {
-				ErrUtils.semanticError(f.getPosition(), 
-						"Double declaration of native function %s", s);
+				ErrUtils.semanticError(f.getPosition(), "Double declaration of native function %s",
+						s);
 			}
 			f.accept(this, null);
 		}
@@ -33,9 +33,9 @@ public class NativeCallsChecker extends VoidVisitorAdapter<Void> {
 		for(Expression a : f.getArgs()) {
 			a.accept(this, arg);
 		}
-		
+
 		if(natives.containsKey(f.getFuncName().getVal()))
 			f.setNative(true);
 	}
-	
+
 }

@@ -7,7 +7,7 @@ import com.bamless.interpreter.visitor.VoidVisitor;
 public class FormalArg extends ASTNode {
 	private Type type;
 	private Identifier id;
-	
+
 	public FormalArg(Position pos, Type type, Identifier id) {
 		super(pos);
 		this.type = type;
@@ -18,7 +18,7 @@ public class FormalArg extends ASTNode {
 	public <A> void accept(VoidVisitor<A> v, A arg) {
 		v.visit(this, arg);
 	}
-	
+
 	@Override
 	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
 		return v.visit(this, arg);
@@ -31,10 +31,10 @@ public class FormalArg extends ASTNode {
 	public Identifier getIdentifier() {
 		return id;
 	}
-	
+
 	@Override
 	public String toString() {
 		return type + " " + id.getVal();
 	}
-	
+
 }

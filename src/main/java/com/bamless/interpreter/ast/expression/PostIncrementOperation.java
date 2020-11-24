@@ -5,7 +5,7 @@ import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class PostIncrementOperation extends PostFixExpression {
 	private IncrementOperator op;
-	
+
 	public PostIncrementOperation(IncrementOperator op, Expression e) {
 		super(e);
 		this.op = op;
@@ -20,14 +20,14 @@ public class PostIncrementOperation extends PostFixExpression {
 	public <A> void accept(VoidVisitor<A> v, A arg) {
 		v.visit(this, arg);
 	}
-	
+
 	public IncrementOperator getOperator() {
 		return op;
 	}
-	
+
 	@Override
 	public String toString() {
 		return getExpression() + op.toString();
 	}
-	
+
 }

@@ -43,17 +43,17 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 		for(String id : p.getFunctions().keySet()) {
 			p.getFunctions().get(id).accept(this, arg);
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public T visit(IfStatement v, A arg) {
 		v.getCondition().accept(this, arg);
 		v.getThenStmt().accept(this, arg);
 		if(v.getElseStmt() != null)
 			v.getElseStmt().accept(this, arg);
-		
+
 		return null;
 	}
 
@@ -61,11 +61,10 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(WhileStatement v, A arg) {
 		v.getCondition().accept(this, arg);
 		v.getBody().accept(this, null);
-		
+
 		return null;
 	}
 
-	
 	@Override
 	public T visit(ForStatement v, A arg) {
 		if(v.getInit() != null)
@@ -75,7 +74,7 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 		if(v.getAct() != null)
 			v.getAct().accept(this, arg);
 		v.getBody().accept(this, arg);
-		
+
 		return null;
 	}
 
@@ -84,30 +83,30 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 		for(Statement s : v.getStmts()) {
 			s.accept(this, arg);
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public T visit(PrintStatement p, A arg) {
 		p.getExpression().accept(this, arg);
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public T visit(ReturnStatement r, A arg) {
 		if(r.getExpression() != null)
 			r.getExpression().accept(this, arg);
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public T visit(BreakStatement b, A arg) {
 		return null;
 	}
-	
+
 	@Override
 	public T visit(ContinueStatement c, A arg) {
 		return null;
@@ -117,16 +116,16 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(VarDecl v, A arg) {
 		if(v.getInitializer() != null)
 			v.getInitializer().accept(this, arg);
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public T visit(ArrayDecl a, A arg) {
 		for(Expression e : a.getDimensions()) {
 			e.accept(this, arg);
 		}
-		
+
 		return null;
 	}
 
@@ -134,7 +133,7 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(ArithmeticBinExpression e, A arg) {
 		e.getLeft().accept(this, arg);
 		e.getRight().accept(this, arg);
-		
+
 		return null;
 	}
 
@@ -142,15 +141,15 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(LogicalExpression l, A arg) {
 		l.getLeft().accept(this, arg);
 		l.getRight().accept(this, arg);
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public T visit(RelationalExpression r, A arg) {
 		r.getLeft().accept(this, arg);
 		r.getRight().accept(this, arg);
-		
+
 		return null;
 	}
 
@@ -158,7 +157,7 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(EqualityExpression e, A arg) {
 		e.getLeft().accept(this, arg);
 		e.getRight().accept(this, arg);
-		
+
 		return null;
 	}
 
@@ -167,7 +166,7 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 		n.getExpression().accept(this, arg);
 		return null;
 	}
-	
+
 	@Override
 	public T visit(PostIncrementOperation p, A arg) {
 		p.getExpression().accept(this, arg);
@@ -184,17 +183,17 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(AssignExpression e, A arg) {
 		e.getLvalue().accept(this, arg);
 		e.getExpression().accept(this, arg);
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public T visit(CastExpression c, A arg) {
 		c.getExpression().accept(this, arg);
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public T visit(FloatLiteral f, A arg) {
 		return null;
@@ -209,7 +208,7 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(BooleanLiteral b, A arg) {
 		return null;
 	}
-	
+
 	@Override
 	public T visit(StringLiteral s, A arg) {
 		return null;
@@ -224,16 +223,16 @@ public class VisitorAdapter<T, A> implements GenericVisitor<T, A> {
 	public T visit(ArrayAccess a, A arg) {
 		a.getLvalue().accept(this, arg);
 		a.getIndex().accept(this, arg);
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public T visit(FuncCallExpression f, A arg) {
 		for(Expression e : f.getArgs()) {
 			e.accept(this, arg);
 		}
-		
+
 		return null;
 	}
 

@@ -13,7 +13,6 @@ public class ArrayAccess extends Lvalue {
 		this.index = index;
 	}
 
-
 	@Override
 	public <T, A> T accept(GenericVisitor<T, A> v, A arg) {
 		return v.visit(this, arg);
@@ -23,19 +22,19 @@ public class ArrayAccess extends Lvalue {
 	public <A> void accept(VoidVisitor<A> v, A arg) {
 		v.visit(this, arg);
 	}
-	
+
 	public Expression getLvalue() {
 		return lvalue;
 	}
-	
+
 	public Expression getIndex() {
 		return index;
 	}
-	
+
 	@Override
 	public String toString() {
 		boolean par = lvalue instanceof AssignExpression;
 		return (par ? "(" : "") + lvalue + (par ? ")" : "") + "[" + index + "]";
 	}
-	
+
 }

@@ -9,10 +9,11 @@ public class ForStatement extends Statement {
 	private Statement init;
 	private Expression cond;
 	private Expression act;
-	
+
 	private Statement body;
 
-	public ForStatement(Position start, Statement init, Expression cond, Expression act, Statement body) {
+	public ForStatement(Position start, Statement init, Expression cond, Expression act,
+			Statement body) {
 		super(start);
 		this.init = init;
 		this.cond = cond;
@@ -41,9 +42,9 @@ public class ForStatement extends Statement {
 	public Expression getAct() {
 		return act;
 	}
-	
+
 	public Statement getBody() {
 		return body;
 	}
-	
+
 }

@@ -19,7 +19,7 @@ public class LogicalNotExpression extends UnaryExpression {
 	public <A> void accept(VoidVisitor<A> v, A arg) {
 		v.visit(this, arg);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "!(" + getExpression() + ")";

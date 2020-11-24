@@ -31,38 +31,60 @@ import com.bamless.interpreter.ast.statement.WhileStatement;
 
 public interface VoidVisitor<A> {
 	void visit(Visitable v, A arg);
-	
+
 	void visit(Program p, A arg);
-	
+
 	void visit(IfStatement i, A arg);
+
 	void visit(WhileStatement w, A arg);
+
 	void visit(ForStatement f, A arg);
+
 	void visit(BlockStatement b, A arg);
+
 	void visit(PrintStatement p, A arg);
+
 	void visit(ReturnStatement r, A arg);
+
 	void visit(BreakStatement b, A arg);
+
 	void visit(ContinueStatement c, A arg);
-	
+
 	void visit(VarDecl v, A arg);
+
 	void visit(ArrayDecl a, A arg);
-	
+
 	void visit(ArithmeticBinExpression e, A arg);
+
 	void visit(LogicalExpression l, A arg);
+
 	void visit(RelationalExpression r, A arg);
+
 	void visit(EqualityExpression e, A arg);
+
 	void visit(LogicalNotExpression n, A arg);
+
 	void visit(PostIncrementOperation p, A arg);
+
 	void visit(PreIncrementOperation p, A arg);
+
 	void visit(AssignExpression e, A arg);
+
 	void visit(CastExpression c, A arg);
-	
+
 	void visit(FloatLiteral f, A arg);
+
 	void visit(IntegerLiteral i, A arg);
+
 	void visit(BooleanLiteral b, A arg);
+
 	void visit(StringLiteral s, A arg);
+
 	void visit(VarLiteral v, A arg);
+
 	void visit(ArrayAccess a, A arg);
+
 	void visit(FuncCallExpression f, A arg);
-	
+
 	void visit(FuncDecl d, A arg);
 }

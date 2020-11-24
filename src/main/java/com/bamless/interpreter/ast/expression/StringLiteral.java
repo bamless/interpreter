@@ -7,7 +7,7 @@ import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class StringLiteral extends Expression {
 	private String value;
-	
+
 	public StringLiteral(Position pos, String value) {
 		super(pos);
 		this.value = value;
@@ -23,11 +23,11 @@ public class StringLiteral extends Expression {
 	public <A> void accept(VoidVisitor<A> v, A arg) {
 		v.visit(this, null);
 	}
-	
+
 	public String getValue() {
 		return value;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "\"" + value.replaceAll("\n", "\\\\n") + "\"";

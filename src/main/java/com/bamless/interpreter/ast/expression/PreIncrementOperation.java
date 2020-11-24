@@ -6,7 +6,7 @@ import com.bamless.interpreter.visitor.VoidVisitor;
 
 public class PreIncrementOperation extends UnaryExpression {
 	private IncrementOperator op;
-	
+
 	public PreIncrementOperation(IncrementOperator op, Expression e, Position pos) {
 		super(e, pos);
 		this.op = op;
@@ -25,10 +25,10 @@ public class PreIncrementOperation extends UnaryExpression {
 	public IncrementOperator getOperator() {
 		return op;
 	}
-	
+
 	@Override
 	public String toString() {
 		return op.toString() + getExpression();
 	}
-	
+
 }

@@ -25,22 +25,26 @@ import com.bamless.interpreter.visitor.VoidVisitorAdapter;
 
 /**
  * AST walker that checks for various context sensitive constrains, such as
- * declaration of variables/functions before use, initialization of variables, 
+ * declaration of variables/functions before use, initialization of variables,
  * correct number of arguments passed to functions, etc...
  * 
  * @author fabrizio
  *
  */
 public class SemanticChecker extends VoidVisitorAdapter<Void> {
-	/** Marker object used to denote the presence of an identifier in the 'varDecl'
-	 * symboltable */
+	/**
+	 * Marker object used to denote the presence of an identifier in the 'varDecl'
+	 * symboltable
+	 */
 	private static final Object DECL = new Object();
-	/** Symbol table to keep track of declared variables. The Object associated with
-	 * the identidfier is used as a marker. */
+	/**
+	 * Symbol table to keep track of declared variables. The Object associated with
+	 * the identidfier is used as a marker.
+	 */
 	private SymbolTable<Object> varDecl;
 	/** Symbol table to keep track of initialized variables. */
 	private SymbolTable<Boolean> init;
-	
+
 	private Map<String, FuncDecl> funcs;
 
 	public SemanticChecker() {
@@ -52,20 +56,20 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 	public void visit(Program p, Void arg) {
 		this.funcs = p.getFunctions();
 
-		if (funcs.get(Interpreter.MAIN_FUNC) == null)
+		if(funcs.get(Interpreter.MAIN_FUNC) == null)
 			ErrUtils.semanticError(p.getPosition(), "Could not find main function");
 
-		for (String id : funcs.keySet()) {
+		for(String id : funcs.keySet()) {
 			funcs.get(id).accept(this, arg);
 		}
 	}
-	
+
 	@Override
 	public void visit(FuncDecl d, Void arg) {
 		varDecl.enterScope();
 		init.enterScope();
 
-		for (FormalArg a : d.getFormalArgs()) {
+		for(FormalArg a : d.getFormalArgs()) {
 			varDecl.define(a.getIdentifier().getVal(), DECL);
 			init.define(a.getIdentifier().getVal(), true);
 		}
@@ -79,8 +83,8 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 	@Override
 	public void visit(BlockStatement v, Void arg) {
 		varDecl.enterScope();
-		for (Statement s : v.getStmts()) {
-			if (s instanceof Expression && !hasSideEffect((Expression) s)) {
+		for(Statement s : v.getStmts()) {
+			if(s instanceof Expression && !hasSideEffect((Expression) s)) {
 				ErrUtils.semanticError(s.getPosition(), "Statement without effect.");
 			}
 			s.accept(this, null);
@@ -90,34 +94,39 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(ForStatement v, Void arg) {
-		if (v.getInit() != null && (v.getInit() instanceof Expression && !hasSideEffect((Expression) v.getInit()))) {
+		if(v.getInit() != null && (v.getInit() instanceof Expression
+				&& !hasSideEffect((Expression) v.getInit()))) {
 			ErrUtils.warn("Warning %s: computed value is not used", v.getInit().getPosition());
 		}
-		if (v.getAct() != null && !hasSideEffect(v.getAct())) {
+		if(v.getAct() != null && !hasSideEffect(v.getAct())) {
 			ErrUtils.warn("Warning %s: computed value is not used", v.getAct().getPosition());
 		}
-		
+
 		boolean forDecl = v.getInit() instanceof VarDecl;
-		
-		if(forDecl) varDecl.enterScope();
-		if(forDecl) init.enterScope();
-		
-		if (v.getInit() != null)
+
+		if(forDecl)
+			varDecl.enterScope();
+		if(forDecl)
+			init.enterScope();
+
+		if(v.getInit() != null)
 			v.getInit().accept(this, arg);
 
 		init.enterScope();
 
-		if (v.getCond() != null)
+		if(v.getCond() != null)
 			v.getCond().accept(this, arg);
-		if (v.getAct() != null)
+		if(v.getAct() != null)
 			v.getAct().accept(this, arg);
 
 		v.getBody().accept(this, arg);
 
 		init.exitScope();
-		
-		if(forDecl) init.exitScope();
-		if(forDecl) varDecl.exitScope();
+
+		if(forDecl)
+			init.exitScope();
+		if(forDecl)
+			varDecl.exitScope();
 	}
 
 	@Override
@@ -128,7 +137,7 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 		v.getThenStmt().accept(this, arg);
 		init.exitScope();
 
-		if (v.getElseStmt() != null) {
+		if(v.getElseStmt() != null) {
 			init.enterScope();
 			v.getElseStmt().accept(this, arg);
 			init.exitScope();
@@ -148,13 +157,14 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 	public void visit(VarDecl v, Void arg) {
 		// we considered declaring a variable with the same name of another variable in
 		// an outer scope an error
-		if (varDecl.lookup(v.getId().getVal()) != null)
-			ErrUtils.semanticError(v.getPosition(), "double declaration of variable %s", v.getId().getVal());
+		if(varDecl.lookup(v.getId().getVal()) != null)
+			ErrUtils.semanticError(v.getPosition(), "double declaration of variable %s",
+					v.getId().getVal());
 
 		varDecl.define(v.getId().getVal(), DECL);
 		init.define(v.getId().getVal(), false);
 
-		if (v.getInitializer() != null)
+		if(v.getInitializer() != null)
 			v.getInitializer().accept(this, arg);
 	}
 
@@ -163,26 +173,29 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 		try {
 			varDecl.define(a.getId().getVal(), DECL);
 		} catch (IllegalArgumentException e) {
-			ErrUtils.semanticError(a.getPosition(), "double declaration of variable %s", a.getId().getVal());
+			ErrUtils.semanticError(a.getPosition(), "double declaration of variable %s",
+					a.getId().getVal());
 		}
 		// true because arrays get initialized automagically
 		init.define(a.getId().getVal(), true);
 
-		for (Expression e : a.getDimensions()) {
+		for(Expression e : a.getDimensions()) {
 			e.accept(this, arg);
 		}
 	}
 
 	@Override
 	public void visit(AssignExpression e, Void arg) {
-		if (!(e.getLvalue() instanceof Lvalue))
-			ErrUtils.semanticError(e.getPosition(), "left hand side of assignement must be an lvalue");
+		if(!(e.getLvalue() instanceof Lvalue))
+			ErrUtils.semanticError(e.getPosition(),
+					"left hand side of assignement must be an lvalue");
 
-		if (e.getLvalue() instanceof VarLiteral) {
+		if(e.getLvalue() instanceof VarLiteral) {
 			VarLiteral v = (VarLiteral) e.getLvalue();
 
-			if (varDecl.lookup(v.getId().getVal()) == null) {
-				ErrUtils.semanticError(v.getId().getPosition(), "variable %s cannot be resolved", v.getId().getVal());
+			if(varDecl.lookup(v.getId().getVal()) == null) {
+				ErrUtils.semanticError(v.getId().getPosition(), "variable %s cannot be resolved",
+						v.getId().getVal());
 			}
 
 			e.getExpression().accept(this, arg);
@@ -198,39 +211,43 @@ public class SemanticChecker extends VoidVisitorAdapter<Void> {
 
 	@Override
 	public void visit(PreIncrementOperation p, Void arg) {
-		if (!(p.getExpression() instanceof Lvalue))
-			ErrUtils.semanticError(p.getPosition(), "left hand side of assignement must be an lvalue");
+		if(!(p.getExpression() instanceof Lvalue))
+			ErrUtils.semanticError(p.getPosition(),
+					"left hand side of assignement must be an lvalue");
 
 		p.getExpression().accept(this, arg);
 	}
 
 	@Override
 	public void visit(PostIncrementOperation p, Void arg) {
-		if (!(p.getExpression() instanceof Lvalue))
-			ErrUtils.semanticError(p.getPosition(), "left hand side of assignement must be an lvalue");
+		if(!(p.getExpression() instanceof Lvalue))
+			ErrUtils.semanticError(p.getPosition(),
+					"left hand side of assignement must be an lvalue");
 
 		p.getExpression().accept(this, arg);
 	}
 
 	@Override
 	public void visit(VarLiteral v, Void arg) {
-		if (varDecl.lookup(v.getId().getVal()) == null)
-			ErrUtils.semanticError(v.getPosition(), "variable %s cannot be resolved", v.getId().getVal());
-
-		if (!init.lookup(v.getId().getVal()))
-			ErrUtils.semanticError(v.getId().getPosition(), "the local variable %s may not have been initialized",
+		if(varDecl.lookup(v.getId().getVal()) == null)
+			ErrUtils.semanticError(v.getPosition(), "variable %s cannot be resolved",
 					v.getId().getVal());
+
+		if(!init.lookup(v.getId().getVal()))
+			ErrUtils.semanticError(v.getId().getPosition(),
+					"the local variable %s may not have been initialized", v.getId().getVal());
 	}
 
 	@Override
 	public void visit(FuncCallExpression f, Void arg) {
-		for (Expression e : f.getArgs())
+		for(Expression e : f.getArgs())
 			e.accept(this, arg);
 
 		FuncDecl decl = funcs.get(f.getFuncName().getVal());
 
-		if (decl == null && !f.isNative())
-			ErrUtils.semanticError(f.getPosition(), "Use of undeclared function `%s`.", f.getFuncName());
+		if(decl == null && !f.isNative())
+			ErrUtils.semanticError(f.getPosition(), "Use of undeclared function `%s`.",
+					f.getFuncName());
 	}
 
 	private boolean hasSideEffect(Expression e) {

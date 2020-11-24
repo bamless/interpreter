@@ -13,7 +13,7 @@ public class PrintStatement extends Statement {
 		super(start);
 		this.e = e;
 	}
-	
+
 	public PrintStatement(Position start, Expression e, boolean newLine) {
 		super(start);
 		this.e = e;
@@ -33,9 +33,9 @@ public class PrintStatement extends Statement {
 	public Expression getExpression() {
 		return e;
 	}
-	
+
 	public boolean isNweLine() {
 		return newLine;
 	}
-	
+
 }

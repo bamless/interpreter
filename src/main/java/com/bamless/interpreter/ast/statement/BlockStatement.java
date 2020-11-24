@@ -18,7 +18,7 @@ public class BlockStatement extends Statement {
 	public <A> void accept(VoidVisitor<A> v, A arg) {
 		v.visit(this, arg);
 	}
-	
+
 	public Statement[] getStmts() {
 		return stmts;
 	}
