@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import com.bamless.interpreter.visitor.Visitable;
 
+@SuppressWarnings("serial")
 public abstract class ASTNode implements Visitable, Serializable {
     private transient Position start;
 

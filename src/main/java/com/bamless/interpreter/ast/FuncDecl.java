@@ -7,6 +7,7 @@ import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
+@SuppressWarnings("serial")
 public class FuncDecl extends ASTNode {
     private static final FormalArg[] VOID_ARGS = new FormalArg[0];
 

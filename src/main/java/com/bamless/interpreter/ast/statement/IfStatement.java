@@ -5,6 +5,7 @@ import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
+@SuppressWarnings("serial")
 public class IfStatement extends Statement {
     private Expression condition;
     private Statement thenStmt;

@@ -3,6 +3,7 @@ package com.bamless.interpreter.ast.expression;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
+@SuppressWarnings("serial")
 public class AssignExpression extends Expression {
     private Expression lvalue;
     private Expression e;

@@ -1,5 +1,6 @@
 package com.bamless.interpreter.ast.expression;
 
+@SuppressWarnings("serial")
 public abstract class BinaryExpression extends Expression {
     private Expression left;
     private Expression right;

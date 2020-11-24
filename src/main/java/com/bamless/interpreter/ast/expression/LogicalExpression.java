@@ -3,6 +3,7 @@ package com.bamless.interpreter.ast.expression;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
+@SuppressWarnings("serial")
 public class LogicalExpression extends BinaryExpression {
     public static enum BooleanBinOperation {
         OR("||"), AND("&&");

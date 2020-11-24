@@ -5,6 +5,7 @@ import com.bamless.interpreter.ast.expression.Expression;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
+@SuppressWarnings("serial")
 public class ForStatement extends Statement {
     private Statement init;
     private Expression cond;

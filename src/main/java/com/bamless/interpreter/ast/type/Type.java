@@ -3,6 +3,7 @@ package com.bamless.interpreter.ast.type;
 import java.io.Serializable;
 import java.util.HashMap;
 
+@SuppressWarnings("serial")
 public abstract class Type implements Serializable {
     /** Singleton types */
     public static final Type INT = new IntType();

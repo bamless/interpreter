@@ -1,5 +1,6 @@
 package com.bamless.interpreter.ast.type;
 
+@SuppressWarnings("serial")
 public class StringType extends Type {
 
     public StringType() {

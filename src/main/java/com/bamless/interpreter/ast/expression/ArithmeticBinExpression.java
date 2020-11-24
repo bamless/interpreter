@@ -3,6 +3,7 @@ package com.bamless.interpreter.ast.expression;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
+@SuppressWarnings("serial")
 public class ArithmeticBinExpression extends BinaryExpression {
     public static enum ArithmeticBinOperation {
         PLUS("+"), MINUS("-"), MULT("*"), DIV("/"), MOD("%");

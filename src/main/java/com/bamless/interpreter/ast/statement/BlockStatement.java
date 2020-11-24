@@ -6,6 +6,7 @@ import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
+@SuppressWarnings("serial")
 public class BlockStatement extends Statement {
     private Statement[] stmts;
 

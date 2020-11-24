@@ -4,6 +4,7 @@ import com.bamless.interpreter.ast.Identifier;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
+@SuppressWarnings("serial")
 public class VarLiteral extends Lvalue {
     private Identifier id;
 

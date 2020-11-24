@@ -4,6 +4,7 @@ import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.ast.statement.Statement;
 import com.bamless.interpreter.ast.type.Type;
 
+@SuppressWarnings("serial")
 public abstract class Expression extends Statement {
     private Type type;
 

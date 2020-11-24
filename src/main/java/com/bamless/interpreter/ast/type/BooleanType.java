@@ -1,11 +1,12 @@
 package com.bamless.interpreter.ast.type;
 
 /**
- * Can only use equality operations over a boolean, and the other
- * operand must also be a boolean.
+ * Can only use equality operations over a boolean, and the other operand must
+ * also be a boolean.
  */
+@SuppressWarnings("serial")
 public class BooleanType extends Type {
-    
+
     protected BooleanType() {
         super(TypeID.BOOLEAN, Type.NULL_WIDENFACT);
     }
@@ -46,18 +47,18 @@ public class BooleanType extends Type {
     public Type equalityOp(Type other) {
         if(other == Type.BOOLEAN)
             return Type.BOOLEAN;
-        
+
         return null;
     }
-    
+
     @Override
     public Type logicalOp(Type other) {
         if(other == Type.BOOLEAN)
             return Type.BOOLEAN;
-        
+
         return null;
     }
-    
+
     @Override
     public boolean isArray() {
         return false;
@@ -67,7 +68,7 @@ public class BooleanType extends Type {
     public boolean isCompatible(Type other) {
         return other == Type.BOOLEAN;
     }
-    
+
     @Override
     public String toString() {
         return "BOOLEAN";

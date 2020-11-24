@@ -2,6 +2,7 @@ package com.bamless.interpreter.ast;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class Identifier implements Serializable {
     private transient Position position;
     private String id;

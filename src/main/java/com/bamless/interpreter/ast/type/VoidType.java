@@ -1,5 +1,6 @@
 package com.bamless.interpreter.ast.type;
 
+@SuppressWarnings("serial")
 public class VoidType extends Type {
 
     public VoidType() {

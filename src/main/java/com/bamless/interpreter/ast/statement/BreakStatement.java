@@ -4,6 +4,7 @@ import com.bamless.interpreter.ast.Position;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
+@SuppressWarnings("serial")
 public class BreakStatement extends Statement {
 
     public BreakStatement(Position start) {

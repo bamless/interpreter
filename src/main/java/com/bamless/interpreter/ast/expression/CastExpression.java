@@ -5,6 +5,7 @@ import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
+@SuppressWarnings("serial")
 public class CastExpression extends UnaryExpression {
 
     public CastExpression(Type castType, Expression e, Position pos) {

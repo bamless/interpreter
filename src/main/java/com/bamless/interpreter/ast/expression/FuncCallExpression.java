@@ -5,6 +5,7 @@ import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 import java.util.Collection;
 
+@SuppressWarnings("serial")
 public class FuncCallExpression extends Expression {
     private static final Expression[] VOID_ARGS = new Expression[0];
 

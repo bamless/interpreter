@@ -2,6 +2,7 @@ package com.bamless.interpreter.ast.expression;
 
 import com.bamless.interpreter.ast.Position;
 
+@SuppressWarnings("serial")
 public abstract class UnaryExpression extends Expression {
     private Expression expression;
 

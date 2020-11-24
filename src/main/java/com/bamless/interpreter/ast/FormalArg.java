@@ -4,6 +4,7 @@ import com.bamless.interpreter.ast.type.Type;
 import com.bamless.interpreter.visitor.GenericVisitor;
 import com.bamless.interpreter.visitor.VoidVisitor;
 
+@SuppressWarnings("serial")
 public class FormalArg extends ASTNode {
     private Type type;
     private Identifier id;
